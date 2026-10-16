@@ -6,7 +6,7 @@ export const COMPANY = {
 // key = canonical id; aliases are accepted spellings (normalized compare).
 export const VENDORS = {
   "andes-dev": { name: "Andes Dev Studio SAS", aliases: ["Andes Dev Studio"], country: "CO", currency: "COP", lang: "es",
-    acct: "CO-FAKE-1001", agreement: "Desarrollo de software: COP 180.000 por hora, máximo 60 horas al mes. Sin cargos adicionales." },
+    acct: "CO-FAKE-1001", agreement: "Desarrollo de software: COP 180.000 por hora, máximo 120 horas al mes. Sin cargos adicionales." },
   "pixel-norte": { name: "Pixel Norte S.A. de C.V.", aliases: ["Pixel Norte"], country: "MX", currency: "MXN", lang: "es",
     acct: "MX-FAKE-2002", agreement: "Diseño UI: tarifa fija MXN 28,000.00 por mes." },
   "sampa-cloud": { name: "Sampa Cloud Serviços Ltda", aliases: ["Sampa Cloud"], country: "BR", currency: "BRL", lang: "pt",
@@ -24,7 +24,7 @@ export const VENDORS = {
 };
 // Already paid in September (for duplicate questions).
 export const HISTORY = [
-  { vendor: "pixel-norte", number: "PN-0925", date: "2026-09-30", amount: 28000, currency: "MXN", lines: "Diseño UI septiembre 2026, tarifa fija" },
-  { vendor: "sampa-cloud", number: "SC-2026-09", date: "2026-09-01", amount: 2400, currency: "BRL", lines: "Hospedagem setembro 2026" },
-  { vendor: "maria-qa", number: "MFR-09", date: "2026-09-30", amount: 1600, currency: "USD", lines: "QA services September 2026" },
+  { vendor: "pixel-norte", number: "PN-0925", date: "2026-09-30", period: "2026-09", amount: 28000, currency: "MXN", lines: "Diseño UI septiembre 2026, tarifa fija" },
+  { vendor: "sampa-cloud", number: "SC-2026-09", date: "2026-09-01", period: "2026-09", amount: 2400, currency: "BRL", lines: "Hospedagem setembro 2026" },
+  { vendor: "maria-qa", number: "MFR-09", date: "2026-09-30", period: "2026-09", amount: 1600, currency: "USD", lines: "QA services September 2026" },
 ];

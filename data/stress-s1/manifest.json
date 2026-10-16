@@ -63,6 +63,7 @@
   "amount": 3250,
   "lines": "5 horas de consultoria x 650",
   "format": "email",
+  "dupOf": "G1-001",
   "file": "G1-003.email.txt"
  },
  {
@@ -107,6 +108,7 @@
   "amount": 3250,
   "lines": "5 horas de consultoria x 650",
   "format": "email",
+  "dupOf": "G1-001",
   "file": "G1-005.email.txt"
  },
  {
@@ -129,6 +131,7 @@
   "amount": 2400,
   "lines": "Hospedagem mensal 2026-10 #1",
   "format": "chat",
+  "dupOf": "G1-002",
   "file": "G1-006.chat.txt"
  },
  {
@@ -217,6 +220,7 @@
   "amount": 28000,
   "lines": "Diseño UI mensual 2026-10 #9",
   "format": "pdf",
+  "dupOf": "G1-004",
   "file": "G1-010.pdf"
  },
  {
@@ -396,6 +400,7 @@
   "amount": 28000,
   "lines": "Diseño UI mensual 2026-10 #9",
   "format": "pdf",
+  "dupOf": "G1-010",
   "file": "G1-018.pdf"
  },
  {
@@ -440,6 +445,7 @@
   "amount": 2400,
   "lines": "Hospedagem mensal 2026-10 #19",
   "format": "chat",
+  "dupOf": "G1-011",
   "file": "G1-020.chat.txt"
  },
  {
@@ -706,6 +712,7 @@
   "amount": 950000,
   "lines": "Licencia analítica mensual 2026-10 #31",
   "format": "email",
+  "dupOf": "G1-019",
   "file": "G1-032.email.txt"
  },
  {
@@ -728,6 +735,7 @@
   "amount": 950000,
   "lines": "Licencia analítica mensual 2026-10 #32",
   "format": "image",
+  "dupOf": "G1-019",
   "file": "G1-033.png"
  },
  {
@@ -750,6 +758,7 @@
   "amount": 28000,
   "lines": "Diseño UI mensual 2026-10 #9 (reenvío)",
   "format": "email",
+  "dupOf": "G1-018",
   "file": "G1-034.email.txt"
  },
  {
@@ -791,7 +800,7 @@
    "trap:agreement-mismatch"
   ],
   "number": "RI-1035",
-  "amount": 2633,
+  "amount": 2194,
   "lines": "3 horas de consultoria x 650 + cargo adicional no pactado",
   "format": "chat",
   "file": "G1-036.chat.txt"

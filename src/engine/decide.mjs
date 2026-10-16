@@ -2,7 +2,26 @@
 // A model answer can only add reasons to hold/escalate — it can never override a rule to authorize payment.
 import { VENDORS, HISTORY } from "../data/vendors.mjs";
 
-export const newLedger = () => ({ seen: HISTORY.map((h) => ({ ...h })), spentUsd: 0, vendorPaidUsd: {} });
+export const newLedger = () => ({ seen: HISTORY.map((h) => ({ ...h, paid: true })), spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} });
+const days = (a, b) => (a && b ? Math.abs(Date.parse(a) - Date.parse(b)) / 864e5 : Infinity);
+
+/** Agreement check in code (config.agreements). Returns {fail?: reason, units?} */
+export function agreementCheck(x, ledger, rules) {
+  const a = rules.agreements?.[x.vendorKey];
+  if (!a) return { fail: "No hay acuerdo configurado para este proveedor." };
+  if (x.currency !== a.currency) return { fail: `Moneda ${x.currency} distinta a la pactada (${a.currency}).` };
+  if (a.type === "flat") {
+    if (Math.abs(x.amount - a.amount) > 0.005) return { fail: `Monto ${x.amount} distinto a la tarifa fija pactada (${a.currency} ${a.amount}).` };
+    if (ledger.seen.some((h) => h.paid && h.vendor === x.vendorKey && (h.period ?? rules.period) === rules.period))
+      return { fail: `La tarifa mensual de ${rules.period} ya fue pagada (posible duplicado).` };
+    return {};
+  }
+  const units = x.amount / a.rate;
+  if (Math.abs(units - Math.round(units)) > 1e-6) return { fail: `El monto no corresponde a horas completas a la tarifa pactada (${a.currency} ${a.rate}/h).` };
+  const used = ledger.unitsPaid[x.vendorKey] ?? 0;
+  if (used + units > a.max_units_per_period) return { fail: `Superaría las ${a.max_units_per_period} horas pactadas en el período (ya pagadas ${used}, factura ${Math.round(units)}).` };
+  return { units: Math.round(units) };
+}
 const nnum = (s) => (s ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 export const toUsd = (amt, cur, rules) => (rules.fx_to_usd[cur] != null ? amt * rules.fx_to_usd[cur] : null);
 
@@ -30,6 +49,16 @@ export function hardChecks(x, ledger, rules) {
   if (x.payee && !v) esc.push(`Beneficiario "${x.payee}" no está en la lista de proveedores autorizados.`);
   if (v && x.acct && x.acct !== v.acct) hold.push(`La cuenta ${x.acct} no coincide con la registrada para ${v.name.replace(/\.$/, "")}.`);
   if (v && x.number && ledger.seen.some((h) => h.vendor === x.vendorKey && nnum(h.number) === nnum(x.number))) hold.push(`Duplicado exacto: ${v.name} ya presentó la factura ${x.number}.`);
+  if (v && x.number) {
+    const n = nnum(x.number);
+    const near = ledger.seen.filter((h) => h.vendor === x.vendorKey && nnum(h.number) !== n);
+    if (near.some((h) => { const m = nnum(h.number); return m.length >= 4 && (n.startsWith(m) || m.startsWith(n)); }))
+      esc.push("Número de factura muy parecido a otra del mismo proveedor (posible reenvío).");
+    const sameAmt = near.filter((h) => h.amount === x.amount && h.currency === x.currency && days(h.date, x.date) <= rules.duplicate_window_days);
+    if (sameAmt.some((h) => h.paid)) hold.push(`Posible duplicado: mismo proveedor, monto y fecha cercana que la factura ${sameAmt.find((h) => h.paid).number} ya pagada.`);
+    else if (sameAmt.length) esc.push(`Mismo proveedor y monto que la factura ${sameAmt[0].number} recibida hace poco (posible duplicado por otro canal).`);
+  }
+  if (v && x.amount != null && x.currency) { const ag = agreementCheck(x, ledger, rules); if (ag.fail) hold.push("No cumple el acuerdo: " + ag.fail); }
   if (x.amount != null && x.currency) {
     const usd = toUsd(x.amount, x.currency, rules);
     if (usd == null) esc.push(`Moneda ${x.currency} sin tipo de cambio configurado.`);
@@ -65,9 +94,11 @@ export function decide(x, answers, ledger, rules) {
   else { action = "pay"; reasons = ["Proveedor autorizado, cuenta registrada, cumple el acuerdo, no es duplicado y está dentro de límites y presupuesto."]; }
   // Final invariant: pay only if every hard requirement is present.
   if (action === "pay" && (!x.vendorKey || x.amount == null || !x.currency || !x.due || !x.number || !x.acct)) { action = "escalate"; reasons = ["Invariante de seguridad: faltan datos."]; }
-  if (x.vendorKey && x.number) ledger.seen.push({ vendor: x.vendorKey, number: x.number, date: null, amount: x.amount, currency: x.currency, lines: x.text?.slice(0, 300) });
+  if (x.vendorKey && x.number) ledger.seen.push({ vendor: x.vendorKey, number: x.number, date: x.date, period: x.date?.slice(0, 7), paid: action === "pay", amount: x.amount, currency: x.currency, lines: x.text?.slice(0, 300) });
   if (action === "pay") {
     const usd = toUsd(x.amount, x.currency, rules);
+    const ag = agreementCheck(x, { ...ledger, seen: [] }, rules);
+    if (ag.units) ledger.unitsPaid[x.vendorKey] = (ledger.unitsPaid[x.vendorKey] ?? 0) + ag.units;
     ledger.spentUsd += usd; ledger.vendorPaidUsd[x.vendorKey] = (ledger.vendorPaidUsd[x.vendorKey] ?? 0) + usd;
   }
   return { action, reasons, needsModel: !hold.length };

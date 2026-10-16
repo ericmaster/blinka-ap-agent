@@ -69,8 +69,9 @@ export function extractText(text) {
   const number = after(t, /(?:factura|invoice|fatura|nota fiscal)\s*(?:n[°ºo*]\.?|#|no\.?)?\s*:?\s*([A-Z0-9][A-Z0-9\-/]*\d[A-Z0-9\-/]*)/i);
   const dueRaw = after(t, /(?:vence(?:\s+el)?|due(?: date)?|vencimento|fecha de vencimiento)\s*:?\s*([^\n,]+(?:,\s*\d{4})?)/i);
   const acct = after(t, /(?:cuenta|account|conta)\s*:?\s*([A-Z]{2}-[A-Z0-9]+-\d+)/i);
+  const dateRaw = after(t, /(?:^|\n)\s*(?:fecha|date|data)\s*:\s*([^\n]+)/i) ?? after(t, /^\[(\d{4}-\d{2}-\d{2})/);
   const { amount, currency } = findAmount(t);
   const vendorKey = matchVendor(payeeRaw);
-  return { payee: payeeRaw, vendorKey, number, amount, currency, due: dueRaw ? parseDate(dueRaw) : null, acct,
+  return { payee: payeeRaw, vendorKey, number, amount, currency, due: dueRaw ? parseDate(dueRaw) : null, date: dateRaw ? parseDate(dateRaw) : null, acct,
     injectionSuspected: INJECTION.test(t), text: t.slice(0, 2000) };
 }

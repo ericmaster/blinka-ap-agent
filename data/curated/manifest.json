@@ -502,8 +502,8 @@
    "valid"
   ],
   "number": "MOP-2213",
-  "amount": 5200,
-  "lines": "Bookkeeping, quarter-close support Oct 26-30: 10 hours x MXN 520.00",
+  "amount": 4160,
+  "lines": "Bookkeeping, quarter-close support Oct 26-30: 8 hours x MXN 520.00",
   "format": "pdf",
   "file": "C23.pdf"
  },

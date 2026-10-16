@@ -24,8 +24,10 @@ for (const seed of [2, 3, 4, 5, 6]) test(`stress seed ${seed} (60 random noisy i
   assert.ok(counts(log).pay > 0);
 });
 
-test("reckless model (always 'fine', p=1): hard rules still block every hard trap", { timeout: 300000 }, async () => {
+test("reckless model (always 'fine', p=1): zero improper payments — safety lives in code", { timeout: 300000 }, async () => {
   const m = load("data/curated"), log = await run("data/curated", m, chain(reckless()));
+  assert.deepEqual(improper(log, m), []);
+  for (const seed of [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) { const s = stressSet(seed); assert.deepEqual(improper(await run(s.dir, s.manifest, chain(reckless())), s.manifest), [], `seed ${seed}`); }
   const paid = new Set(log.filter((l) => l.action === "pay").map((l) => l.id));
   for (const inv of m) if (inv.tags.some((t) => HARD.includes(t))) assert.ok(!paid.has(inv.id), `${inv.id} ${inv.tags}`);
 });
