@@ -15,6 +15,13 @@ FASTINO_API_KEY=... JEV_API_KEY=... node scripts/run.mjs data/curated --real   #
 ```
 Reglas configurables: [`config/rules.json`](config/rules.json). Extracción: [`docs/EXTRACTION.md`](docs/EXTRACTION.md). Datos: [`docs/DATASET.md`](docs/DATASET.md).
 
+## Dashboard
+```bash
+npm ci && npm run build && npm start      # http://localhost:8796  (FASTINO_API_KEY / JEV_API_KEY optional; without them every invoice escalates)
+```
+Pendientes / pagadas / frenadas con el porqué, aprobar o rechazar (la aprobación vuelve a verificar las reglas duras), reglas editables, carga de correo/chat/PDF/imagen (OCR en el navegador), prueba de estrés con Autonomía · Pagos indebidos · Explicabilidad, descarga pain.001.
+Cloudflare Workers: `wrangler.toml` (KV `STATE`), `npx wrangler secret put FASTINO_API_KEY`, `npx wrangler deploy`.
+
 ## Evidencia / Evidence
 [`bench/RESULTS.md`](bench/RESULTS.md): 30 facturas sintéticas — GLiDE 100% decisiones correctas, **0 pagos indebidos**.
 
