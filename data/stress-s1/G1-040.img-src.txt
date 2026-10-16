@@ -1,7 +1,0 @@
-Fornecedor: Rio Legal Consultoria Ltda
-Fatura nº RI-1039
-Data: 5 de outubro de 2026
-Vencimento: 15 de outubro de 2026
-Descrição: 5 horas de consultoria x 650
-Total a pagar: BRL 3.250,00
-Conta: BR-FAKE-6006

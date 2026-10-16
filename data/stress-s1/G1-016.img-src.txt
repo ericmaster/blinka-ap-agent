@@ -1,7 +1,0 @@
-Proveedor: Pixel Norte S.A. de C.V.
-Factura N° PI-1015
-Fecha: 11 de octubre de 2026
-Vence: 21 de octubre de 2026
-Concepto: Prepago anual
-Total a pagar: 109.091,00 MXN
-Cuenta: MX-FAKE-2002

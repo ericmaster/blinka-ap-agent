@@ -1,0 +1,7 @@
+Proveedor: Lima Support Desk SAC
+Factura N° LI-1003
+Fecha: 02/10/2026
+Vence: 12/10/2026
+Concepto: 8 horas de soporte x 45
+Total a pagar: PEN 360,00
+Cuenta: PE-FAKE-4004

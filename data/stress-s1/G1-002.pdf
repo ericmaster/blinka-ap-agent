@@ -12,15 +12,15 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
 endobj
 5 0 obj
-<< /Length 291 >>
+<< /Length 295 >>
 stream
 BT /F1 11 Tf 14 TL 50 790 Td
 (Fornecedor: Sampa Cloud Serviços Ltda) Tj T*
 (Fatura nº SA-1001) Tj T*
 (Data: 10 de outubro de 2026) Tj T*
 (Vencimento: 20 de outubro de 2026) Tj T*
-(Descrição: Hospedagem mensal 2026-10 #1) Tj T*
-(Total a pagar: $ 2.400,00) Tj T*
+(Descrição: Equipos de cómputo \(laptops\)) Tj T*
+(Total a pagar: 2.400,00 BRL) Tj T*
 (Conta: BR-FAKE-3003) Tj T*
 ET
 endstream
@@ -36,5 +36,5 @@ xref
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-680
+684
 %%EOF

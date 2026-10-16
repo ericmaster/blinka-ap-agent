@@ -1,5 +1,5 @@
 [2026-10-16 09:46] Camila: hola! te paso la factura PI-1008 de Pixel Norte S.A. de C.V.
-total MXN 109.091,00
+total MXN 28.000,00
 vence 15 de octubre de 2026
-cuenta MX-FAKE-2002
-concepto: Prepago anual
+cuenta MX-FAKE-9008
+concepto: Diseño UI mensual 2026-10 #8

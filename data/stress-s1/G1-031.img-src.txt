@@ -1,0 +1,7 @@
+Fornecedor: Sampa Cloud Serviços Ltda
+Fatura nº SA-1030
+Data: 2026-10-14
+Vencimento: 2026-10-24
+Descrição: Hospedagem mensal 2026-10 #30
+Total a pagar: 2.400,00 BRL
+Conta: BR-FAKE-3003

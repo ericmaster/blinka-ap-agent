@@ -63,6 +63,15 @@ export function matchVendor(name) {
 }
 const INJECTION = /(ignor[ae]?r?|disregard|olvida|esque[cç]a)\b[^\n]{0,40}\b(regla|rule|instruc|regra|polic)|\b(system|sistema)\s*:|\b(aprueba|approve|aprove)\b[^\n]{0,30}\b(ahora|now|agora|inmediato|immediately)|nota para el agente|note to the agent|aten[cç][aã]o agente/i;
 
+/** Line items: description + qty + unit price (e.g. "40 horas x COP 180.000"). */
+export function lineItems(t) {
+  const desc = after(t, /(?:concepto|description|descri[cç][aã]o|for|referente a)\s*:\s*([^\n]+)/i);
+  if (!desc) return [];
+  return desc.split(/\s\+\s|;/).map((d) => {
+    const m = d.match(new RegExp(String.raw`(\d+(?:[.,]\d+)?)\s*(?:horas?|hours?|h)?\s*x\s*${CUR}?\s*${AMT}`, "i"));
+    return { description: d.trim(), qty: m ? parseNumber(m[1]) : 1, unitPrice: m ? parseNumber(m[3]) : null };
+  });
+}
 export function extractText(text) {
   const t = text.replace(/\r/g, "");
   const payeeRaw = after(t, /(?:proveedor|vendor|fornecedor)\s*:\s*([^\n]+)/i) ?? after(t, /(?:factura|invoice|fatura)\s+[A-Z0-9][\w\-/]*\s+(?:de|from|da|do)\s+(.+?)(?:,|\n|$)/i);
@@ -73,5 +82,5 @@ export function extractText(text) {
   const { amount, currency } = findAmount(t);
   const vendorKey = matchVendor(payeeRaw);
   return { payee: payeeRaw, vendorKey, number, amount, currency, due: dueRaw ? parseDate(dueRaw) : null, date: dateRaw ? parseDate(dateRaw) : null, acct,
-    injectionSuspected: INJECTION.test(t), text: t.slice(0, 2000) };
+    injectionSuspected: INJECTION.test(t), items: lineItems(t), text: t.slice(0, 2000) };
 }

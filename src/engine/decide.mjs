@@ -3,6 +3,12 @@
 import { VENDORS, HISTORY } from "../data/vendors.mjs";
 
 export const newLedger = () => ({ seen: HISTORY.map((h) => ({ ...h, paid: true })), spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} });
+// Duplicate fingerprint (FNV-1a, runtime-agnostic): items + vendor + total + currency + date + number + account.
+const fnv = (str) => { let h = 0x811c9dc5; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); };
+const normItems = (items = []) => items.map((i) => [i.description.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), i.qty, i.unitPrice].join("|")).join(";");
+export const itemsKey = (x) => fnv([x.vendorKey, normItems(x.items), x.amount, x.currency].join("#"));
+export const fingerprint = (x) => fnv([itemsKey(x), x.date, nnum(x.number), x.acct].join("#"));
+const kwNorm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const days = (a, b) => (a && b ? Math.abs(Date.parse(a) - Date.parse(b)) / 864e5 : Infinity);
 
 /** Agreement check in code (config.agreements). Returns {fail?: reason, units?} */
@@ -47,8 +53,20 @@ export function hardChecks(x, ledger, rules) {
     if (x[k] == null) esc.push(`No se pudo leer con certeza: ${label}.`);
   if (x.channel === "image" && x.ocrConfidence != null && x.ocrConfidence < 80) esc.push(`Lectura OCR con baja confianza (${x.ocrConfidence}%).`);
   if (x.payee && !v) esc.push(`Beneficiario "${x.payee}" no está en la lista de proveedores autorizados.`);
-  if (v && x.acct && x.acct !== v.acct) hold.push(`La cuenta ${x.acct} no coincide con la registrada para ${v.name.replace(/\.$/, "")}.`);
+  const reg = rules.vendors?.[x.vendorKey];
+  if (v && x.acct && x.acct !== (reg?.acct ?? v.acct)) hold.push(`La cuenta ${x.acct} no coincide con la registrada para ${v.name.replace(/\.$/, "")}.`);
   if (v && x.number && ledger.seen.some((h) => h.vendor === x.vendorKey && nnum(h.number) === nnum(x.number))) hold.push(`Duplicado exacto: ${v.name} ya presentó la factura ${x.number}.`);
+  if (v && x.items?.length && reg?.keywords?.length) {
+    const off = x.items.filter((i) => !reg.keywords.some((k) => kwNorm(i.description).includes(k)));
+    if (off.length) hold.push(`Concepto fuera del servicio contratado (${reg.category}): "${off.map((i) => i.description).join("; ")}".`);
+  }
+  if (v && x.amount != null) {
+    const prior = ledger.seen.filter((h) => h.vendor === x.vendorKey && h.entryId !== x.id);
+    const fp = fingerprint(x), ik = itemsKey(x);
+    const same = prior.find((h) => h.fp === fp);
+    if (same) hold.push(`Duplicado: huella idéntica a la factura ${same.number} (mismos conceptos, monto, fecha, número y cuenta).`);
+    else { const near = prior.find((h) => h.ik === ik); if (near) esc.push(`Posible duplicado: mismos conceptos y monto que la factura ${near.number}, con otra fecha o número.`); }
+  }
   if (v && x.number) {
     const n = nnum(x.number);
     const near = ledger.seen.filter((h) => h.vendor === x.vendorKey && nnum(h.number) !== n);
@@ -89,17 +107,32 @@ export function decide(x, answers, ledger, rules) {
     }
   }
   let action, reasons;
-  if (hold.length || modelHold.length) { action = "hold"; reasons = [...hold, ...modelHold]; }
+  if (hold.length || modelHold.length) { action = "hold"; reasons = [...hold, ...modelHold, ...esc.map((r) => "Además: " + r)]; }
   else if (esc.length || modelEsc.length || !answers) { action = "escalate"; reasons = [...esc, ...modelEsc]; if (!reasons.length) reasons = ["Sin evaluación del modelo; se escala."]; }
   else { action = "pay"; reasons = ["Proveedor autorizado, cuenta registrada, cumple el acuerdo, no es duplicado y está dentro de límites y presupuesto."]; }
   // Final invariant: pay only if every hard requirement is present.
   if (action === "pay" && (!x.vendorKey || x.amount == null || !x.currency || !x.due || !x.number || !x.acct)) { action = "escalate"; reasons = ["Invariante de seguridad: faltan datos."]; }
-  if (x.vendorKey && x.number) ledger.seen.push({ vendor: x.vendorKey, number: x.number, date: x.date, period: x.date?.slice(0, 7), paid: action === "pay", amount: x.amount, currency: x.currency, lines: x.text?.slice(0, 300) });
-  if (action === "pay") {
-    const usd = toUsd(x.amount, x.currency, rules);
-    const ag = agreementCheck(x, { ...ledger, seen: [] }, rules);
-    if (ag.units) ledger.unitsPaid[x.vendorKey] = (ledger.unitsPaid[x.vendorKey] ?? 0) + ag.units;
-    ledger.spentUsd += usd; ledger.vendorPaidUsd[x.vendorKey] = (ledger.vendorPaidUsd[x.vendorKey] ?? 0) + usd;
-  }
+  if (x.vendorKey && x.number) ledger.seen.push({ entryId: x.id, fp: fingerprint(x), ik: itemsKey(x), vendor: x.vendorKey, number: x.number, date: x.date, period: x.date?.slice(0, 7), paid: action === "pay", amount: x.amount, currency: x.currency, lines: x.text?.slice(0, 300) });
+  if (action === "pay") book(x, ledger, rules);
   return { action, reasons, needsModel: !hold.length };
+}
+function book(x, ledger, rules) {
+  const usd = toUsd(x.amount, x.currency, rules);
+  const ag = agreementCheck(x, { ...ledger, seen: [] }, rules);
+  if (ag.units) ledger.unitsPaid[x.vendorKey] = (ledger.unitsPaid[x.vendorKey] ?? 0) + ag.units;
+  ledger.spentUsd += usd; ledger.vendorPaidUsd[x.vendorKey] = (ledger.vendorPaidUsd[x.vendorKey] ?? 0) + usd;
+}
+
+/** Human approval of an escalated invoice. Hard rules are re-checked against the ledger as it is now;
+ *  a human can resolve doubt or the approval threshold, never override a hard hold or pay an unknown payee. */
+export function approve(entry, ledger, rules) {
+  const x = { ...entry.extracted, id: entry.id };
+  if (entry.action !== "escalate") return { ok: false, reason: "Solo se aprueban facturas pendientes." };
+  if (!x.vendorKey) return { ok: false, reason: "Beneficiario no autorizado: agrégalo a la lista de proveedores antes de aprobar." };
+  if (x.amount == null || !x.currency || !x.due || !x.number || !x.acct) return { ok: false, reason: "Faltan datos de la factura; no se puede aprobar." };
+  const { hold } = hardChecks(x, { ...ledger, seen: ledger.seen.filter((h) => h.entryId !== entry.id) }, rules);
+  if (hold.length) return { ok: false, reason: hold.join(" ") };
+  const s = ledger.seen.find((h) => h.entryId === entry.id); if (s) s.paid = true;
+  book(x, ledger, rules);
+  return { ok: true };
 }

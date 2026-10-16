@@ -1,0 +1,16 @@
+From: billing@valpodataspa.example
+To: ap@northwind-ridge.example
+Subject: Factura N° VA-1005
+
+Hola equipo de Northwind,
+
+PROVEEDOR: Valpo Data SpA
+FACTURA N° VA-1005
+FECHA: 2026-10-05
+VENCE: 2026-10-15
+CONCEPTO: Licencia analítica mensual 2026-10 #5 + cargo adicional no pactado
+TOTAL A PAGAR: CLP 1.282.500
+CUENTA: CL-FAKE-7007
+
+Saludos,
+Valpo Data SpA

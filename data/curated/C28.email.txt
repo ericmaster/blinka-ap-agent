@@ -1,0 +1,16 @@
+From: billing@andesdevstud.example
+To: ap@northwind-ridge.example
+Subject: Factura N° AD-1050
+
+Hola equipo de Northwind,
+
+  Proveedor: Andes Dev Studio SAS
+  Factura N° AD-1050
+  Fecha: 12 de octubre de 2026
+  Vence: 30 de octubre de 2026
+  Concepto: Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000
+  Total a pagar: COP 2.700.000
+  Cuenta: CO-FAKE-1001
+
+Saludos,
+Andes Dev Studio SAS

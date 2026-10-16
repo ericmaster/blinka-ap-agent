@@ -1,7 +1,7 @@
-Proveedor: Valpo Data SpA
-Factura N° VA-1032
-Fecha: 5 de octubre de 2026
-Vence: 15 de octubre de 2026
-Concepto: Licencia analítica mensual 2026-10 #32
-Total a pagar: 950.000 CLP
-Cuenta: CL-FAKE-7007
+Proveedor: Lima Support Desk SAC
+Factura N° LI-1032
+Fecha: 4 de octubre de 2026
+Vence: 14 de octubre de 2026
+Concepto: 3 horas de soporte x 45
+Total a pagar: 135,00 PEN
+Cuenta: PE-FAKE-9032

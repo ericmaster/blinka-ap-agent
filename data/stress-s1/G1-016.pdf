@@ -12,16 +12,16 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
 endobj
 5 0 obj
-<< /Length 265 >>
+<< /Length 271 >>
 stream
 BT /F1 11 Tf 14 TL 50 790 Td
-(Vendor: Monterrey Ops Partners S.C.) Tj T*
-(Invoice # MO-1028) Tj T*
-(Date: 2026-10-13) Tj T*
-(Due date: 2026-10-23) Tj T*
-(Description: 13 bookkeeping hours x 520) Tj T*
-(Total due: 6,760.00 MXN) Tj T*
-(Account: MX-FAKE-8008) Tj T*
+(Vendor: Andes Dev Studios S.A.) Tj T*
+(Invoice # MO-1015) Tj T*
+(Date: October 11, 2026) Tj T*
+(Due date: October 21, 2026) Tj T*
+(Description: 4 bookkeeping hours x 520) Tj T*
+(Total due: 2,080.00 MXN) Tj T*
+(Account: XX-FAKE-1015) Tj T*
 ET
 endstream
 endobj
@@ -36,5 +36,5 @@ xref
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-654
+660
 %%EOF

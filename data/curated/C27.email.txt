@@ -1,0 +1,16 @@
+From: billing@monterreyops.example
+To: ap@northwind-ridge.example
+Subject: Invoice # MOP-2214
+
+Hi Northwind team,
+
+Vendor: Monterrey Ops Partners S.C.
+Invoice # MOP-2214
+Date: October 5, 2026
+Due date: October 30, 2026
+Description: Licencias de servidores dedicados: 2 hours x MXN 520.00
+Total due: MXN 1,040.00
+Account: MX-FAKE-8008
+
+Best regards,
+Monterrey Ops Partners S.C.

@@ -1,0 +1,7 @@
+Vendor: Maria Fernanda Rojas (contractor)
+Invoice # MA-1037
+Date: 2026-10-01
+Due date: 2026-10-11
+Description: QA monthly fee 2026-10 #37
+Total due: USD 1,600.00
+Account: CO-FAKE-5005

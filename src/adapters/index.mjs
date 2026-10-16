@@ -11,9 +11,9 @@ function systemOne(name, url, model, headers) {
     return out;
   } };
 }
-export const glide = () => systemOne("Fastino GLiDE", "https://api.fastino.ai/v1/systemone", "fastino/GLiDE", () => ({ "X-API-Key": need("FASTINO_API_KEY") }));
-export const jev = () => systemOne("TypeSafe JEV", "https://jevtypesafeai.com/api/v1/decide", "jev-latest", () => ({ Authorization: "Bearer " + need("JEV_API_KEY") }));
-function need(k) { const v = process.env[k]; if (!v) throw new Error(`${k} not set`); return v; }
+export const glide = (env) => systemOne("Fastino GLiDE", "https://api.fastino.ai/v1/systemone", "fastino/GLiDE", () => ({ "X-API-Key": need("FASTINO_API_KEY", env) }));
+export const jev = (env) => systemOne("TypeSafe JEV", "https://jevtypesafeai.com/api/v1/decide", "jev-latest", () => ({ Authorization: "Bearer " + need("JEV_API_KEY", env) }));
+function need(k, env = globalThis.process?.env ?? {}) { const v = env[k]; if (!v) throw new Error(`${k} not set`); return v; }
 
 /** Fake adapters for tests/CI (ADAPTER_MODE=fake). */
 export const oracle = (truthById) => ({ name: "fake-oracle", async ask(qs, ctx) { const t = truthById[ctx.id]; return { is_duplicate: t.is_duplicate ? 0.97 : 0.03, matches_agreement: t.matches_agreement ? 0.96 : 0.04 }; } });
@@ -30,4 +30,8 @@ export function chain(...adapters) {
     return { error: errs.join("; ") };
   } };
 }
-export function fromEnv() { return process.env.ADAPTER_MODE === "real" ? chain(glide(), jev()) : chain(constant(0.5)); }
+/** Real models when keys exist (primary GLiDE, fallback JEV); otherwise none => every invoice that reaches the model escalates. */
+export function fromEnv(env = globalThis.process?.env ?? {}) {
+  const a = [env.FASTINO_API_KEY && glide(env), env.JEV_API_KEY && jev(env)].filter(Boolean);
+  return a.length ? chain(...a) : null;
+}

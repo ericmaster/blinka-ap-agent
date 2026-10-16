@@ -1,0 +1,16 @@
+From: billing@quitobytesca.example
+To: ap@northwind-ridge.example
+Subject: Invoice # MA-1038
+
+Hi Northwind team,
+
+Vendor: Quito Bytes Cía. Ltda.
+Invoice # MA-1038
+Date: October 10, 2026
+Due date: October 20, 2026
+Description: QA monthly fee 2026-10 #38
+Total due: USD 1,600.00
+Account: XX-FAKE-1038
+
+Best regards,
+Quito Bytes Cía. Ltda.

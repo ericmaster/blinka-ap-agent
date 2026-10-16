@@ -572,5 +572,71 @@
   "lines": "Consultoria jurídica, registro de marca no INPI: 6 horas x BRL 650,00",
   "format": "email",
   "file": "C26.email.txt"
+ },
+ {
+  "id": "C27",
+  "vendorKey": "monterrey-ops",
+  "payeeName": "Monterrey Ops Partners S.C.",
+  "lang": "en",
+  "currency": "MXN",
+  "acct": "MX-FAKE-8008",
+  "date": "2026-10-05",
+  "due": "2026-10-30",
+  "truth": {
+   "is_duplicate": false,
+   "matches_agreement": false
+  },
+  "tags": [
+   "trap:out-of-category"
+  ],
+  "number": "MOP-2214",
+  "amount": 1040,
+  "lines": "Licencias de servidores dedicados: 2 hours x MXN 520.00",
+  "format": "email",
+  "file": "C27.email.txt"
+ },
+ {
+  "id": "C28",
+  "vendorKey": "andes-dev",
+  "payeeName": "Andes Dev Studio SAS",
+  "lang": "es",
+  "currency": "COP",
+  "acct": "CO-FAKE-1001",
+  "date": "2026-10-12",
+  "due": "2026-10-30",
+  "truth": {
+   "is_duplicate": true,
+   "matches_agreement": true
+  },
+  "tags": [
+   "trap:near-duplicate"
+  ],
+  "number": "AD-1050",
+  "amount": 2700000,
+  "lines": "Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000",
+  "format": "email",
+  "file": "C28.email.txt"
+ },
+ {
+  "id": "C29",
+  "vendorKey": "rio-legal",
+  "payeeName": "Rio Legal Consultoria Ltda",
+  "lang": "pt",
+  "currency": "BRL",
+  "acct": "BR-FAKE-6006",
+  "date": "2026-10-05",
+  "due": "2026-10-30",
+  "truth": {
+   "is_duplicate": true,
+   "matches_agreement": true
+  },
+  "tags": [
+   "trap:duplicate-exact-fingerprint"
+  ],
+  "number": "RL-77",
+  "amount": 1300,
+  "lines": "Consultoria jurídica: 2 horas x BRL 650,00",
+  "format": "email",
+  "file": "C29.email.txt"
  }
 ]

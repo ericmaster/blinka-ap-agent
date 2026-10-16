@@ -8,8 +8,8 @@ Vendor: Maria Fernanda Rojas (contractor)
 Invoice # MA-1006
 Date: October 12, 2026
 Due date: October 22, 2026
-Description: QA monthly fee 2026-10 #6 + cargo adicional no pactado
-Total due: 2,160.00 USD
+Description: QA monthly fee 2026-10 #6 (prepago anual)
+Total due: 6,000.00 USD
 Account: CO-FAKE-5005
 
 Best regards,

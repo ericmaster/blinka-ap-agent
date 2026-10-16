@@ -1,0 +1,7 @@
+Vendor: Monterrey Ops Partners S.C.
+Invoice # MO-1028
+Date: 2026-10-05
+Due date: 2026-10-15
+Description: 19 bookkeeping hours x 520
+Total due: 9,880.00 MXN
+Account: MX-FAKE-8008

@@ -68,5 +68,84 @@
       "rate": 520,
       "max_units_per_period": 40
     }
+  },
+  "vendors": {
+    "andes-dev": {
+      "acct": "CO-FAKE-1001",
+      "category": "desarrollo de software",
+      "keywords": [
+        "desarrollo",
+        "software",
+        "development",
+        "integracion",
+        "sprint"
+      ]
+    },
+    "pixel-norte": {
+      "acct": "MX-FAKE-2002",
+      "category": "diseño UI",
+      "keywords": [
+        "diseno",
+        "design",
+        "ui",
+        "ux"
+      ]
+    },
+    "sampa-cloud": {
+      "acct": "BR-FAKE-3003",
+      "category": "hospedagem em nuvem",
+      "keywords": [
+        "hospedagem",
+        "nuvem",
+        "cloud",
+        "hosting"
+      ]
+    },
+    "lima-support": {
+      "acct": "PE-FAKE-4004",
+      "category": "soporte al cliente",
+      "keywords": [
+        "soporte",
+        "support"
+      ]
+    },
+    "maria-qa": {
+      "acct": "CO-FAKE-5005",
+      "category": "QA / testing",
+      "keywords": [
+        "qa",
+        "testing",
+        "quality"
+      ]
+    },
+    "rio-legal": {
+      "acct": "BR-FAKE-6006",
+      "category": "consultoria jurídica",
+      "keywords": [
+        "consultoria",
+        "juridica",
+        "legal",
+        "contratos",
+        "marca"
+      ]
+    },
+    "valpo-data": {
+      "acct": "CL-FAKE-7007",
+      "category": "licencia analítica",
+      "keywords": [
+        "licencia",
+        "analitica",
+        "analytics"
+      ]
+    },
+    "monterrey-ops": {
+      "acct": "MX-FAKE-8008",
+      "category": "bookkeeping",
+      "keywords": [
+        "bookkeeping",
+        "contabilidad",
+        "accounting"
+      ]
+    }
   }
 }

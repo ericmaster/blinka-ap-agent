@@ -8,9 +8,9 @@ Hola equipo de Northwind,
   Factura N° LI-1007
   Fecha: 12/10/2026
   Vence: 22/10/2026
-  Concepto: Prepago anual
-  Total a pagar: PEN 22.223,00
-  Cuenta: PE-FAKE-4004
+  Concepto: 20 horas de soporte x 45
+  Total a pagar: PEN 900,00
+  Cuenta: PE-FAKE-9007
 
 Saludos,
 Lima Support Desk SAC
