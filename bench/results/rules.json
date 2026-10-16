@@ -1,0 +1,440 @@
+{
+ "metrics": {
+  "modelo": "solo-reglas",
+  "acc_decision": 0.43333333333333335,
+  "acc_preguntas": 0.5,
+  "brier": 0.25,
+  "p50_ms": 0.000285999703919515,
+  "p95_ms": 0.0010000003385357559,
+  "tokens": 0,
+  "costo_usd": null,
+  "unsafe": [],
+  "pagos_perdidos": 14,
+  "errores": 0,
+  "err_ej": null
+ },
+ "rows": [
+  {
+   "id": "F01",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0019270009943284094,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F02",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0010000003385357559,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F03",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.000648000423097983,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F04",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0006000009307172149,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F05",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0004520006768871099,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F06",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0004040011845063418,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F07",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0002710003172978759,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F08",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.000447998900199309,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F09",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.000285999703919515,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F10",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0002759989001788199,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F11",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00025700137484818697,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F12",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0002849992597475648,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F13",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00030100272851996124,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F14",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00025999906938523054,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F15",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00031600211514160037,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F16",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5
+   },
+   "lat": 0.00035199991543777287,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F17",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.000362000719178468,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F18",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00028199792723171413,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F19",
+   "act": "hold",
+   "why": [
+    "monto > límite por pago 5000.0",
+    "excede tope mensual del proveedor",
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0002769993443507701,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F20",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0004989997250959277,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F21",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00027500209398567677,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F22",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0003309978637844324,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F23",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0003120003384537995,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F24",
+   "act": "hold",
+   "why": [
+    "duplicado exacto (proveedor+número)",
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00027299756766296923,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F25",
+   "act": "hold",
+   "why": [
+    "cuenta bancaria distinta a la registrada",
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00027900023269467056,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F26",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5
+   },
+   "lat": 0.0002640008460730314,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F27",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00024800101527944207,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F28",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0003249988367315382,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F29",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.00027799978852272034,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F30",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.50"
+   ],
+   "ans": {
+    "is_duplicate": 0.5,
+    "matches_agreement": 0.5
+   },
+   "lat": 0.0002640008460730314,
+   "tok": 0,
+   "err": null
+  }
+ ]
+}

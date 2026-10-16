@@ -1,0 +1,447 @@
+{
+ "metrics": {
+  "modelo": "GLiNER2.5-Decide (local CPU)",
+  "acc_decision": 0.5,
+  "acc_preguntas": 0.6206896551724138,
+  "brier": 0.1927301435533689,
+  "p50_ms": 649.7424690023763,
+  "p95_ms": 1654.5348600011494,
+  "tokens": 0,
+  "costo_usd": null,
+  "unsafe": [],
+  "pagos_perdidos": 14,
+  "errores": 0,
+  "err_ej": null
+ },
+ "rows": [
+  {
+   "id": "F01",
+   "act": "escalate",
+   "why": [
+    "duplicado incierto p=0.30",
+    "coincidencia incierta p=0.80"
+   ],
+   "ans": {
+    "is_duplicate": 0.30479276180267334,
+    "matches_agreement": 0.7997720837593079
+   },
+   "lat": 1649.8300290004408,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F02",
+   "act": "escalate",
+   "why": [
+    "duplicado incierto p=0.29",
+    "coincidencia incierta p=0.77"
+   ],
+   "ans": {
+    "is_duplicate": 0.28653866052627563,
+    "matches_agreement": 0.7706539034843445
+   },
+   "lat": 776.769989002787,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F03",
+   "act": "escalate",
+   "why": [
+    "duplicado incierto p=0.28",
+    "coincidencia incierta p=0.71"
+   ],
+   "ans": {
+    "is_duplicate": 0.2834245562553406,
+    "matches_agreement": 0.7066726088523865
+   },
+   "lat": 603.928652999457,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F04",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.51"
+   ],
+   "ans": {
+    "is_duplicate": 0.514059841632843,
+    "matches_agreement": 0.7708783745765686
+   },
+   "lat": 639.4832509977277,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F05",
+   "act": "escalate",
+   "why": [
+    "duplicado incierto p=0.29",
+    "coincidencia incierta p=0.69"
+   ],
+   "ans": {
+    "is_duplicate": 0.29047447443008423,
+    "matches_agreement": 0.6936964988708496
+   },
+   "lat": 560.6959169999755,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F06",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.58"
+   ],
+   "ans": {
+    "is_duplicate": 0.5767069458961487,
+    "matches_agreement": 0.6977841854095459
+   },
+   "lat": 866.7179099975328,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F07",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.57"
+   ],
+   "ans": {
+    "is_duplicate": 0.5660889148712158,
+    "matches_agreement": 0.6816949844360352
+   },
+   "lat": 1654.5348600011494,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F08",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.61"
+   ],
+   "ans": {
+    "is_duplicate": 0.6099649667739868,
+    "matches_agreement": 0.8053291440010071
+   },
+   "lat": 3160.2313990006223,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F09",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.56"
+   ],
+   "ans": {
+    "is_duplicate": 0.557237446308136,
+    "matches_agreement": 0.7342770099639893
+   },
+   "lat": 611.8573120002111,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F10",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.64"
+   ],
+   "ans": {
+    "is_duplicate": 0.6355756521224976,
+    "matches_agreement": 0.8221808075904846
+   },
+   "lat": 547.4767770028848,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F11",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.56"
+   ],
+   "ans": {
+    "is_duplicate": 0.5629433989524841,
+    "matches_agreement": 0.7074105143547058
+   },
+   "lat": 594.2374089972873,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F12",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.60",
+    "modelo: no coincide con acuerdo p=0.42"
+   ],
+   "ans": {
+    "is_duplicate": 0.6041297316551208,
+    "matches_agreement": 0.42324358224868774
+   },
+   "lat": 479.61268599829054,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F13",
+   "act": "escalate",
+   "why": [
+    "duplicado incierto p=0.26",
+    "coincidencia incierta p=0.74"
+   ],
+   "ans": {
+    "is_duplicate": 0.2588287591934204,
+    "matches_agreement": 0.7394288778305054
+   },
+   "lat": 523.4624810000241,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F14",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.54"
+   ],
+   "ans": {
+    "is_duplicate": 0.5395163893699646,
+    "matches_agreement": 0.7734596133232117
+   },
+   "lat": 665.0008689975948,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F15",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.56",
+    "modelo: no coincide con acuerdo p=0.17"
+   ],
+   "ans": {
+    "is_duplicate": 0.5604354739189148,
+    "matches_agreement": 0.17491918802261353
+   },
+   "lat": 721.9689400008065,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F16",
+   "act": "escalate",
+   "why": [
+    "proveedor nuevo / no autorizado"
+   ],
+   "ans": {
+    "is_duplicate": 0.29494553804397583
+   },
+   "lat": 248.436148998735,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F17",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.62"
+   ],
+   "ans": {
+    "is_duplicate": 0.6191809773445129,
+    "matches_agreement": 0.8006303906440735
+   },
+   "lat": 824.8613200012187,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F18",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.53"
+   ],
+   "ans": {
+    "is_duplicate": 0.5301851034164429,
+    "matches_agreement": 0.7712293863296509
+   },
+   "lat": 615.7509459990251,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F19",
+   "act": "hold",
+   "why": [
+    "monto > límite por pago 5000.0",
+    "excede tope mensual del proveedor",
+    "modelo: probable duplicado p=0.62"
+   ],
+   "ans": {
+    "is_duplicate": 0.6212570071220398,
+    "matches_agreement": 0.6260886788368225
+   },
+   "lat": 647.1317959985754,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F20",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.58"
+   ],
+   "ans": {
+    "is_duplicate": 0.5845229625701904,
+    "matches_agreement": 0.6872081160545349
+   },
+   "lat": 649.7424690023763,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F21",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.55"
+   ],
+   "ans": {
+    "is_duplicate": 0.5526790022850037,
+    "matches_agreement": 0.7653560638427734
+   },
+   "lat": 835.2655300004699,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F22",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.60"
+   ],
+   "ans": {
+    "is_duplicate": 0.597425103187561,
+    "matches_agreement": 0.6973311901092529
+   },
+   "lat": 569.9916279991157,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F23",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.70"
+   ],
+   "ans": {
+    "is_duplicate": 0.7038648724555969,
+    "matches_agreement": 0.724036693572998
+   },
+   "lat": 846.0200449990225,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F24",
+   "act": "hold",
+   "why": [
+    "duplicado exacto (proveedor+número)",
+    "modelo: probable duplicado p=0.61"
+   ],
+   "ans": {
+    "is_duplicate": 0.6082578301429749,
+    "matches_agreement": 0.7066726088523865
+   },
+   "lat": 764.5281740005885,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F25",
+   "act": "hold",
+   "why": [
+    "cuenta bancaria distinta a la registrada",
+    "modelo: probable duplicado p=0.55"
+   ],
+   "ans": {
+    "is_duplicate": 0.5506932139396667,
+    "matches_agreement": 0.7228257656097412
+   },
+   "lat": 706.8240589978814,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F26",
+   "act": "escalate",
+   "why": [
+    "proveedor nuevo / no autorizado"
+   ],
+   "ans": {
+    "is_duplicate": 0.2686415910720825
+   },
+   "lat": 252.354935000767,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F27",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.56"
+   ],
+   "ans": {
+    "is_duplicate": 0.5624567270278931,
+    "matches_agreement": 0.7105122804641724
+   },
+   "lat": 531.7583719988761,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F28",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.63"
+   ],
+   "ans": {
+    "is_duplicate": 0.6302524209022522,
+    "matches_agreement": 0.8013601899147034
+   },
+   "lat": 804.8366729999543,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F29",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.63"
+   ],
+   "ans": {
+    "is_duplicate": 0.6278442740440369,
+    "matches_agreement": 0.6730926036834717
+   },
+   "lat": 751.3324319988897,
+   "tok": 0,
+   "err": null
+  },
+  {
+   "id": "F30",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.63"
+   ],
+   "ans": {
+    "is_duplicate": 0.6318504810333252,
+    "matches_agreement": 0.7983279228210449
+   },
+   "lat": 1401.8815209965396,
+   "tok": 0,
+   "err": null
+  }
+ ]
+}

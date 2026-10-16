@@ -1,0 +1,442 @@
+{
+ "metrics": {
+  "modelo": "Fastino GLiDE (API)",
+  "acc_decision": 1.0,
+  "acc_preguntas": 1.0,
+  "brier": 0.0036605576385891282,
+  "p50_ms": 372.92015200000606,
+  "p95_ms": 465.53786599906744,
+  "tokens": 20727,
+  "costo_usd": 0.00310905,
+  "unsafe": [],
+  "pagos_perdidos": 0,
+  "errores": 0,
+  "err_ej": null
+ },
+ "rows": [
+  {
+   "id": "F01",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.0022307573451541204,
+    "matches_agreement": 0.9981313937648026
+   },
+   "lat": 457.74617600181955,
+   "tok": 524,
+   "err": null
+  },
+  {
+   "id": "F02",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.0024632460654409345,
+    "matches_agreement": 0.9978007639292672
+   },
+   "lat": 335.28003500032355,
+   "tok": 506,
+   "err": null
+  },
+  {
+   "id": "F03",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.002381647998542497,
+    "matches_agreement": 0.997266704953685
+   },
+   "lat": 364.9990820013045,
+   "tok": 504,
+   "err": null
+  },
+  {
+   "id": "F04",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.0036797464352178078,
+    "matches_agreement": 0.9982764625531642
+   },
+   "lat": 421.0599359976186,
+   "tok": 568,
+   "err": null
+  },
+  {
+   "id": "F05",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.002297411214380626,
+    "matches_agreement": 0.9982362952623755
+   },
+   "lat": 348.2857509989117,
+   "tok": 506,
+   "err": null
+  },
+  {
+   "id": "F06",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.0049044282083032294,
+    "matches_agreement": 0.9983061903639484
+   },
+   "lat": 353.51588599951356,
+   "tok": 510,
+   "err": null
+  },
+  {
+   "id": "F07",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.004287633882170789,
+    "matches_agreement": 0.9974303641811795
+   },
+   "lat": 466.51159199973335,
+   "tok": 578,
+   "err": null
+  },
+  {
+   "id": "F08",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.04362114351624897,
+    "matches_agreement": 0.996672610464843
+   },
+   "lat": 440.5165640018822,
+   "tok": 668,
+   "err": null
+  },
+  {
+   "id": "F09",
+   "act": "hold",
+   "why": [
+    "modelo: no coincide con acuerdo p=0.06"
+   ],
+   "ans": {
+    "is_duplicate": 0.013432108723575779,
+    "matches_agreement": 0.05550986388323025
+   },
+   "lat": 465.53786599906744,
+   "tok": 808,
+   "err": null
+  },
+  {
+   "id": "F10",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.90"
+   ],
+   "ans": {
+    "is_duplicate": 0.8953362230675129,
+    "matches_agreement": 0.9975459519769829
+   },
+   "lat": 288.16841099978774,
+   "tok": 790,
+   "err": null
+  },
+  {
+   "id": "F11",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.006134471678609603,
+    "matches_agreement": 0.99731132424569
+   },
+   "lat": 346.16114699747413,
+   "tok": 626,
+   "err": null
+  },
+  {
+   "id": "F12",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.03789124454503848,
+    "matches_agreement": 0.9972987582460932
+   },
+   "lat": 399.8348340028315,
+   "tok": 634,
+   "err": null
+  },
+  {
+   "id": "F13",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.002450385400051138,
+    "matches_agreement": 0.9986423678415811
+   },
+   "lat": 356.20776299765566,
+   "tok": 478,
+   "err": null
+  },
+  {
+   "id": "F14",
+   "act": "hold",
+   "why": [
+    "modelo: no coincide con acuerdo p=0.01"
+   ],
+   "ans": {
+    "is_duplicate": 0.025642682685545943,
+    "matches_agreement": 0.005641378856261206
+   },
+   "lat": 441.2603679993481,
+   "tok": 842,
+   "err": null
+  },
+  {
+   "id": "F15",
+   "act": "hold",
+   "why": [
+    "modelo: no coincide con acuerdo p=0.00"
+   ],
+   "ans": {
+    "is_duplicate": 0.32556870835305257,
+    "matches_agreement": 0.0022752686862898175
+   },
+   "lat": 449.51520699760295,
+   "tok": 664,
+   "err": null
+  },
+  {
+   "id": "F16",
+   "act": "escalate",
+   "why": [
+    "proveedor nuevo / no autorizado"
+   ],
+   "ans": {
+    "is_duplicate": 0.003140231726629065
+   },
+   "lat": 337.2699330029718,
+   "tok": 180,
+   "err": null
+  },
+  {
+   "id": "F17",
+   "act": "escalate",
+   "why": [
+    "monto > 2000.0 requiere aprobación humana"
+   ],
+   "ans": {
+    "is_duplicate": 0.11039405004397268,
+    "matches_agreement": 0.9960400288138211
+   },
+   "lat": 417.15106799892965,
+   "tok": 938,
+   "err": null
+  },
+  {
+   "id": "F18",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.94"
+   ],
+   "ans": {
+    "is_duplicate": 0.9390638498304001,
+    "matches_agreement": 0.9986279390731864
+   },
+   "lat": 385.44301699948846,
+   "tok": 690,
+   "err": null
+  },
+  {
+   "id": "F19",
+   "act": "hold",
+   "why": [
+    "monto > límite por pago 5000.0",
+    "excede tope mensual del proveedor",
+    "presupuesto insuficiente"
+   ],
+   "ans": {
+    "is_duplicate": 0.011063548581348162,
+    "matches_agreement": 0.9446583448474627
+   },
+   "lat": 286.6346299997531,
+   "tok": 884,
+   "err": null
+  },
+  {
+   "id": "F20",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.03546820375236339,
+    "matches_agreement": 0.9960172703855258
+   },
+   "lat": 336.2302440000349,
+   "tok": 750,
+   "err": null
+  },
+  {
+   "id": "F21",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.06173397814150159,
+    "matches_agreement": 0.9969120083178008
+   },
+   "lat": 400.70401199773187,
+   "tok": 966,
+   "err": null
+  },
+  {
+   "id": "F22",
+   "act": "pay",
+   "why": [
+    "todas las reglas OK"
+   ],
+   "ans": {
+    "is_duplicate": 0.0050022465618684165,
+    "matches_agreement": 0.9981592367024434
+   },
+   "lat": 286.32768399984343,
+   "tok": 604,
+   "err": null
+  },
+  {
+   "id": "F23",
+   "act": "hold",
+   "why": [
+    "modelo: probable duplicado p=0.99"
+   ],
+   "ans": {
+    "is_duplicate": 0.9888474653636501,
+    "matches_agreement": 0.9966047772232539
+   },
+   "lat": 393.98408499982907,
+   "tok": 726,
+   "err": null
+  },
+  {
+   "id": "F24",
+   "act": "hold",
+   "why": [
+    "duplicado exacto (proveedor+número)",
+    "modelo: probable duplicado p=0.91"
+   ],
+   "ans": {
+    "is_duplicate": 0.9133517068719748,
+    "matches_agreement": 0.9976370525461972
+   },
+   "lat": 289.4596010009991,
+   "tok": 874,
+   "err": null
+  },
+  {
+   "id": "F25",
+   "act": "hold",
+   "why": [
+    "cuenta bancaria distinta a la registrada",
+    "modelo: probable duplicado p=0.94"
+   ],
+   "ans": {
+    "is_duplicate": 0.9435912134755877,
+    "matches_agreement": 0.9982833044753192
+   },
+   "lat": 355.54929400313995,
+   "tok": 758,
+   "err": null
+  },
+  {
+   "id": "F26",
+   "act": "escalate",
+   "why": [
+    "proveedor nuevo / no autorizado"
+   ],
+   "ans": {
+    "is_duplicate": 0.003150507619677942
+   },
+   "lat": 372.92015200000606,
+   "tok": 169,
+   "err": null
+  },
+  {
+   "id": "F27",
+   "act": "hold",
+   "why": [
+    "modelo: no coincide con acuerdo p=0.21"
+   ],
+   "ans": {
+    "is_duplicate": 0.03836237687222842,
+    "matches_agreement": 0.21346218583326984
+   },
+   "lat": 412.3676160015748,
+   "tok": 722,
+   "err": null
+  },
+  {
+   "id": "F28",
+   "act": "hold",
+   "why": [
+    "excede tope mensual del proveedor",
+    "presupuesto insuficiente"
+   ],
+   "ans": {
+    "is_duplicate": 0.054878522495961146,
+    "matches_agreement": 0.9959014782078399
+   },
+   "lat": 428.2915050025622,
+   "tok": 1082,
+   "err": null
+  },
+  {
+   "id": "F29",
+   "act": "hold",
+   "why": [
+    "presupuesto insuficiente"
+   ],
+   "ans": {
+    "is_duplicate": 0.028979985657679445,
+    "matches_agreement": 0.9979924131324188
+   },
+   "lat": 280.42627700051526,
+   "tok": 970,
+   "err": null
+  },
+  {
+   "id": "F30",
+   "act": "hold",
+   "why": [
+    "excede tope mensual del proveedor",
+    "presupuesto insuficiente"
+   ],
+   "ans": {
+    "is_duplicate": 0.04315254009307018,
+    "matches_agreement": 0.9945583718445802
+   },
+   "lat": 396.67107299828785,
+   "tok": 1208,
+   "err": null
+  }
+ ]
+}

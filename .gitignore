@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.next/
+__pycache__/
+.venv/
+coverage/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+docs/private/

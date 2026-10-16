@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nimble · Reto Blinka · 30X</title>
+<style>
+:root{--ink:#14181f;--mut:#5b6472;--line:#e3e6eb;--bg:#fafbfc;--acc:#2b5cff;--ok:#12805c;--hold:#b54708;--esc:#6941c6;--bad:#c01048}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{padding:28px 32px 0;max-width:1180px;margin:auto}
+h1{margin:0;font-size:26px}
+.sub{color:var(--mut);margin:4px 0 18px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav button{border:0;background:none;padding:10px 14px;font:inherit;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent}
+nav button.on{color:var(--ink);border-color:var(--acc);font-weight:600}
+main{max-width:1180px;margin:auto;padding:24px 32px 60px}
+section{display:none}section.on{display:block}
+h2{font-size:20px;margin:28px 0 10px}h2:first-child{margin-top:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:12px 0}
+.w3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.w3 .card{margin:0}.w3 b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc);margin-bottom:6px}
+.vp{display:flex;gap:16px;align-items:flex-start}
+.vp .tag{min-width:150px;font-weight:600}.vp .sec{margin-left:auto;color:var(--mut);white-space:nowrap}
+.vp.rec{border:2px solid var(--acc)}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:13px;background:#eef2ff;color:var(--acc);font-weight:600}
+.hc{font-size:22px;font-weight:600;padding:22px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f3f5f8;font-size:14px}
+tr:last-child td{border-bottom:0}
+.m{font-weight:700}.must{color:var(--ok)}.should{color:var(--acc)}.could{color:var(--esc)}.wont{color:var(--mut)}
+.lc{display:grid;grid-template-columns:repeat(5,1fr);grid-template-areas:"p s u a c" "p k u ch c" "co co co r r";gap:8px}
+.lc>div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;min-height:150px}
+.lc h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc)}
+.lc [contenteditable]{outline:none;font-size:14.5px;min-height:110px;white-space:pre-wrap}
+.lc [contenteditable]:focus{background:#f6f8ff;border-radius:6px}
+.tools{display:flex;gap:8px;margin:0 0 12px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+.saved{color:var(--mut);align-self:center;font-size:14px}
+.good{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+svg text{font-family:system-ui,sans-serif}
+@media(max-width:820px){.w3,.two{grid-template-columns:1fr}.lc{grid-template-columns:1fr;grid-template-areas:"p" "s" "k" "u" "a" "ch" "c" "co" "r"}.vp{flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Nimble · Reto Blinka</h1>
+  <p class="sub">30X Hackathon · Eric Aguayo · entrega dom 18 oct, 11:59 ECT</p>
+  <nav id="nav">
+    <button data-t="vp">Propuesta de valor</button>
+    <button data-t="lean">Lean Canvas</button>
+    <button data-t="sol">Solución</button>
+    <button data-t="ev">Evidencia</button>
+    <button data-t="risk">Riesgos</button>
+    <button data-t="plan">Plan 43 h</button>
+  </nav>
+</header>
+<main>
+
+<!-- PROPUESTA DE VALOR -->
+<section id="s-vp">
+  <h2>W3</h2>
+  <div class="w3">
+    <div class="card"><b>Quién</b>El equipo de finanzas (1–3 personas) de una empresa de EE. UU. que paga a su equipo, proveedores y contratistas en Latinoamérica: decenas de pagos al mes.</div>
+    <div class="card"><b>Problema real</b>Cada factura llega por un canal distinto. Se revisa contra lo acordado, se piden datos y aprobación por chat, se paga a mano en otra moneda y se concilia en Excel.</div>
+    <div class="card"><b>Por qué importa</b>Un pago internacional doble o a quien no es cuesta recuperarlo. Las empresas quieren que sus agentes paguen; falta la confianza.</div>
+  </div>
+
+  <h2>Tres versiones</h2>
+  <div class="card vp"><span class="tag">V1 · Funcional</span><span>Para equipos de finanzas en EE. UU. que pagan proveedores en Latinoamérica y revisan cada factura a mano, ofrecemos un agente que decide qué pagar dentro de sus reglas, que a diferencia de un bot que adivina, resuelve solo la mayoría y nunca se pasa de un límite.</span><span class="sec">~19 s</span></div>
+  <div class="card vp rec"><span class="tag">V2 · Palabras del cliente <span class="pill">Recomendada</span></span><span><b>Para el equipo de finanzas que hoy aprueba pagos por WhatsApp y concilia en Excel, ofrecemos un agente que paga solo lo que se acordó, que a diferencia de un bot sin frenos, frena lo raro y te pregunta solo cuando hace falta, con la prueba en una línea.</b></span><span class="sec">~19 s</span></div>
+  <div class="card vp"><span class="tag">V3 · Con evidencia</span><span>Para clientes de Blinka que pagan equipos en varios países, ofrecemos reglas de pago que se cumplen solas, que a diferencia de un asistente que solo sugiere, deja a finanzas solo las excepciones: cero pagos indebidos en nuestra prueba, por menos de un centavo por factura.</span><span class="sec">~18 s</span></div>
+  <p class="sub">Por qué V2: usa las palabras del cliente (WhatsApp, Excel, «lo acordado»), vende beneficios y entra en 20 s. En el video, decir V2 y mostrar en pantalla el dato de V3: <b>0 pagos indebidos</b>.</p>
+
+  <h2>High-concept</h2>
+  <div class="card hc">El piloto automático de cuentas por pagar: paga lo acordado, frena lo raro y te pregunta lo dudoso.</div>
+</section>
+
+<!-- LEAN CANVAS -->
+<section id="s-lean">
+  <div class="tools">
+    <button class="btn p" id="exp">Exportar a Markdown</button>
+    <button class="btn" id="rst">Restaurar original</button>
+    <span class="saved" id="st">Haz clic en un bloque para editar. Se guarda solo.</span>
+  </div>
+  <div class="lc" id="lc">
+    <div style="grid-area:p"><h3>Problema</h3><div contenteditable data-k="Problema">1. Revisar cada factura a mano contra lo acordado.
+2. Aprobaciones dispersas en chat y correo, sin rastro.
+3. Riesgo de pagar doble, a alguien nuevo o de más, en otra moneda.
+
+Hoy: Excel + chat + pago a mano.</div></div>
+    <div style="grid-area:s"><h3>Solución</h3><div contenteditable data-k="Solución">1. Reglas que define la empresa.
+2. Reglas duras en código + modelos que solo dicen sí/no.
+3. Registro explicable y avisos con evidencia.</div></div>
+    <div style="grid-area:k"><h3>Métricas clave</h3><div contenteditable data-k="Métricas clave">Autonomía: % bien decidido sin humano.
+Seguridad: pagos fuera de reglas = 0.
+Explicabilidad: % entendido sin leer código.
+Tiempo de factura a decisión.</div></div>
+    <div style="grid-area:u"><h3>Propuesta única de valor</h3><div contenteditable data-k="Propuesta única de valor">Paga lo acordado, frena lo raro y te pregunta lo dudoso.
+
+Cada decisión, explicada en una línea.</div></div>
+    <div style="grid-area:a"><h3>Ventaja injusta</h3><div contenteditable data-k="Ventaja injusta">«El modelo nunca autoriza»: reglas en código + juicios sí/no.
+Bench propio con trampas y generador de estrés reproducible.
+Independiente del modelo.</div></div>
+    <div style="grid-area:ch"><h3>Canales</h3><div contenteditable data-k="Canales">Dentro de Blinka (proveedores y pagos).
+Correo y WhatsApp como entrada.
+API/MCP para los agentes de cada empresa.</div></div>
+    <div style="grid-area:c"><h3>Segmentos</h3><div contenteditable data-k="Segmentos de clientes">Empresas de EE. UU. con equipo, proveedores y contratistas en LatAm; decenas de pagos al mes.
+
+Early adopter: empresa que ya construye sus agentes y quiere que paguen.</div></div>
+    <div style="grid-area:co"><h3>Estructura de costos</h3><div contenteditable data-k="Estructura de costos">Modelo de decisión ~$0.0001 por factura (GLiDE).
+Hosting en capa gratuita.
+Extracción de PDF/imagen.
+Desarrollo e integración.</div></div>
+    <div style="grid-area:r"><h3>Valor para Blinka y sus clientes</h3><div contenteditable data-k="Flujo de ingresos (valor para Blinka y sus clientes)">Cliente: horas ahorradas, cero pagos dobles, cierre más rápido.
+Blinka: más pagos dentro de su plataforma, diferenciación, retención.
+Forma de cobro: hipótesis a validar con Blinka.</div></div>
+  </div>
+</section>
+
+<!-- SOLUCIÓN -->
+<section id="s-sol">
+  <h2>Arquitectura</h2>
+  <div class="card">
+  <svg viewBox="0 0 1100 230" width="100%" role="img" aria-label="Arquitectura">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#8a93a3"/></marker></defs>
+    <g font-size="13" text-anchor="middle">
+      <rect x="5" y="70" width="140" height="90" rx="10" fill="#f3f5f8" stroke="#cfd5de"/>
+      <text x="75" y="100" font-weight="700">Canales</text><text x="75" y="120">correo · WhatsApp</text><text x="75" y="138">PDF · chat</text>
+      <rect x="175" y="65" width="160" height="100" rx="10" fill="#f3f5f8" stroke="#cfd5de"/>
+      <text x="255" y="100" font-weight="700">Ingesta y</text><text x="255" y="118" font-weight="700">extracción</text><text x="255" y="138">quién · cuánto</text><text x="255" y="154">moneda · vence · idioma</text>
+      <rect x="365" y="20" width="190" height="80" rx="10" fill="#eef2ff" stroke="#2b5cff"/>
+      <text x="460" y="50" font-weight="700">Reglas deterministas</text><text x="460" y="70">límites · presupuesto</text><text x="460" y="87">beneficiarios · duplicado</text>
+      <rect x="365" y="130" width="190" height="80" rx="10" fill="#f4f0ff" stroke="#6941c6"/>
+      <text x="460" y="158" font-weight="700">Modelos sí/no</text><text x="460" y="177">adaptador GLiDE / JEV</text><text x="460" y="194">duda o error → escalar</text>
+      <rect x="590" y="70" width="140" height="90" rx="10" fill="#fff" stroke="#14181f" stroke-width="1.5"/>
+      <text x="660" y="100" font-weight="700">Decisión</text><text x="660" y="122" fill="#12805c">pagar</text><text x="660" y="139" fill="#b54708">frenar</text><text x="660" y="156" fill="#6941c6">escalar</text>
+      <rect x="765" y="70" width="150" height="90" rx="10" fill="#f3f5f8" stroke="#cfd5de"/>
+      <text x="840" y="100" font-weight="700">Registro explicable</text><text x="840" y="120">+ notificaciones</text><text x="840" y="138">correo · WhatsApp</text>
+      <rect x="950" y="70" width="145" height="90" rx="10" fill="#f3f5f8" stroke="#cfd5de" stroke-dasharray="5 4"/>
+      <text x="1022" y="100" font-weight="700">Salida estándar</text><text x="1022" y="120">pain.001 · AP2</text><text x="1022" y="140" fill="#5b6472">sin mover dinero</text>
+    </g>
+    <g stroke="#8a93a3" stroke-width="1.6" fill="none" marker-end="url(#ar)">
+      <path d="M145,115H178"/><path d="M330,105L363,65"/><path d="M330,125L363,168"/>
+      <path d="M555,60L588,100"/><path d="M555,170L588,130"/><path d="M730,115H763"/><path d="M915,115H948"/>
+    </g>
+  </svg>
+  <p class="sub" style="margin:4px 0 0">El modelo nunca autoriza un pago: solo responde «¿es duplicado?» y «¿cumple el acuerdo?». Las reglas las aplica el código.</p>
+  </div>
+
+  <h2>MoSCoW</h2>
+  <p class="sub">Rúbrica: IR Impacto 30% · IN Innovación 20% · VT Viab. técnica · VI Implementación · PR Presentación. Blinka: A Autonomía · S Seguridad · E Explicabilidad.</p>
+  <table>
+    <tr><th>Prioridad</th><th>Funcionalidad</th><th>Rúbrica</th><th>Blinka</th></tr>
+    <tr><td class="m must">Must</td><td>Extracción: quién, cuánto, moneda, vencimiento (correo, PDF, chat)</td><td>IR · VT</td><td>A</td></tr>
+    <tr><td class="m must">Must</td><td>Pantalla de reglas: límite por pago y por período, beneficiarios permitidos, aprobación sobre monto, presupuesto/saldo</td><td>IR · VI</td><td>S</td></tr>
+    <tr><td class="m must">Must</td><td>Motor: reglas duras + adaptador GLiDE (respaldo JEV); error o p 0.2–0.8 → escalar</td><td>VT · IN</td><td>S · A</td></tr>
+    <tr><td class="m must">Must</td><td>Decisión pagar / frenar / escalar con razón clara y evidencia</td><td>IR</td><td>E</td></tr>
+    <tr><td class="m must">Must</td><td>Tablero pagadas / frenadas / pendientes con el porqué; aprobar o rechazar ahí</td><td>IR · PR</td><td>E · S</td></tr>
+    <tr><td class="m must">Must</td><td>Dataset con trampas: duplicado, beneficiario nuevo, no cumple acuerdo, sobre límite, sin saldo</td><td>IR · VT</td><td>S</td></tr>
+    <tr><td class="m must">Must</td><td>Demo desplegada + repo público igual a la demo</td><td>VI · PR</td><td>—</td></tr>
+    <tr><td class="m should">Should</td><td>Cola en vivo multicanal con píldoras de origen e idioma</td><td>PR · IR</td><td>E</td></tr>
+    <tr><td class="m should">Should</td><td>Pipeline visual: recibir → revisar vs. acordado → datos del beneficiario → aprobación → crear pago → conciliar</td><td>PR · IN</td><td>E</td></tr>
+    <tr><td class="m should">Should</td><td>Botón «prueba de estrés»: generador con semilla, verdad conocida, ruido y formatos; marcador A/S/E en vivo</td><td>IN · VT · PR</td><td>A · S</td></tr>
+    <tr><td class="m should">Should</td><td>Multimoneda (USD → COP/MXN/BRL) e idiomas ES/EN/PT</td><td>IR</td><td>A</td></tr>
+    <tr><td class="m should">Should</td><td>Salida ISO 20022 pain.001 (XML) — salida estándar, sin mover dinero</td><td>VI · IN</td><td>—</td></tr>
+    <tr><td class="m could">Could</td><td>Avisos: aprobado, frenado y error de proceso, con evidencia (correo real, WhatsApp simulado)</td><td>IR · PR</td><td>E</td></tr>
+    <tr><td class="m could">Could</td><td>Multi-tenant: 2 empresas demo con reglas distintas</td><td>VI</td><td>—</td></tr>
+    <tr><td class="m could">Could</td><td>Mandato estilo AP2 (JSON) que representa la regla preautorizada</td><td>IN</td><td>S</td></tr>
+    <tr><td class="m could">Could</td><td>Exportar CSV de conciliación</td><td>IR</td><td>E</td></tr>
+    <tr><td class="m wont">Won't</td><td>Mover dinero, abrir cuentas, KYC, fraude/cumplimiento, diseñar la app de Blinka, WhatsApp Business real, x402</td><td>—</td><td>—</td></tr>
+  </table>
+
+  <h2>Salida de pago: protocolos</h2>
+  <table>
+    <tr><th>Candidato</th><th>Qué es</th><th>¿Encaja?</th></tr>
+    <tr><td><b>ISO 20022 pain.001</b></td><td>Mensaje XML con el que una empresa pide a su banco una transferencia; varios pagos, también internacionales. Vigente .13; la .09 sigue muy usada.</td><td class="good">Sí · principal</td></tr>
+    <tr><td><b>AP2</b> (Agent Payments Protocol)</td><td>Protocolo abierto de Google con «mandatos» firmados para pagos de agentes. v0.2 (abr 2026) agrega «Human Not Present»; donado a FIDO Alliance.</td><td>Parcial · mostrar mandato</td></tr>
+    <tr><td><b>ACP</b> (Stripe + OpenAI)</td><td>Estándar abierto para que agentes completen checkouts de comercios.</td><td class="wont">No · es compra, no factura</td></tr>
+    <tr><td><b>x402</b> (Coinbase)</td><td>HTTP 402 para pagos en stablecoins por acceso a APIs.</td><td class="wont">No · micropagos</td></tr>
+  </table>
+  <p class="sub">Fuentes: payments.ca · pain001.com · iso20022.org · blog.google · ap2-protocol.org · stripe.com/newsroom · agenticcommerce.dev · docs.cdp.coinbase.com/x402</p>
+</section>
+
+<!-- EVIDENCIA -->
+<section id="s-ev">
+  <h2>Bench: 30 facturas ficticias</h2>
+  <p class="sub">Verdad: 14 pagar · 13 frenar · 3 escalar. El código aplica las reglas; los modelos solo responden sí/no. Duda (0.2–0.8) o error → escalar.</p>
+  <table>
+    <tr><th>Motor</th><th>Decisiones correctas</th><th>Pagos indebidos</th><th>p50</th><th>Costo total</th></tr>
+    <tr><td><b>Fastino GLiDE</b></td><td class="good">100%</td><td class="good">0</td><td>373 ms</td><td>~$0.003</td></tr>
+    <tr><td>TypeSafe JEV</td><td>93%</td><td class="good">0</td><td>808 ms</td><td>~$0.008</td></tr>
+    <tr><td>GLiNER-2.5-Decide (API)</td><td>67%</td><td class="bad">4</td><td>732 ms</td><td>n/d</td></tr>
+    <tr><td>Solo reglas</td><td>43%</td><td class="good">0</td><td>—</td><td>$0</td></tr>
+  </table>
+  <div class="two">
+    <div class="card"><b>Lectura</b><ul><li>Solo reglas: seguro, pero escala casi todo.</li><li>GLiNER se equivoca con seguridad: la franja de duda no basta, hay que elegir el modelo por evidencia.</li><li>GLiDE principal, JEV de respaldo.</li></ul></div>
+    <div class="card"><b>Ojo</b><ul><li>Dataset chico y hecho por nosotros: el 100% puede no generalizar.</li><li>Por eso el botón de estrés: facturas nuevas con verdad conocida, en vivo.</li></ul></div>
+  </div>
+</section>
+
+<!-- RIESGOS -->
+<section id="s-risk">
+  <div class="two">
+    <div class="card"><h2>Riesgos</h2><ul>
+      <li>Dataset chico y propio → generador con semilla, ruido y formatos nuevos.</li>
+      <li>Dataset actual es de una empresa colombiana → re-sembrar como «US Inc.» que paga en LatAm.</li>
+      <li>Extracción desde PDF/imagen aún sin medir.</li>
+      <li>JEV vía revendedor no oficial → solo respaldo.</li>
+      <li>API externa caída → escala, nunca paga.</li>
+      <li>Factura con instrucciones («ignora las reglas») → agregar como trampa.</li>
+      <li>Tipo de cambio: fuente y momento; límites en USD.</li>
+      <li>Misma factura por dos canales.</li>
+    </ul></div>
+    <div class="card"><h2>Preguntas para Blinka</h2><ul>
+      <li>¿La autonomía se mide con nuestro dataset o con uno suyo?</li>
+      <li>¿«Límite por período» es mensual, por proveedor o global?</li>
+      <li>¿Hay API o export de su gestión de proveedores?</li>
+      <li>¿Qué salida les sirve: pain.001, CSV o JSON?</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- PLAN -->
+<section id="s-plan">
+  <h2>Plan de 43 h (ECT)</h2>
+  <table>
+    <tr><th>Bloque</th><th>Trabajo</th><th>Checkpoint</th></tr>
+    <tr><td>Vie 17–21</td><td>Repo, datos, portar engine/adapters a API, reglas en JSON, re-sembrar dataset US Inc.</td><td><b>Vie 21:00</b> · API decide las 30 con razones; deploy mínimo</td></tr>
+    <tr><td>Vie 21–02</td><td>Pantalla de reglas, tablero, detalle con el porqué, aprobar/rechazar</td><td></td></tr>
+    <tr><td>Sáb 09–14</td><td>Ingesta y extracción, multimoneda, ES/EN/PT, píldoras</td><td></td></tr>
+    <tr><td>Sáb 14–20</td><td>Generador + botón de estrés + marcador; pipeline visual; pain.001</td><td></td></tr>
+    <tr><td>Sáb 20–23</td><td>Avisos por correo, README, deploy final</td><td><b>Sáb 23:00</b> · flujo completo en línea; borrador de video</td></tr>
+    <tr><td>Dom 07–10</td><td>Grabar video, arreglos, repo = demo</td><td><b>Dom 10:00 · congelar</b></td></tr>
+    <tr><td>Dom 10–11:30</td><td>Editar, subir, enviar</td><td>Envío ≤ 11:30</td></tr>
+  </table>
+  <div class="two">
+    <div class="card"><b>Si voy tarde, se corta en orden</b><ol><li>WhatsApp</li><li>Multi-tenant</li><li>Mandato AP2</li><li>Portugués</li><li>Ruido del generador</li><li>Animación del pipeline</li><li>Notificaciones</li></ol><b>Nunca:</b> reglas, motor seguro, registro, trampas, deploy, repo.</div>
+    <div class="card"><b>Guion del video (3 min)</b><ul><li>0:00 V2 + high-concept</li><li>0:20 factura por WhatsApp se paga sola</li><li>0:50 trampas frenadas con su razón</li><li>1:30 sobre el monto → pide aprobación</li><li>2:00 estrés en vivo: 0 pagos indebidos</li><li>2:35 salida pain.001, sin mover dinero</li><li>2:50 cierre</li></ul></div>
+  </div>
+</section>
+</main>
+
+<script>
+const tabs=[...document.querySelectorAll('#nav button')];
+function show(id){if(!document.getElementById('s-'+id))id='vp';tabs.forEach(b=>b.classList.toggle('on',b.dataset.t===id));document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+id));}
+tabs.forEach(b=>b.onclick=()=>{history.replaceState(null,'','#'+b.dataset.t);show(b.dataset.t)});
+show(location.hash.slice(1));
+const KEY='nimble-blinka-lean-v1',cells=[...document.querySelectorAll('#lc [contenteditable]')],orig={};
+cells.forEach(c=>orig[c.dataset.k]=c.innerText);
+try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');cells.forEach(c=>{if(s[c.dataset.k]!=null)c.innerText=s[c.dataset.k]})}catch(e){}
+const st=document.getElementById('st');
+cells.forEach(c=>c.addEventListener('input',()=>{const o={};cells.forEach(x=>o[x.dataset.k]=x.innerText);try{localStorage.setItem(KEY,JSON.stringify(o));st.textContent='Guardado'}catch(e){st.textContent='No se pudo guardar'}}));
+document.getElementById('rst').onclick=()=>{if(!confirm('¿Volver al texto original?'))return;cells.forEach(c=>c.innerText=orig[c.dataset.k]);localStorage.removeItem(KEY);st.textContent='Restaurado'};
+document.getElementById('exp').onclick=()=>{
+  const order=["Problema","Segmentos de clientes","Propuesta única de valor","Solución","Canales","Flujo de ingresos (valor para Blinka y sus clientes)","Estructura de costos","Métricas clave","Ventaja injusta"];
+  const by={};cells.forEach(c=>by[c.dataset.k]=c.innerText.trim());
+  const md='# Lean Canvas · Nimble · Reto Blinka\n\n'+order.map(k=>'## '+k+'\n\n'+by[k]+'\n').join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='lean-canvas-nimble.md';a.click();
+  if(navigator.clipboard)navigator.clipboard.writeText(md).catch(()=>{});st.textContent='Exportado';
+};
+</script>
+</body>
+</html>

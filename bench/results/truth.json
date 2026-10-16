@@ -1,0 +1,426 @@
+[
+ {
+  "id": "F01",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.005683999916072935,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F02",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.002643999323481694,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F03",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0012170021363999695,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F04",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0009260002116207033,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F05",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006500013114418834,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F06",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006830014172010124,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F07",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0010069998097606003,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F08",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0004809990059584379,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F09",
+  "act": "hold",
+  "why": [
+   "modelo: no coincide con acuerdo p=0.00"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 0.0
+  },
+  "lat": 0.0004749999789055437,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F10",
+  "act": "hold",
+  "why": [
+   "modelo: probable duplicado p=1.00"
+  ],
+  "ans": {
+   "is_duplicate": 1.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0011949996405746788,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F11",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0009640025382395834,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F12",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0004840003384742886,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F13",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006400005077011883,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F14",
+  "act": "hold",
+  "why": [
+   "modelo: no coincide con acuerdo p=0.00"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 0.0
+  },
+  "lat": 0.0006160007615108043,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F15",
+  "act": "hold",
+  "why": [
+   "modelo: no coincide con acuerdo p=0.00"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 0.0
+  },
+  "lat": 0.0004159992386121303,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F16",
+  "act": "escalate",
+  "why": [
+   "proveedor nuevo / no autorizado"
+  ],
+  "ans": {
+   "is_duplicate": 0.0
+  },
+  "lat": 0.00042000101529993117,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F17",
+  "act": "escalate",
+  "why": [
+   "monto > 2000.0 requiere aprobación humana"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.00059100057114847,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F18",
+  "act": "hold",
+  "why": [
+   "modelo: probable duplicado p=1.00"
+  ],
+  "ans": {
+   "is_duplicate": 1.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.00043199906940571964,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F19",
+  "act": "hold",
+  "why": [
+   "monto > límite por pago 5000.0",
+   "excede tope mensual del proveedor",
+   "presupuesto insuficiente"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0005330002750270069,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F20",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.00057199940783903,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F21",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0007969974831212312,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F22",
+  "act": "pay",
+  "why": [
+   "todas las reglas OK"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0005130023055244237,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F23",
+  "act": "hold",
+  "why": [
+   "modelo: probable duplicado p=1.00"
+  ],
+  "ans": {
+   "is_duplicate": 1.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006199989002197981,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F24",
+  "act": "hold",
+  "why": [
+   "duplicado exacto (proveedor+número)",
+   "modelo: probable duplicado p=1.00"
+  ],
+  "ans": {
+   "is_duplicate": 1.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0005319998308550566,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F25",
+  "act": "hold",
+  "why": [
+   "cuenta bancaria distinta a la registrada",
+   "modelo: probable duplicado p=1.00"
+  ],
+  "ans": {
+   "is_duplicate": 1.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0004260000423528254,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F26",
+  "act": "escalate",
+  "why": [
+   "proveedor nuevo / no autorizado"
+  ],
+  "ans": {
+   "is_duplicate": 0.0
+  },
+  "lat": 0.0007499984349124134,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F27",
+  "act": "hold",
+  "why": [
+   "modelo: no coincide con acuerdo p=0.00"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 0.0
+  },
+  "lat": 0.0005030015017837286,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F28",
+  "act": "hold",
+  "why": [
+   "excede tope mensual del proveedor",
+   "presupuesto insuficiente"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0005600013537332416,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F29",
+  "act": "hold",
+  "why": [
+   "presupuesto insuficiente"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006640002538915724,
+  "tok": 0,
+  "err": null
+ },
+ {
+  "id": "F30",
+  "act": "hold",
+  "why": [
+   "excede tope mensual del proveedor",
+   "presupuesto insuficiente"
+  ],
+  "ans": {
+   "is_duplicate": 0.0,
+   "matches_agreement": 1.0
+  },
+  "lat": 0.0006039990694262087,
+  "tok": 0,
+  "err": null
+ }
+]
