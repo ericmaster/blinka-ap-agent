@@ -4,6 +4,14 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=22" },
-  "scripts": { "test": "node --test test/repo.test.mjs" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 test/*.test.mjs"
+  },
+  "dependencies": {
+    "tesseract.js": "^7.0.0",
+    "unpdf": "^1.9.0"
+  }
 }
