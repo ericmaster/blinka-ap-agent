@@ -1,0 +1,15 @@
+{
+  "company": "Northwind Ridge Inc. (fictional, Delaware)",
+  "period": "2026-10",
+  "base_currency": "USD",
+  "max_per_payment_usd": 5000,
+  "human_approval_above_usd": 2000,
+  "vendor_period_cap_usd": 6000,
+  "period_budget_usd": 11500,
+  "allowlist_only": true,
+  "uncertain_band": [0.2, 0.8],
+  "p_duplicate_hold": 0.5,
+  "p_match_min": 0.5,
+  "fx_as_of": "2026-10-15 (fixed demo table, USD per 1 unit)",
+  "fx_to_usd": { "USD": 1, "COP": 0.00025, "MXN": 0.055, "BRL": 0.18, "PEN": 0.27, "CLP": 0.00105 }
+}
