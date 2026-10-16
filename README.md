@@ -7,6 +7,14 @@
 ## Arquitectura / Architecture
 Reglas deterministas → GLiDE (Fastino, principal) → JEV (respaldo) → pagar · frenar · escalar → log + tablero → pain.001. Detalle: [`docs/SPEC.md`](docs/SPEC.md).
 
+## Uso / Usage
+```bash
+npm ci && npm test                       # 0 pagos indebidos / zero improper payments (fake model)
+node scripts/run.mjs data/curated        # decisions.jsonl, log.md, pain001.xml en out/
+FASTINO_API_KEY=... JEV_API_KEY=... node scripts/run.mjs data/curated --real   # GLiDE → JEV
+```
+Reglas configurables: [`config/rules.json`](config/rules.json). Extracción: [`docs/EXTRACTION.md`](docs/EXTRACTION.md). Datos: [`docs/DATASET.md`](docs/DATASET.md).
+
 ## Evidencia / Evidence
 [`bench/RESULTS.md`](bench/RESULTS.md): 30 facturas sintéticas — GLiDE 100% decisiones correctas, **0 pagos indebidos**.
 
@@ -19,6 +27,7 @@ export FASTINO_API_KEY=... JEV_API_KEY=...   # never commit keys
 ## Repo
 - `docs/` — SPEC, PROPUESTA (propuesta de valor, Lean Canvas, MoSCoW), canvas.html/png, PITCH, JUDGE-GUIDE
 - `bench/` — bench de modelos de decisión y resultados
+- `src/` — `extract/` (texto, PDF, OCR), `engine/` (reglas), `adapters/` (GLiDE, JEV, fakes), `output/` (pain.001), `gen/` (generador)
 - `src/ports/` — patrón port/adapter (real vs fake via `ADAPTER_MODE`)
 
 Datos 100% ficticios / fully synthetic data. Licencia MIT.
