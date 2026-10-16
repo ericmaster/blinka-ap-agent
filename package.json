@@ -8,10 +8,18 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test --test-concurrency=1 test/*.test.mjs"
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "start": "node scripts/serve.mjs",
+    "build": "node scripts/build-ui.mjs",
+    "bundle": "esbuild src/worker.mjs --bundle --format=esm --platform=browser --conditions=worker,browser --external:node:* --external:tesseract.js --minify --outfile=dist/worker.mjs",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "tesseract.js": "^7.0.0",
     "unpdf": "^1.9.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "wrangler": "^4.151.1"
   }
 }
