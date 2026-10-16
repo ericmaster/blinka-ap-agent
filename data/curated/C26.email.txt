@@ -1,0 +1,16 @@
+From: billing@riolegalcons.example
+To: ap@northwind-ridge.example
+Subject: Fatura nº RL-80
+
+Olá equipe Northwind,
+
+FORNECEDOR: Rio Legal Consultoria Ltda
+FATURA Nº RL-80
+DATA: 5 de outubro de 2026
+VENCIMENTO: 30 de outubro de 2026
+DESCRIÇÃO: Consultoria jurídica, registro de marca no INPI: 6 horas x BRL 650,00
+TOTAL A PAGAR: R$ 3.900,00
+CONTA: BR-FAKE-6006
+
+Atenciosamente,
+Rio Legal Consultoria Ltda

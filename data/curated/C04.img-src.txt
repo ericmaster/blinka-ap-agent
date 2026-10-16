@@ -1,0 +1,7 @@
+Proveedor: Lima Support Desk SAC
+Factura N° LSD-310
+Fecha: 2026-10-05
+Vence: 2026-10-30
+Concepto: Soporte nivel 1: 100 horas x PEN 45.00
+Total a pagar: 4.500,00 PEN
+Cuenta: PE-FAKE-4004

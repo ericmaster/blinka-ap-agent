@@ -1,0 +1,5 @@
+[2026-10-16 09:56] Camila: hola! te paso la factura VA-1018 de Valpo Data SpA
+total CLP 950.000
+vence 23 de octubre de 2026
+cuenta CL-FAKE-7007
+concepto: Licencia analítica mensual 2026-10 #18

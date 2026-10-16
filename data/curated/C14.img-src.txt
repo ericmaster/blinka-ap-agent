@@ -1,0 +1,7 @@
+FORNECEDOR: Rio Legal Consultoria Ltda
+FATURA Nº RL-78
+DATA: 2026-10-05
+VENCIMENTO: 2026-10-30
+DESCRIÇÃO: Consultoria: 2 horas x BRL 650,00 + despesas de viagem BRL 900,00 (sem aprovação prévia)
+TOTAL A PAGAR: BRL 2.200,00
+CONTA: BR-FAKE-6006

@@ -1,0 +1,7 @@
+Proveedor: Valpo Data SpA
+Factura N° VA-1032
+Fecha: 5 de octubre de 2026
+Vence: 15 de octubre de 2026
+Concepto: Licencia analítica mensual 2026-10 #32
+Total a pagar: 950.000 CLP
+Cuenta: CL-FAKE-7007

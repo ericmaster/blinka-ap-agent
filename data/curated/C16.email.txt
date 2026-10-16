@@ -1,0 +1,16 @@
+From: billing@monterreyops.example
+To: ap@northwind-ridge.example
+Subject: Invoice # MOP-2211
+
+Hi Northwind team,
+
+  VENDOR: Monterrey Ops Partners S.C.
+  INVOICE # MOP-2211
+  DATE: October 5, 2026
+  DUE DATE: October 30, 2026
+  DESCRIPTION: Bookkeeping, week of Oct 12: 10 hours x MXN 520.00
+  TOTAL DUE: MXN 5.200,00
+  ACCOUNT: MX-FAKE-9999
+
+Best regards,
+Monterrey Ops Partners S.C.

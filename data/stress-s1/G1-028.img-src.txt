@@ -1,0 +1,7 @@
+Proveedor: Lima Support Desk SAC
+Factura N° LI-1027
+Fecha: 2026-10-09
+Vence: 2026-10-19
+Concepto: 6 horas de soporte x 45
+Total a pagar: PEN 270,00
+Cuenta: PE-FAKE-4004

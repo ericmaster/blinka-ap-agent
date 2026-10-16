@@ -1,0 +1,16 @@
+From: billing@monterreyops.example
+To: ap@northwind-ridge.example
+Subject: Invoice # MO-1016
+
+Hi Northwind team,
+
+Vendor: Monterrey Ops Partners S.C.
+Invoice # MO-1016
+Date: October 3, 2026
+Due date: October 13, 2026
+Description: 8 bookkeeping hours x 520
+Total due: 4,160.00 MXN
+Account: MX-FAKE-8008
+
+Best regards,
+Monterrey Ops Partners S.C.

@@ -1,0 +1,16 @@
+From: billing@valpodataspa.example
+To: ap@northwind-ridge.example
+Subject: Factura N° VD-5521
+
+Hola equipo de Northwind,
+
+  Proveedor: Valpo Data SpA
+  Factura N° VD-5521
+  Fecha: 2026-10-05
+  Vence: 2026-10-30
+  Concepto: Licencia analítica octubre 2026
+  Total a pagar: CLP 950.000
+  Cuenta: CL-FAKE-7007
+
+Saludos,
+Valpo Data SpA

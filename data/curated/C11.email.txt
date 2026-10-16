@@ -1,0 +1,16 @@
+From: billing@bogotgrowtha.example
+To: ap@northwind-ridge.example
+Subject: Factura N° BGA-1
+
+Hola equipo de Northwind,
+
+PROVEEDOR: Bogotá Growth Agency SAS
+FACTURA N° BGA-1
+FECHA: 07/10/2026
+VENCE: 25/10/2026
+CONCEPTO: Campaña de marketing digital octubre
+TOTAL A PAGAR: USD 1,200.00
+CUENTA: CO-FAKE-9911
+
+Saludos,
+Bogotá Growth Agency SAS

@@ -1,0 +1,16 @@
+From: billing@riolegalcons.example
+To: ap@northwind-ridge.example
+Subject: Fatura nº RL-79
+
+Olá equipe Northwind,
+
+Fornecedor: Rio Legal Consultoria Ltda
+Fatura nº RL-79
+Data: 5 de outubro de 2026
+Vencimento: 30 de outubro de 2026
+Descrição: Consultoria jurídica, revisão de contratos de fornecedores: 10 horas x BRL 650,00
+Total a pagar: R$ 6.500,00
+Conta: BR-FAKE-6006
+
+Atenciosamente,
+Rio Legal Consultoria Ltda

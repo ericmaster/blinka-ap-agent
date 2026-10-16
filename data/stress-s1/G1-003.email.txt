@@ -1,0 +1,16 @@
+From: billing@riolegalcons.example
+To: ap@northwind-ridge.example
+Subject: Fatura nº RI-1000
+
+Olá equipe Northwind,
+
+Fornecedor: Rio Legal Consultoria Ltda
+Fatura nº RI-1000
+Data: 7 de outubro de 2026
+Vencimento: 17 de outubro de 2026
+Descrição: 5 horas de consultoria x 650
+Total a pagar: BRL 3.250,00
+Conta: BR-FAKE-6006
+
+Atenciosamente,
+Rio Legal Consultoria Ltda

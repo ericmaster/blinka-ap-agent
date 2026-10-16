@@ -1,0 +1,16 @@
+From: billing@pixelnortesa.example
+To: ap@northwind-ridge.example
+Subject: Factura N° PN-1025
+
+Hola equipo de Northwind,
+
+Proveedor: Pixel Norte S.A. de C.V.
+Factura N° PN-1025
+Fecha: 05/10/2026
+Vence: 30/10/2026
+Concepto: Diseño UI octubre 2026, tarifa fija mensual
+Total a pagar: MXN 28.000,00
+Cuenta: MX-FAKE-2002
+
+Saludos,
+Pixel Norte S.A. de C.V.
