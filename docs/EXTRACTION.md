@@ -19,3 +19,9 @@ Reglas de seguridad de la extracción:
 - OCR con confianza < 80% → **escalar**.
 
 Por qué no un LLM de visión: costo y una superficie de prompt-injection más; el OCR + parser es reproducible y gratis. Se puede enchufar uno detrás del mismo puerto si el OCR falla en documentos reales.
+
+## Translation (UI only)
+Non-English invoices can be shown in English in the detail view. Deployed: Cloudflare Workers AI `@cf/meta/m2m100-1.2b` (free tier, line by line, cached per entry). Locally or without the binding: the original is shown with a note. Decisions always use the original text, never the translation.
+
+## Evidence schema
+Each entry carries `schema`: `vendor, amount, currency, due_date, invoice_number, bank_account, line_items`, each `{ value, evidence: {text, start, end}, confidence }`. Offsets point into the extracted text. Confidence is heuristic: labeled match 0.93–0.97, unlabeled pattern 0.85, unregistered vendor 0.6, scaled by OCR confidence for images; missing = 0.

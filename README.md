@@ -19,6 +19,8 @@ Reglas configurables: [`config/rules.json`](config/rules.json). Extracción: [`d
 ```bash
 npm ci && npm run build && npm start      # http://localhost:8796  (FASTINO_API_KEY / JEV_API_KEY optional; without them every invoice escalates)
 ```
+English UI. Sign in with email + one-time code (DEMO MODE shows the code on screen). Mock email inbox and WhatsApp chat are the primary feed ("Process new"), plus manual upload; each queue entry links to its source message. Details: NER-style schema with evidence span + confidence per field, rules applied, decision log with who/when, original PDF/image view + download, translation toggle (Workers AI m2m100 when deployed; otherwise the original with a note).
+
 Pendientes / pagadas / frenadas con el porqué, aprobar o rechazar (la aprobación vuelve a verificar las reglas duras), reglas editables, carga de correo/chat/PDF/imagen (OCR en el navegador), prueba de estrés con Autonomía · Pagos indebidos · Explicabilidad, descarga pain.001.
 Cloudflare Workers: `wrangler.toml` (KV `STATE`), `npx wrangler secret put FASTINO_API_KEY`, `npx wrangler deploy`.
 
