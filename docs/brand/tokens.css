@@ -1,0 +1,15 @@
+/* Design tokens aligned with blinka.co (observed 2026-10-16). Applied to the Clearhold UI (src/server/ui.html). */
+:root{
+  --color-ink:#1c253a; --color-ink-hover:#334360;
+  --color-accent:#2a4bd0; --color-accent-hover:#2342bd; --color-accent-soft:#b9c8ff;
+  --color-paper:#f7f7f4; --color-surface:#fdfdfd; --color-line:#dedfdc;
+  --color-muted:#656975; --color-slate:#47525d; --color-night:#111720;
+  /* status (product-specific, not from blinka) */
+  --color-pay:#1f8a5b; --color-hold:#c98a12; --color-escalate:#c2410c;
+  --font-sans:"Inter",ui-sans-serif,system-ui,sans-serif; /* blinka uses self-hosted "Blinka Inter" */
+  --font-mono:"Geist Mono",ui-monospace,monospace;
+  --radius-xs:2px; --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-pill:999px;
+  --btn-height:48px; --btn-height-sm:38px; --btn-pad-x:25px; --btn-font-size:14px; --btn-font-weight:500;
+  --shadow-hover:0 3px 12px #1c253a14; --transition:.18s;
+}
+@media (prefers-color-scheme:dark){:root{--color-ink:#e9edf1;--color-muted:#b2bbc7;--color-line:#b9c7da2b;--color-paper:#111720}}
