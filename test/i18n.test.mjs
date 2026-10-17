@@ -28,6 +28,10 @@ test("i18n: API errors, notes and payout rails from the server and mocks are cov
   const rails = [["CO", "COP"], ["BR", "BRL"], ["MX", "MXN"], ["AR", "ARS"], ["CL", "CLP"], ["PE", "PEN"], ["BO", "BOB"], ["CR", "CRC"], ["US", "USD"], ["PE", "USD"], ["DE", "USD"]].map(([c, k]) => railFor(c, k).rail);
   assert.deepEqual(missing(rails.filter((r) => !/^(Argentina|SWIFT)/.test(r))), []); // those two read the same in Spanish
   assert.ok(rails.every((r) => es(r)));
+  assert.equal(es('Bank account MX-1 does not match the registered account for Monterrey Ops Partners S.C. Moved to pending by a@x.example at 2026-10-17T15:00:00Z: "ok".'), 'La cuenta bancaria MX-1 no coincide con la cuenta registrada de Monterrey Ops Partners S.C. Movida a pendientes por a@x.example el 2026-10-17T15:00:00Z: "ok".');
+  assert.equal(es('Moved to pending by ana@x.example at 2026-10-17T15:00:00Z: "Vendor confirmed".'), 'Movida a pendientes por ana@x.example el 2026-10-17T15:00:00Z: "Vendor confirmed".');
+  assert.equal(es('Rejected by a@x.example at 2026-10-17T15:00:00Z. Override requested by a@x.example at 2026-10-17T15:01:00Z: "ok then". Above US$2,000, a second person must approve.'), 'Rechazada por a@x.example el 2026-10-17T15:00:00Z. Excepción solicitada por a@x.example el 2026-10-17T15:01:00Z: "ok then". Por encima de US$2,000, otra persona debe aprobar.');
+  assert.equal(es('Approved over a hold by b@x.example at 2026-10-17T15:02:00Z; hard rules re-checked. Reason: "Checked". Second approver after a@x.example.'), 'Aprobada sobre una retención por b@x.example el 2026-10-17T15:02:00Z; reglas duras verificadas de nuevo. Motivo: "Checked". Segundo aprobador después de a@x.example.');
   assert.deepEqual(missing(["Approved by ana@x.example at 2026-10-17T15:00:00Z; hard rules re-checked.", "Rejected by ana@x.example at 2026-10-17T15:00:00Z.", "approvers", "contact on file for Pixel Norte S.A. de C.V."]), []);
 });
 
@@ -68,7 +72,7 @@ test("i18n: every Clearhold UI string has Spanish with matching arguments", () =
   const miss = [...new Set([...s, ...maps, ...rows])].filter((k) => !(k in UI_ES) && k !== "WhatsApp" && k !== "PDF");
   assert.deepEqual(miss, []);
   for (const [k, v] of Object.entries(UI_ES)) assert.equal(args(v), args(k), k);
-  for (const a of ["edit vendor", "remove vendor", "reset demo", "propose new vendor", "propose bank/terms change", "approve change", "reject change"]) assert.ok(UI_ES[a], a);
+  for (const a of ["edit vendor", "remove vendor", "reset demo", "propose new vendor", "propose bank/terms change", "approve change", "reject change", "move held invoice to pending", "request hold override", "approve held invoice"]) assert.ok(UI_ES[a], a);
 });
 
 test("i18n: mock Mailbox, ChatApp and Blinka pages have Spanish and the shared EN · ES toggle", async () => {

@@ -4,7 +4,7 @@ import defaultRules from "../../config/rules.json" with { type: "json" };
 import { VENDORS, COMPANY } from "../data/vendors.mjs";
 import { contractMarkdown, contractHtml, contractPdf } from "../contracts.mjs";
 import { processDoc } from "../pipeline.mjs";
-import { newLedger, approve, registry, DUP_RE } from "../engine/decide.mjs";
+import { newLedger, approve, registry, DUP_RE, toUsd } from "../engine/decide.mjs";
 import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, rng } from "../gen/generator.mjs";
@@ -51,12 +51,12 @@ export function validateRules(r) {
 const withAllow = (rules, x) => (x.vendorKey && !(rules.allowlist ?? Object.keys(registry(rules))).includes(x.vendorKey) ? { ...x, vendorKey: null } : x);
 const cookie = (req) => Object.fromEntries((req.headers.get("cookie") ?? "").split(/;\s*/).filter(Boolean).map((c) => { const i = c.indexOf("="); return [c.slice(0, i), c.slice(i + 1)]; }));
 
-export function createApp({ store, auth, env = {}, connectors = {}, resetMocks = async () => {} }) {
+export function createApp({ store, auth, env = {}, connectors = {}, resetMocks = async () => {}, model = null }) {
   // Auth (users, sessions, one-time codes) is one shared record; everything else is per workspace (store).
   const loadA = async () => { const a = (await auth.load()) ?? {}; a.users ??= {}; a.sessions ??= {}; a.otps ??= {}; a.otpLog ??= {}; return a; };
   const saveA = async (a) => { const cur = await auth.load(); if ((cur?.v ?? 0) !== (a.v ?? 0)) throw new Conflict("auth changed"); a.v = (a.v ?? 0) + 1; await auth.save(a); };
   const demo = env.DEMO_MODE !== "false";
-  const adapter = () => fromEnv(env) ?? noModel;
+  const adapter = () => model ?? fromEnv(env) ?? noModel;
   const notifier = createNotifier(env);
   // Optimistic concurrency: every save checks the stored version; a conflicting request is re-run from fresh state
   // (so the hard rules are re-evaluated against the current ledger before anything is booked). Requests are also serialized per isolate.
@@ -224,20 +224,50 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
         e.translation = { text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
         await save(st); return json(e.translation);
       }
-      if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|reject)$/))) {
+      if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|reject|reopen)$/))) {
         const e = st.log.find((l) => l.id === mm[1]);
         if (!e) return json({ error: "not found" }, 404);
-        if (e.action !== "escalate") return json({ error: "Only pending invoices can be decided" }, 409);
         const at = new Date().toISOString();
         const ab = await req.json().catch(() => ({}));
-        if (mm[2] === "reject") { e.action = "hold"; e.reasons = [...e.reasons, `Rejected by ${user} at ${at}.`]; }
-        else {
-          const r = approve(e, st.ledger, st.rules, { override: ab.override });
-          if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
-          e.action = "pay"; e.reasons = [...e.reasons, `Approved by ${user} at ${at}; hard rules re-checked.` + (ab.override && e.reasons.some((x) => DUP_RE.test(x)) ? ` Duplicate override: "${String(ab.override).slice(0, 200)}".` : "")];
+        const why = typeof ab.reason === "string" ? ab.reason.trim().slice(0, 300) : "";
+        const audit = (action, extra = {}) => st.audit.push({ by: user, at, action, key: e.id, name: `${e.id} · ${e.extracted?.payee ?? "?"}`, changes: { reason: [null, why], ...extra } });
+        const done = () => { e.reason = e.reasons.join(" "); e.decidedBy = user; e.history = [...(e.history ?? []), { by: user, at, action: e.action }]; };
+        // Held -> Pending: a person takes it back for review (typed reason, logged). Nothing is paid; approving later re-runs every hard rule.
+        if (mm[2] === "reopen") {
+          if (e.action !== "hold") return json({ error: "Only held invoices can be moved to pending." }, 409);
+          if (why.length < 5) return json({ error: "Give a reason (at least 5 characters); it is logged." }, 400);
+          e.action = "escalate"; e.wasHeld = true; e.reasons = [...e.reasons, `Moved to pending by ${user} at ${at}: "${why}".`];
+          done(); audit("move held invoice to pending"); await save(st); return json(e);
         }
-        e.reason = e.reasons.join(" "); e.decidedBy = user; e.history = [...(e.history ?? []), { by: user, at, action: e.action }];
-        await save(st); return json(e);
+        // Overriding a hold (held now, or held before and moved to pending): typed reason; above the human-approval threshold a second, different person.
+        const overriding = e.action === "hold" || (e.action === "escalate" && e.wasHeld);
+        if (e.action !== "escalate" && !(overriding && mm[2] === "approve")) return json({ error: "Only pending invoices can be decided" }, 409);
+        if (mm[2] === "reject") { e.action = "hold"; delete e.overrideRequest; e.reasons = [...e.reasons, `Rejected by ${user} at ${at}.`]; done(); await save(st); return json(e); }
+        if (overriding) {
+          if (why.length < 5) return json({ error: "Give a reason (at least 5 characters); it is logged.", needsReason: true }, 400);
+          const dry = approve({ ...e, action: "escalate" }, structuredClone(st.ledger), st.rules, { override: why });
+          if (!dry.ok) return json({ error: dry.reason, needsOverride: !!dry.needsOverride }, 409);
+          const usd = e.amountUsd ?? toUsd(e.extracted.amount, e.extracted.currency, st.rules);
+          if (usd == null || usd > st.rules.human_approval_above_usd) {
+            const req1 = e.overrideRequest;
+            if (!req1) {
+              e.overrideRequest = { by: user, at, reason: why };
+              e.reasons = [...e.reasons, `Override requested by ${user} at ${at}: "${why}". Above US$${st.rules.human_approval_above_usd.toLocaleString("en-US")}, a second person must approve.`];
+              e.reason = e.reasons.join(" "); audit("request hold override"); await save(st); return json({ ...e, pendingSecond: true }, 202);
+            }
+            if (req1.by === user) return json({ error: "A different person must approve this override." }, 403);
+          }
+          const r = approve({ ...e, action: "escalate" }, st.ledger, st.rules, { override: why });
+          if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
+          const second = e.overrideRequest ? ` Second approver after ${e.overrideRequest.by}.` : "";
+          e.action = "pay"; delete e.overrideRequest;
+          e.reasons = [...e.reasons, `Approved over a hold by ${user} at ${at}; hard rules re-checked. Reason: "${why}".${second}`];
+          done(); audit("approve held invoice"); await save(st); return json(e);
+        }
+        const r = approve(e, st.ledger, st.rules, { override: ab.override });
+        if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
+        e.action = "pay"; e.reasons = [...e.reasons, `Approved by ${user} at ${at}; hard rules re-checked.` + (ab.override && e.reasons.some((x) => DUP_RE.test(x)) ? ` Duplicate override: "${String(ab.override).slice(0, 200)}".` : "")];
+        done(); await save(st); return json(e);
       }
       if (m === "PUT" && p === "/api/rules") {
         const r = { ...st.rules, ...(await req.json()) };
@@ -310,7 +340,7 @@ export function auditRows(st) {
     return { id: e.id, received_at: e.at, channel: s.channel ?? null, format: e.channel, source_message: s.messageId ?? s.name ?? null,
       payee: x.payee ?? null, vendor_key: x.vendorKey ?? null, invoice_number: x.number ?? null, amount: x.amount ?? null, currency: x.currency ?? null,
       amount_usd: e.amountUsd != null ? Math.round(e.amountUsd * 100) / 100 : null, due: x.due ?? null, bank_account: x.acct ?? null,
-      agent_decision: h[0]?.action ?? e.action, final_decision: e.action, decided_by: h.at(-1)?.by ?? "agent", decided_at: h.at(-1)?.at ?? e.at,
+      agent_decision: h[0]?.action ?? e.action, final_decision: e.action, decided_by: h.at(-1)?.by ?? "agent", decision_source: (h.at(-1)?.by ?? "agent") === "agent" ? "agent" : "user", decided_at: h.at(-1)?.at ?? e.at,
       reasons: e.reason, rules_failed: (e.checks ?? []).filter((c) => !c.ok).map((c) => c.rule).join("; "),
       model: e.model?.name ?? null, p_duplicate: e.model?.is_duplicate ?? null, p_matches_agreement: e.model?.matches_agreement ?? null,
       evidence: JSON.stringify(ev), history: h.map((y) => `${y.at ?? ""} ${y.by} ${y.action}`).join(" | ") };
