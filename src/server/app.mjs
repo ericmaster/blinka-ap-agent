@@ -9,7 +9,18 @@ import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, bodyLines, rng } from "../gen/generator.mjs";
 import { textPdf } from "../gen/pdf.mjs";
-import { score, counts } from "../score.mjs";
+import { score, counts, improper } from "../score.mjs";
+import { curated } from "../gen/generator.mjs";
+const MANIFEST = curated();
+/** Header KPIs. Improper payments are judged against ground truth for seeded (fake) cases paid by the agent on its own. */
+export function kpis(st) {
+  const held = st.log.filter((l) => l.action === "hold"), n = st.log.length;
+  const agentPaid = st.log.filter((l) => l.action === "pay" && l.history?.at(-1)?.by === "agent")
+    .map((l) => ({ ...l, id: /-(C\d+)$/.exec(l.source?.messageId ?? "")?.[1] })).filter((l) => l.id && MANIFEST.some((m) => m.id === l.id));
+  return { heldUsd: Math.round(held.reduce((a, l) => a + (l.amountUsd ?? 0), 0)), stopped: held.length,
+    autonomy: n ? Math.round((st.log.filter((l) => l.history?.at(-1)?.by === "agent" && l.action !== "escalate").length / n) * 100) : null,
+    improper: improper(agentPaid, MANIFEST, st.rules).length };
+}
 import { UI } from "./ui.mjs";
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
@@ -80,7 +91,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
       const st = st0;
       if (m === "GET" && p === "/api/state") {
         return json({ user, demo, rules: st.rules, audit: st.audit.slice(-50).reverse(), sources: { email: connectors.email?.ui("") ?? null, whatsapp: connectors.whatsapp?.ui("") ?? null }, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
-          log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), spentUsd: st.ledger.spentUsd, channels: st.channels });
+          log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), kpis: kpis(st), spentUsd: st.ledger.spentUsd, channels: st.channels });
       }
       // ---- connectors: pull new messages from the external email / WhatsApp services (poll)
       if (m === "POST" && p === "/api/sync") {

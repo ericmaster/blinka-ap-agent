@@ -14,7 +14,7 @@ button,.btn{font:inherit;border:1px solid var(--line);background:#fff;border-rad
 button:hover,.btn:hover{box-shadow:0 3px 12px #1c253a14}button.pri:hover{background:var(--acc-h)}
 button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.5;cursor:default}button.link{border:0;padding:0;background:none;color:var(--acc)}
 .pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:99px;background:#eef0f4;color:#47525d;margin-right:4px;vertical-align:1px}
-.k{font-size:12.5px;color:var(--mut)}.kpi{padding:3px 9px;border-radius:8px;background:#f3f4f6;font-size:13px}
+.k{font-size:12.5px;color:var(--mut)}.kpi{padding:3px 9px;border-radius:8px;background:#f3f4f6;font-size:13px}.kpi,#model{white-space:nowrap}.kpi.good{background:#e7f6ec}.kpi.bad{background:#fde8e8}#guide{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:#f8faff}#guide ol{margin:8px 0;padding-left:20px}#guide li{margin:6px 0}.gr{font-size:13.5px}@media(max-width:760px){header{flex-wrap:wrap;gap:6px}.kpi{font-size:12px}#who,#model{display:none}nav{overflow-x:auto;white-space:nowrap}nav button{flex:none}.row{grid-template-columns:1fr!important}.grid2{grid-template-columns:1fr!important}.amt{text-align:left!important}}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}.pay{background:var(--pay)}.hold{background:var(--hold)}.escalate{background:var(--esc)}.new{background:var(--acc)}
 .sub{display:flex;gap:6px;margin-bottom:10px;align-items:center}.sub .tab{border-radius:99px}.tab.on{background:var(--fg);color:#fff;border-color:var(--fg)}
 .row{display:grid;grid-template-columns:52px 1fr 170px;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.row:first-child{border-top:0}
@@ -44,12 +44,12 @@ mark{background:#fff3b0;border-radius:3px}.doc{width:100%;height:420px;border:1p
 <input id="em" type="email" placeholder="you@company.com" autocomplete="email"><div id="otpBox" style="display:none;gap:10px;display:none"><div class="demo" id="demoCode"></div><input id="otp" inputmode="numeric" placeholder="6-digit code"></div>
 <button class="pri" id="lgo">Send code</button></div></div>
 <header><div class="logo"><svg width="30" height="30" viewBox="8 8 48 48" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#1c253a"/><path d="M22 33l7 7 13-15" stroke="#b9c8ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Clearhold</b><small>by Blinka</small></div></div><span class="pill" id="model"></span><span class="sp"></span>
-<span class="kpi"><span class="dot pay"></span><b id="cPay">0</b> paid</span><span class="kpi"><span class="dot hold"></span><b id="cHold">0</b> held</span><span class="kpi"><span class="dot escalate"></span><b id="cEsc">0</b> pending</span>
+<span class="kpi" title="Total held by the rules"><b id="kHeld">US$ 0</b> held</span><span class="kpi"><b id="kStop">0</b> risky stopped</span><span class="kpi"><b id="kAuto">–</b> autonomous</span><span class="kpi good"><b id="kImp">0</b> improper payments</span>
 <button class="pri" id="proc">Process new</button><a class="btn" href="/api/pain001">pain.001</a><span class="k" id="who"></span><button class="link" id="out">Sign out</button></header>
 <nav><button data-v="queue" class="on">Queue</button><button data-v="vendors">Vendors</button><button data-v="rules">Rules</button><button data-v="stress">Stress test</button><span class="sp"></span><a class="ext" href="/mail/" target="clearhold-mail">Mailbox ↗</a><a class="ext" href="/chat/" target="clearhold-chat">WhatsApp ↗</a></nav>
 <main>
-<section id="v-queue"><div class="card"><div id="drop"><textarea id="txt" placeholder="Paste an email or chat message, or drop a PDF / photo here"></textarea><button id="go">Add</button><label class="btn">File<input type="file" id="file" accept=".pdf,image/*,.txt,.eml" multiple hidden></label></div>
-<div class="sub"><button class="tab on" data-t="escalate">Pending</button><button class="tab" data-t="pay">Paid</button><button class="tab" data-t="hold">Held</button></div><div id="list"></div></div></section>
+<section id="v-queue"><div class="card"><div id="guide" hidden></div><div id="drop"><textarea id="txt" placeholder="Paste an email or chat message, or drop a PDF / photo here"></textarea><button id="go">Add</button><label class="btn">File<input type="file" id="file" accept=".pdf,image/*,.txt,.eml" multiple hidden></label></div>
+<div class="sub"><button class="tab on" data-t="escalate">Needs you <span id="tE"></span></button><button class="tab" data-t="hold">Held <span id="tH"></span></button><button class="tab" data-t="pay">Paid <span id="tP"></span></button></div><div id="list"></div></div></section>
 <section id="v-rules" hidden><div class="card" style="max-width:520px"><div id="rules"></div><button class="pri" id="save">Save rules</button>
 <div class="k" style="margin-top:10px">Vendors, bank accounts, contracted services and prices are in the Vendors tab.</div></div></section>
 <section id="v-vendors" hidden><div class="card"><div class="sub"><b>Vendor registry</b><span class="sp"></span><button class="pri" id="addv">Add vendor</button></div><div id="vform"></div><table id="vt"></table><div style="margin-top:14px"><b>Change log</b><div id="audit"></div></div></div></section>
@@ -75,18 +75,18 @@ $("#otp").onkeydown=$("#em").onkeydown=e=>{if(e.key==="Enter")$("#lgo").click()}
 $("#out").onclick=async()=>{await api("/api/auth/logout",{method:"POST"});location.reload()};
 // ---- data
 async function load(){S=await api("/api/state");render()}
-async function boot(){await load();await sync()}
+async function boot(){$("#list").innerHTML='<div class="empty">Loading…</div>';await load();await sync();guideRan=!S.log.length}
 const entry=id=>S.log.find(l=>l.id===id);
 const unprocessed=()=>[...S.channels.emails.map(e=>({...e,ch:"email"})),...S.channels.chats.map(c=>({...c,ch:"whatsapp"}))].filter(m=>!m.entryId).sort((a,b)=>a.at<b.at?-1:1);
 const status=m=>m.entryId?`<span class="pill"><span class="dot ${entry(m.entryId)?.action}"></span>${ACT[entry(m.entryId)?.action]||""}</span>`:`<span class="pill"><span class="dot new"></span>New</span>`;
-function render(){$("#model").textContent="model: "+S.model;$("#cPay").textContent=S.counts.pay;$("#cHold").textContent=S.counts.hold;$("#cEsc").textContent=S.counts.escalate;$("#who").textContent=S.user;
+function render(){$("#model").textContent="model: "+S.model;const K=S.kpis||{};$("#kHeld").textContent="US$ "+(K.heldUsd||0).toLocaleString("en-US");$("#kStop").textContent=K.stopped||0;$("#kAuto").textContent=K.autonomy==null?"–":K.autonomy+"%";$("#kImp").textContent=K.improper||0;$("#kImp").parentNode.className="kpi "+(K.improper?"bad":"good");$("#tE").textContent=S.counts.escalate||"";$("#tH").textContent=S.counts.hold||"";$("#tP").textContent=S.counts.pay||"";renderGuide();$("#who").textContent=S.user;
  const n=unprocessed().length;if(!busy){$("#proc").textContent=n?`Process ${n} new`:"Inbox processed";$("#proc").disabled=!n}
  $$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));$$("main>section").forEach(s=>s.hidden=s.id!=="v-"+view);
  renderQueue();renderRules();renderVendors()}
 function renderQueue(){const rows=S.log.filter(l=>l.action===tab).slice().reverse();
  $("#list").innerHTML=rows.length?rows.map(l=>{const x=l.extracted||{},s=l.source||{};return `<div class="row"><div class="k">${l.id}</div><div><b>${esc(x.payee||"(no vendor)")}</b> <span class="pill">${CH[s.channel]||"—"}</span>${DK[l.channel]?`<span class="pill">${DK[l.channel]}</span>`:""}${x.lang?`<span class="pill">${LG[x.lang]}</span>`:""}
  <div class="why">${esc(l.reason)}</div><div class="act" style="justify-content:flex-start"><button class="sm" data-d="${l.id}">Details</button>${s.messageId?`<button class="sm" data-src="${s.channel}:${s.messageId}">Source message ↗</button>`:""}</div></div>
- <div><div class="amt"><b>${money(x.amount,x.currency)}</b>${l.amountUsd!=null&&x.currency!=="USD"?`<div class="k">≈ US$ ${l.amountUsd.toLocaleString("en-US",{maximumFractionDigits:0})}</div>`:""}</div>${l.action==="escalate"?`<div class="act"><button data-a="reject" data-id="${l.id}">Reject</button>${x.vendorKey?`<button class="pri" data-a="approve" data-id="${l.id}">Approve</button>`:""}</div>`:""}</div></div>`}).join(""):`<div class="empty">Nothing here.</div>`}
+ <div><div class="amt"><b>${money(x.amount,x.currency)}</b>${l.amountUsd!=null&&x.currency!=="USD"?`<div class="k">≈ US$ ${l.amountUsd.toLocaleString("en-US",{maximumFractionDigits:0})}</div>`:""}</div>${l.action==="escalate"?`<div class="act"><button data-a="reject" data-id="${l.id}">Reject</button>${x.vendorKey?`<button class="pri" data-a="approve" data-id="${l.id}">Approve</button>`:""}</div>`:""}</div></div>`}).join(""):`<div class="empty">${S.log.length?{escalate:"Nothing needs you right now.",hold:"Nothing held yet.",pay:"Nothing paid yet."}[tab]:"No invoices yet. Run the guided demo above, or process the inbox."}</div>`}
 const RL=[["max_per_payment_usd","Per-payment limit (USD)"],["human_approval_above_usd","Human approval above (USD)"],["vendor_period_cap_usd","Vendor monthly cap (USD)"],["period_budget_usd","Monthly budget (USD)"]];
 function renderRules(){if(document.activeElement?.dataset?.k)return;$("#rules").innerHTML=RL.map(([k,n])=>`<label class="f">${n}<input type="number" min="0" step="any" data-k="${k}" value="${S.rules[k]}"></label>`).join("");}
 // ---- navigation
@@ -116,6 +116,12 @@ async function details(id){const l=await api("/api/entry/"+id),x=l.extracted||{}
 // ---- OCR + processing (images are read in the browser; PDFs and text on the server)
 let T=null;async function ocr(blob){if(!window.Tesseract)await new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/tesseract.min.js";s.onload=ok;s.onerror=ko;document.head.appendChild(s)});
  T??=await Tesseract.createWorker(["spa","eng","por"]);const{data}=await T.recognize(blob);return{text:data.text,confidence:data.confidence}}
+const GUIDE=[["m-C02","A normal invoice from a contracted vendor"],["m-C16","Same vendor style, but the bank account changed"],["w-C10","The same invoice again, resent on WhatsApp"]];
+const msgById=id=>[...S.channels.emails,...S.channels.chats].find(m=>m.id===id);
+function renderGuide(){const g=$("#guide"),show=view==="queue"&&GUIDE.every(([id])=>msgById(id))&&(!S.log.length||guideRan);g.hidden=!show;if(!show)return;
+ g.innerHTML=`<b>Guided demo: 3 invoices, 30 seconds</b><ol>${GUIDE.map(([id,t])=>{const m=msgById(id),e=m?.entryId&&entry(m.entryId);return `<li class="gr">${t}${e?` → <span class="pill"><span class="dot ${e.action}"></span>${ACT[e.action]}</span> <b>${esc(e.reasons?.[0]||e.reason)}</b> <button class="sm" data-d="${e.id}">Details</button>`:""}</li>`}).join("")}</ol>${GUIDE.every(([id])=>msgById(id)?.entryId)?`<div class="k">The model can only stop a payment, never approve one. Process the rest of the inbox to see more traps.</div>`:`<button class="pri" id="gRun">Run guided demo</button>`}`;
+ const b=$("#gRun");if(b)b.onclick=async()=>{guideRan=true;b.disabled=true;busy=true;for(const [id] of GUIDE){const m=msgById(id);if(m.entryId)continue;b.textContent="Processing "+esc(m.from||"")+"…";try{const e=await api("/api/process",{method:"POST",body:JSON.stringify({messageId:id})});m.entryId=e.id;S.log.push(e);S.counts[e.action]++;render()}catch(err){toast(err.message)}}busy=false;await load()}}
+let guideRan=false;
 let busy=false;async function sync(){try{const r=await api("/api/sync",{method:"POST"});if(r.added)await load()}catch(e){}}
 setInterval(()=>{if(S&&!busy&&!document.hidden)sync()},10000);
 $("#proc").onclick=async()=>{const b=$("#proc");busy=true;b.disabled=true;await sync();let k=0;const todo=unprocessed();
