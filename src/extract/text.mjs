@@ -70,7 +70,7 @@ export function matchVendor(name, reg = VENDORS) {
   for (const [k, v] of Object.entries(reg)) if ([v.name, ...(v.aliases ?? [])].some((a) => norm(a) === n)) return k;
   return null;
 }
-const INJECTION = /(ignor[ae]?r?|disregard|olvida|esque[cç]a)\b[^\n]{0,40}\b(regla|rule|instruc|regra|polic)|\b(system|sistema)\s*:|\b(aprueba|approve|aprove)\b[^\n]{0,30}\b(ahora|now|agora|inmediato|immediately)|nota para el agente|note to the agent|aten[cç][aã]o agente/i;
+const INJECTION = /(ignor[ae]?r?|disregard|olvida|esque[cç]a)\b[^\n]{0,40}\b(regla|rule|instruc|regra|polic)|\b(system|sistema)\s*:|\b(aprueba|approve|aprove)\b[^\n]{0,30}\b(ahora|now|agora|inmediato|immediately)|nota para el agente|note to the agent|aten[cç][aã]o agente|\b(override|bypass|skip|salta|omit[ea]|anula)\b[^\n]{0,40}\b(safety|security|check|control|regla|rule|verific|seguridad)|\b(do not|don't|no)\s+(follow|sigas|seguir|apply|apliques)\b[^\n]{0,30}\b(rule|regla|polic|instruc)|\b(authori[sz]e|autoriza|pay|paga|pague)\b[^\n]{0,25}\b(without|sin|sem)\s+(review|revis|check|verific|aprobaci)|\b(ai|ia|bot|assistant|asistente|agent[ee]?)\s*[,:]\s*(please\s+)?(pay|paga|approve|aprueba|ignore|ignora)/i;
 
 /** Line items: description + qty + unit price (e.g. "40 horas x COP 180.000"). */
 export function lineItems(t) {
