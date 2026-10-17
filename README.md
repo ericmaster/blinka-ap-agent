@@ -4,6 +4,19 @@
 
 Equipo / Team: Nimble · 30X Hackathon, reto Blinka.
 
+[![ci](https://github.com/ericmaster/blinka-ap-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/ericmaster/blinka-ap-agent/actions/workflows/ci.yml)
+
+| For judges | |
+|---|---|
+| Live demo | https://blinka-ap-agent.ericmaster.workers.dev (any email; demo mode shows the code) |
+| 2-minute guide (EN/ES) | [`docs/JUDGE-GUIDE.md`](docs/JUDGE-GUIDE.md) |
+| 3-minute video | _link added at submission_ · backup screen capture: [`docs/demo-backup.mp4`](docs/demo-backup.mp4) |
+| Run locally | **Node ≥ 22** required: `npm ci && npm test && npm run build && npm start` |
+
+| Real | Simulated |
+|---|---|
+| Extraction (regex, PDF text, OCR), rules engine, decision models (Fastino GLiDE → TypeSafe JEV, yes/no only), translation (Workers AI), ISO 20022 pain.001, audit log | Mailbox and WhatsApp (mock services with their own API), login email (code on screen), bank (no money moves). All data is synthetic. |
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 **ES** — **Clearhold** es un agente de cuentas por pagar para el reto **Blinka** (30X Hackathon). Recibe facturas por PDF, imagen, correo o chat, extrae beneficiario, monto, moneda y vencimiento, y decide **pagar / frenar / escalar** con reglas configurables, registro explicable y tablero. El modelo nunca autoriza un pago: las reglas duras viven en código y la duda se escala.
@@ -43,6 +56,5 @@ export FASTINO_API_KEY=... JEV_API_KEY=...   # never commit keys
 - `docs/` — SPEC, PROPUESTA (propuesta de valor, Lean Canvas, MoSCoW), canvas.html/png, PITCH, JUDGE-GUIDE
 - `bench/` — bench de modelos de decisión y resultados
 - `src/` — `extract/` (texto, PDF, OCR), `engine/` (reglas), `adapters/` (GLiDE, JEV, fakes), `output/` (pain.001), `gen/` (generador)
-- `src/ports/` — patrón port/adapter (real vs fake via `ADAPTER_MODE`)
 
 Datos 100% ficticios / fully synthetic data. Licencia MIT.

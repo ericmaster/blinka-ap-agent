@@ -5,7 +5,7 @@ Grabar la pantalla del enlace en vivo. El respaldo ya grabado está en `docs/dem
 | Tiempo | Pantalla | Voz |
 |---|---|---|
 | 0:00–0:12 | Logo Clearhold | «Clearhold es el piloto automático de cuentas por pagar: paga lo acordado, frena lo raro y te pregunta lo dudoso.» |
-| 0:12–0:35 | Slide con la cifra del FBI | «Laura es controller de una pyme en EE. UU. con 40 proveedores en Latinoamérica. Le llegan facturas por correo, PDF, foto y WhatsApp. En 2024 se reportaron al FBI 2.770 millones de dólares perdidos por fraude de correo empresarial (fuente: FBI IC3, informe 2024). El truco más común: "cambiamos de cuenta" o la misma factura dos veces.» |
+| 0:12–0:35 | Slide con la cifra del FBI | «Laura es controller de una pyme en EE. UU. con 40 proveedores en Latinoamérica. Le llegan facturas por correo, PDF, foto y WhatsApp. En 2025 se reportaron al FBI más de 3.000 millones de dólares perdidos por fraude de correo empresarial (fuente: FBI IC3, informe 2025). El truco más común: "cambiamos de cuenta" o la misma factura dos veces.» |
 | 0:35–0:45 | Banner de demo | «Todo lo que van a ver usa datos ficticios: 629 facturas sintéticas con trampas.» |
 | 0:45–1:15 | Clic en **Run guided demo** | «Tres facturas. La primera es normal: se paga. La segunda viene del mismo proveedor, pero con otra cuenta bancaria: **frenada**, y te dice por qué en una línea. La tercera es la misma factura reenviada por WhatsApp: **frenada** por duplicada.» (la trampa queda frenada antes del minuto) |
 | 1:15–1:35 | **Details** de la frenada | «Cada campo trae su evidencia en el texto original, y se ven las reglas que pasó y las que no. Si viene en portugués, lo traduce.» |
