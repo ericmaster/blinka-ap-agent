@@ -1,16 +1,28 @@
-From: billing@valpodataspa.example
+From: Valpo Data SpA <facturacion@valpodata.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° VA-1026
+Subject: Factura electrónica VA-1026 — Valpo Data SpA
+Attachment: VA-1026.pdf
 
-Hola equipo de Northwind,
+Buenos días, equipo de Cuentas por Pagar de Northwind:
 
-  Proveedor: Valpo Data SpA
-  Factura N° VA-1026
-  Fecha: 2026-10-12
-  Vence: 2026-10-22
-  Concepto: Licencia analítica mensual 2026-10 #26
-  Total a pagar: $ 950.000,00
-  Cuenta: CL-FAKE-7007
+Adjuntamos la factura VA-1026 por los servicios del periodo. El PDF va adjunto a este correo; a continuación el resumen.
 
-Saludos,
-Valpo Data SpA
+Resumen de la factura
+Proveedor: Valpo Data SpA
+Factura N° VA-1026
+Fecha: 2026-10-12
+Vence: 2026-10-22
+Concepto: Licencia analítica mensual 2026-10 #26
+Total a pagar: $ 950.000,00
+Cuenta: CL-FAKE-7007
+
+Quedamos atentos a la confirmación del pago.
+
+Cordialmente,
+
+Tomás Fuentes
+Administración y finanzas · Valpo Data SpA
+RUT 00.000.707-K · Av. Ejemplo 707, Of. 3, Valparaíso, Chile
++56 32 000 0707 · facturacion@valpodata.example
+
+📎 Adjunto: VA-1026.pdf

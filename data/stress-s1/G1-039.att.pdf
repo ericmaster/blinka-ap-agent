@@ -1,0 +1,112 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [9 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>
+endobj
+8 0 obj
+<< /Length 4430 >>
+stream
+q 0.5 w 0.200 0.255 0.333 rg 40 763.89 38 38 re f Q
+BT /HB 15.96 Tf 1.000 1.000 1.000 rg 47.03 777.89 Td (QB) Tj ET
+BT /HB 12.5 Tf 0.000 0.000 0.000 rg 90 787.89 Td (Quito Bytes CÌa. Ltda.) Tj ET
+BT /H 7.8 Tf 0.333 0.333 0.333 rg 90 773.89 Td (RUC 000.000.912-2 \(fictitious\)) Tj ET
+BT /H 7.8 Tf 0.333 0.333 0.333 rg 90 763.39 Td (Calle Ficticia 000, Of. 91) Tj ET
+BT /H 7.8 Tf 0.333 0.333 0.333 rg 90 752.89 Td (Quito, Ecuador) Tj ET
+BT /H 7.8 Tf 0.333 0.333 0.333 rg 90 742.39 Td (billing@quitobytescialtd.example ∑ +00 000 000 912) Tj ET
+BT /HB 22 Tf 0.200 0.255 0.333 rg 464.82 785.89 Td (INVOICE) Tj ET
+BT /H 9.5 Tf 0.200 0.200 0.200 rg 350 757.89 Td (Invoice number) Tj ET
+BT /HB 9.5 Tf 0.000 0.000 0.000 rg 516.22 757.89 Td (MA-1038) Tj ET
+BT /H 9.5 Tf 0.200 0.200 0.200 rg 350 744.39 Td (Date of issue) Tj ET
+BT /HB 9.5 Tf 0.000 0.000 0.000 rg 506.7 744.39 Td (2026-10-10) Tj ET
+BT /H 9.5 Tf 0.200 0.200 0.200 rg 350 730.89 Td (Due date) Tj ET
+BT /HB 9.5 Tf 0.000 0.000 0.000 rg 506.7 730.89 Td (2026-10-20) Tj ET
+BT /H 9.5 Tf 0.200 0.200 0.200 rg 350 717.39 Td (PO number) Tj ET
+BT /HB 9.5 Tf 0.000 0.000 0.000 rg 491.41 717.39 Td (NWR-PO-5192) Tj ET
+BT /H 9.5 Tf 0.200 0.200 0.200 rg 350 703.89 Td (Currency) Tj ET
+BT /HB 9.5 Tf 0.000 0.000 0.000 rg 535.23 703.89 Td (USD) Tj ET
+BT /HB 7.5 Tf 0.333 0.333 0.333 rg 40 685.89 Td (BILL TO) Tj ET
+BT /HB 8.5 Tf 0.000 0.000 0.000 rg 40 672.89 Td (Northwind Ridge Inc.) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 662.39 Td (EIN 00-0000001 \(fictitious\)) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 651.89 Td (400 Example Ave, Suite 12) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 641.39 Td (Wilmington, DE 19899, USA) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 630.89 Td (ap@northwind-ridge.example) Tj ET
+BT /HB 14 Tf 0.067 0.067 0.067 rg 40 596.89 Td (1,600.00 USD due 2026-10-20) Tj ET
+q 0.5 w 0.953 0.957 0.965 rg 40 562.89 515 17 re f Q
+BT /HB 8.5 Tf 0.067 0.067 0.067 rg 44 567.89 Td (Description) Tj ET
+BT /HB 8.5 Tf 0.067 0.067 0.067 rg 316.83 567.89 Td (Qty) Tj ET
+BT /HB 8.5 Tf 0.067 0.067 0.067 rg 339 567.89 Td (Unit) Tj ET
+BT /HB 8.5 Tf 0.067 0.067 0.067 rg 426.8 567.89 Td (Unit price) Tj ET
+BT /HB 8.5 Tf 0.067 0.067 0.067 rg 518.9 567.89 Td (Amount) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 44 551.89 Td (QA monthly fee 2026-10 #38) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 326.27 551.89 Td (1) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 339 551.89 Td (month) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 432.92 551.89 Td (1,600.00) Tj ET
+BT /HB 8.5 Tf 0.000 0.000 0.000 rg 517.92 551.89 Td (1,600.00) Tj ET
+q 0.5 w 0.898 0.906 0.922 RG 40 545.89 m 555 545.89 l S Q
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 527.89 Td (Subtotal) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 494.75 527.89 Td (1,600.00 USD) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 513.89 Td (Tax 0% \(export of services\)) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 512.27 513.89 Td (0.00 USD) Tj ET
+q 0.5 w 0.933 0.949 1.000 rg 334 493.89 221.28 18 re f Q
+BT /HB 9 Tf 0.067 0.067 0.067 rg 340 499.89 Td (Total due) Tj ET
+BT /HB 9 Tf 0.067 0.067 0.067 rg 494.75 499.89 Td (1,600.00 USD) Tj ET
+BT /H 7 Tf 0.333 0.333 0.333 rg 300 483.89 Td (Amount in words: One thousand six hundred US dollars and 00/100) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 40 454.44 Td (Payment instructions) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 441.44 Td (Bank: Banco Ficticio) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 429.94 Td (Account holder: Quito Bytes CÌa. Ltda.) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 418.44 Td (Account number \(Cuenta corriente\): XX-FAKE-1038) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 406.94 Td (SWIFT/BIC: FAKEXXX1XXX) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 395.44 Td (Reference: MA-1038) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 310 454.44 Td (Notes) Tj ET
+BT /H 8 Tf 0.200 0.200 0.200 rg 310 442.44 Td (Terms: Net 10. Please pay by bank transfer and quote the invoice) Tj ET
+BT /H 8 Tf 0.200 0.200 0.200 rg 310 431.64 Td (number as reference. Sender pays all bank fees.) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 310 418.84 Td (Thank you for your business!) Tj ET
+q 0.5 w 0.898 0.906 0.922 RG 40 35.89 m 555.28 35.89 l S Q
+BT /H 6.5 Tf 0.533 0.533 0.533 rg 40 23.89 Td (Quito Bytes CÌa. Ltda. ∑ RUC 000.000.912-2) Tj ET
+BT /H 6.5 Tf 0.533 0.533 0.533 rg 522.03 23.89 Td (Page 1 of 1) Tj ET
+BT /H 6 Tf 0.667 0.667 0.667 rg 40 13.89 Td (Synthetic sample document ó fictional company and data \(Clearhold demo\).) Tj ET
+
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /H 3 0 R /HB 4 0 R /HI 5 0 R /C 6 0 R /CB 7 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Producer (Clearhold synthetic invoice generator \(fictional data\)) /Title (INVOICE MA-1038 - Quito Bytes CÌa. Ltda.) /Creator (Quito Bytes CÌa. Ltda. billing \(synthetic\)) >>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000320 00000 n 
+0000000425 00000 n 
+0000000520 00000 n 
+0000000620 00000 n 
+0000005102 00000 n 
+0000005272 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 10 0 R >>
+startxref
+5469
+%%EOF

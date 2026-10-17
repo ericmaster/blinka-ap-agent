@@ -43,3 +43,31 @@ test("prompt injection: broader phrasings are flagged", () => {
     assert.ok(extractText(`Vendor: X\nTotal due: USD 10.00\n${t}`).injectionSuspected, t);
   assert.ok(!extractText("Vendor: X\nDescription: security audit checks\nTotal due: USD 10.00").injectionSuspected);
 });
+
+test("realistic invoices: every email's attached PDF extracts the same fields as the email", { timeout: 120000 }, async () => {
+  const wrong = [];
+  for (const inv of load("data/curated").filter((x) => x.attachment)) {
+    const e = await extract({ kind: "pdf", path: `data/curated/${inv.attachment}` });
+    for (const k of ["vendorKey", "number", "amount", "currency", "due", "acct"]) if (e[k] !== inv[k]) wrong.push(`${inv.id}.${k}: ${e[k]} != ${inv[k]}`);
+  }
+  assert.deepEqual(wrong, []);
+});
+test("totals: amount is the total due — not the subtotal, tax or withholding lines; currency from a label", () => {
+  const base = "Proveedor: Andes Dev Studio SAS\nFactura N° AD-9001\nFecha de vencimiento: 30/10/2026\nCuenta: CO-FAKE-1001\n";
+  let x = extractText(base + "Subtotal\tCOP 1.000.000\nIVA 19%\tCOP 190.000\nRetención en la fuente 11%\t-COP 110.000\nTotal a pagar\tCOP 1.080.000");
+  assert.equal(x.amount, 1080000); assert.equal(x.currency, "COP");
+  x = extractText(base + "Moneda: COP\nSubtotal\t$ 2.000.000\nDescuento\t$ 200.000\nTOTAL\t$ 1.800.000");
+  assert.equal(x.amount, 1800000); assert.equal(x.currency, "COP");
+  x = extractText(base + "Subtotal\tUSD 500.00\nTax (0%)\tUSD 0.00\nBalance due\tUSD 500.00\nTotal (all pages)\tUSD 500.00");
+  assert.equal(x.amount, 500); assert.equal(x.currency, "USD");
+  x = extractText(base + "IVA (exento — exportación de servicios)\tCOP 0\nTotal a pagar\tCOP 3.000.000");
+  assert.equal(x.amount, 3000000);
+  x = extractText(base + "Total a pagar\tCOP 1.000.000\nTotal a pagar\tCOP 2.000.000"); // conflicting totals: never guess
+  assert.equal(x.amount, null);
+  x = extractText(base + "Moneda: COP\nTotal a pagar\tUSD 1,000.00"); // currency label contradicts the total: unknown (escalates), never a guess
+  assert.equal(x.currency, null);
+});
+test("realistic invoice text (notes, terms, legal boilerplate) is not flagged as prompt injection", async () => {
+  const clean = load("data/curated").filter((x) => x.format === "pdf" && !x.tags.includes("trap:prompt-injection"));
+  for (const inv of clean) assert.equal((await extract({ kind: "pdf", path: `data/curated/${inv.file}` })).injectionSuspected, false, inv.id);
+});

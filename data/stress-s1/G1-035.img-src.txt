@@ -1,7 +1,0 @@
-Proveedor: Pixel Norte S.A. de C.V.
-Factura N° PI-1034
-Fecha: 09/10/2026
-Vence: 19/10/2026
-Concepto: Diseño UI mensual 2026-10 #34
-Total a pagar: MXN 28.000,00
-Cuenta: MX-FAKE-2002

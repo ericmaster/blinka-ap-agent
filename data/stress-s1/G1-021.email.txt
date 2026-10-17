@@ -1,16 +1,28 @@
-From: billing@riolegalcons.example
+From: Rio Legal Consultoria Ltda <financeiro@riolegal.example>
 To: ap@northwind-ridge.example
-Subject: Fatura nº RI-1020
+Subject: Fatura RI-1020 — Rio Legal Consultoria Ltda
+Attachment: RI-1020.pdf
 
-Olá equipe Northwind,
+Prezados, bom dia.
 
+Segue em anexo a fatura RI-1020 referente aos serviços do período, com o resumo abaixo.
+
+Resumo
   Fornecedor: Rio Legal Consultoria Ltda
   Fatura nº RI-1020
-  Data: 09/10/2026
-  Vencimento: 19/10/2026
+  Data: 9 de outubro de 2026
+  Vencimento: 19 de outubro de 2026
   Descrição: 3 horas de consultoria x 650
   Total a pagar: BRL 1.950,00
   Conta: BR-FAKE-6006
 
+Qualquer dúvida, estamos à disposição.
+
 Atenciosamente,
-Rio Legal Consultoria Ltda
+
+Dr. Ricardo Alves
+Sócio · Rio Legal Consultoria Ltda
+CNPJ 00.000.006/0001-06 · Av. Fictícia, 606 — sala 1201, Centro, 20040-000 Rio de Janeiro — RJ, Brasil
++55 21 0000-0606 · financeiro@riolegal.example
+
+📎 Anexo: RI-1020.pdf

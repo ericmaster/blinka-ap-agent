@@ -1,9 +1,13 @@
-From: billing@monterreyops.example
+From: Monterrey Ops Partners S.C. <billing@monterreyops.example>
 To: ap@northwind-ridge.example
 Subject: Invoice # MO-1016
+Attachment: MO-1016.pdf
 
 Hi Northwind team,
 
+Here's your invoice! We appreciate your prompt payment. The PDF for invoice MO-1016 is attached.
+
+Invoice details
 Vendor: Monterrey Ops Partners S.C.
 Invoice # MO-1016
 Date: October 3, 2026
@@ -12,5 +16,13 @@ Description: 8 bookkeeping hours x 520
 Total due: 4,160.00 MXN
 Account: MX-FAKE-8008
 
-Best regards,
-Monterrey Ops Partners S.C.
+Thanks for your business!
+
+Kind regards,
+
+Andrea Garza
+Billing · Monterrey Ops Partners S.C.
+RFC MOP000000FK8 · Calle Ejemplo 808, Col. Del Valle, 66220 San Pedro Garza García, N.L., México
++52 81 0000 0808 · billing@monterreyops.example
+
+📎 Attachment: MO-1016.pdf

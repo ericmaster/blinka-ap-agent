@@ -1,16 +1,28 @@
-From: billing@valpodataspa.example
+From: Valpo Data SpA <facturacion@valpodata.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° VD-5521
+Subject: Factura electrónica VD-5521 — Valpo Data SpA
+Attachment: VD-5521.pdf
 
-Hola equipo de Northwind,
+Buenos días, equipo de Cuentas por Pagar de Northwind:
 
+Les compartimos la factura electrónica VD-5521. Encontrarán la representación gráfica en PDF adjunta.
+
+Resumen de la factura
   Proveedor: Valpo Data SpA
   Factura N° VD-5521
-  Fecha: 2026-10-05
-  Vence: 2026-10-30
+  Fecha: 5 de octubre de 2026
+  Vence: 30 de octubre de 2026
   Concepto: Licencia analítica octubre 2026
   Total a pagar: CLP 950.000
   Cuenta: CL-FAKE-7007
 
+Quedamos atentos a la confirmación del pago.
+
 Saludos,
-Valpo Data SpA
+
+Tomás Fuentes
+Administración y finanzas · Valpo Data SpA
+RUT 00.000.707-K · Av. Ejemplo 707, Of. 3, Valparaíso, Chile
++56 32 000 0707 · facturacion@valpodata.example
+
+📎 Adjunto: VD-5521.pdf

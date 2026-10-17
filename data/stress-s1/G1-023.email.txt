@@ -1,16 +1,28 @@
-From: billing@mariafernand.example
+From: Maria Fernanda Rojas <billing@mfrojas-qa.example>
 To: ap@northwind-ridge.example
-Subject: Invoice # MA-1022
+Subject: [Maria Fernanda Rojas] Invoice MA-1022 is ready
+Attachment: MA-1022.pdf
 
 Hi Northwind team,
 
-Vendor: Maria Fernanda Rojas (contractor)
-Invoice # MA-1022
-Date: 2026-10-08
-Due date: 2026-10-18
-Description: QA monthly fee 2026-10 #22
-Total due: 1,600.00 USD
-Account: CO-FAKE-5005
+Please find attached invoice MA-1022. A summary is below for your records.
+
+Invoice details
+  Vendor: Maria Fernanda Rojas (contractor)
+  Invoice # MA-1022
+  Date: 2026-10-08
+  Due date: 2026-10-18
+  Description: QA monthly fee 2026-10 #22
+  Total due: 1,600.00 USD
+  Account: CO-FAKE-5005
+
+Let us know if you have any questions.
 
 Best regards,
-Maria Fernanda Rojas (contractor)
+
+Maria Fernanda Rojas
+QA Engineer (independent contractor) · Maria Fernanda Rojas
+Tax ID (NIT) 000.005.005-5 · Calle 00 # 05-05, Apto 505, Medellín, Colombia
++57 300 000 0505 · billing@mfrojas-qa.example
+
+📎 Attachment: MA-1022.pdf

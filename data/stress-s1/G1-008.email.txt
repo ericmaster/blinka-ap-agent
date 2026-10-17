@@ -1,16 +1,30 @@
-From: billing@limasupportd.example
+From: Lima Support Desk SAC <facturacion@limasupportdesk.example>
 To: ap@northwind-ridge.example
 Subject: Factura N° LI-1007
+Attachment: LI-1007.pdf
 
-Hola equipo de Northwind,
+Estimados señores de Northwind Ridge:
 
-  Proveedor: Lima Support Desk SAC
-  Factura N° LI-1007
-  Fecha: 12/10/2026
-  Vence: 22/10/2026
-  Concepto: 20 horas de soporte x 45
-  Total a pagar: PEN 900,00
-  Cuenta: PE-FAKE-9007
+Adjuntamos la factura LI-1007 por los servicios del periodo. El PDF va adjunto a este correo; a continuación el resumen.
 
-Saludos,
-Lima Support Desk SAC
+Nota: actualizamos nuestros datos bancarios; por favor usen la cuenta indicada abajo.
+
+Resumen de la factura
+Proveedor: Lima Support Desk SAC
+Factura N° LI-1007
+Fecha: 12 de octubre de 2026
+Vence: 22 de octubre de 2026
+Concepto: 20 horas de soporte x 45
+Total a pagar: PEN 900,00
+Cuenta: PE-FAKE-9007
+
+Quedamos atentos a la confirmación del pago.
+
+Cordialmente,
+
+Rosa Quispe
+Administración · Lima Support Desk SAC
+RUC 00000000404 · Av. Ejemplo 404, Of. 12, Miraflores, Lima 15074, Perú
++51 1 000 0404 · facturacion@limasupportdesk.example
+
+📎 Adjunto: LI-1007.pdf

@@ -1,7 +1,0 @@
-Proveedor: Andes Dev Studio SAS
-Factura N° AD-1046
-Fecha: 05/10/2026
-Vence: 30/10/2026
-Concepto: Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000
-Total a pagar: 2.700.000 COP
-Cuenta: CO-FAKE-1001

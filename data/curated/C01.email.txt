@@ -1,16 +1,28 @@
-From: billing@andesdevstud.example
+From: Andes Dev Studio SAS <facturacion@andesdevstudio.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° AD-1043
+Subject: Factura electrónica AD-1043 — Andes Dev Studio SAS
+Attachment: AD-1043.pdf
 
-Hola equipo de Northwind,
+Estimados señores de Northwind Ridge:
 
+Les compartimos la factura electrónica AD-1043. Encontrarán la representación gráfica en PDF adjunta.
+
+Resumen de la factura
   Proveedor: Andes Dev Studio SAS
   Factura N° AD-1043
-  Fecha: 2026-10-05
-  Vence: 2026-10-30
+  Fecha: 05/10/2026
+  Vence: 30/10/2026
   Concepto: Desarrollo de software octubre: 40 horas x COP 180.000
-  Total a pagar: 7.200.000 COP
+  Total a pagar: COP 7.200.000
   Cuenta: CO-FAKE-1001
 
+Por favor confirmen la recepción. Cualquier inquietud con gusto la resolvemos.
+
 Saludos,
-Andes Dev Studio SAS
+
+Laura Méndez
+Facturación y cartera · Andes Dev Studio SAS
+NIT 000.000.101-1 · Cra. 11 # 00-01, Of. 501, Bogotá D.C., Colombia
++57 601 000 0101 · facturacion@andesdevstudio.example
+
+📎 Adjunto: AD-1043.pdf

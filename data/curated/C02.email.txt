@@ -1,9 +1,13 @@
-From: billing@pixelnortesa.example
+From: Pixel Norte S.A. de C.V. <facturacion@pixelnorte.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° PN-1025
+Subject: Factura electrónica PN-1025 — Pixel Norte S.A. de C.V.
+Attachment: PN-1025.pdf
 
-Hola equipo de Northwind,
+Buenos días, equipo de Cuentas por Pagar de Northwind:
 
+Les compartimos la factura electrónica PN-1025. Encontrarán la representación gráfica en PDF adjunta.
+
+Resumen de la factura
 Proveedor: Pixel Norte S.A. de C.V.
 Factura N° PN-1025
 Fecha: 05/10/2026
@@ -12,5 +16,13 @@ Concepto: Diseño UI octubre 2026, tarifa fija mensual
 Total a pagar: MXN 28.000,00
 Cuenta: MX-FAKE-2002
 
+Por favor confirmen la recepción. Cualquier inquietud con gusto la resolvemos.
+
 Saludos,
-Pixel Norte S.A. de C.V.
+
+Diego Salinas
+Cobranza · Pixel Norte S.A. de C.V.
+RFC PNO000000FK1 · Av. Ficticia 245, Col. Americana, 44160 Guadalajara, Jal., México
++52 33 0000 0202 · facturacion@pixelnorte.example
+
+📎 Adjunto: PN-1025.pdf

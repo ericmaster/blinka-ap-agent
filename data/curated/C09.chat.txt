@@ -1,5 +1,5 @@
-[2026-10-16 09:40] João: oi! segue a fatura SC2026-10-B da Sampa Cloud Serviços Ltda
-total 2.400,00 BRL
-vencimento 30/10/2026
+[2026-10-16 09:55] João: oi! segue a fatura SC2026-10-B da Sampa Cloud Serviços Ltda
+total R$ 2.400,00
+vencimento 30 de outubro de 2026
 conta BR-FAKE-3003
 referente a: Hospedagem nuvem out/2026 (plano fixo) - reenvio

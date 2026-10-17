@@ -1,16 +1,28 @@
-From: billing@riolegalcons.example
+From: Rio Legal Consultoria Ltda <financeiro@riolegal.example>
 To: ap@northwind-ridge.example
-Subject: Fatura nº RL-79
+Subject: NFS-e RL-79 — Rio Legal Consultoria Ltda
+Attachment: RL-79.pdf
 
-Olá equipe Northwind,
+Prezados, bom dia.
 
-Fornecedor: Rio Legal Consultoria Ltda
-Fatura nº RL-79
-Data: 5 de outubro de 2026
-Vencimento: 30 de outubro de 2026
-Descrição: Consultoria jurídica, revisão de contratos de fornecedores: 10 horas x BRL 650,00
-Total a pagar: R$ 6.500,00
-Conta: BR-FAKE-6006
+Encaminhamos a nota fiscal RL-79 (PDF em anexo).
 
-Atenciosamente,
-Rio Legal Consultoria Ltda
+Resumo
+  Fornecedor: Rio Legal Consultoria Ltda
+  Fatura nº RL-79
+  Data: 05/10/2026
+  Vencimento: 30/10/2026
+  Descrição: Consultoria jurídica, revisão de contratos de fornecedores: 10 horas x BRL 650,00
+  Total a pagar: BRL 6.500,00
+  Conta: BR-FAKE-6006
+
+Por gentileza, confirmem o recebimento.
+
+Abraços,
+
+Dr. Ricardo Alves
+Sócio · Rio Legal Consultoria Ltda
+CNPJ 00.000.006/0001-06 · Av. Fictícia, 606 — sala 1201, Centro, 20040-000 Rio de Janeiro — RJ, Brasil
++55 21 0000-0606 · financeiro@riolegal.example
+
+📎 Anexo: RL-79.pdf

@@ -1,16 +1,28 @@
-From: billing@bogotgrowtha.example
+From: Bogotá Growth Agency SAS <facturacion@bogotagrowthagen.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° BGA-1
+Subject: Bogotá Growth Agency SAS: factura BGA-1 (vence 25/10/2026)
+Attachment: BGA-1.pdf
 
 Hola equipo de Northwind,
 
-PROVEEDOR: Bogotá Growth Agency SAS
-FACTURA N° BGA-1
-FECHA: 07/10/2026
-VENCE: 25/10/2026
-CONCEPTO: Campaña de marketing digital octubre
-TOTAL A PAGAR: USD 1,200.00
-CUENTA: CO-FAKE-9911
+Adjuntamos la factura BGA-1 por los servicios del periodo. El PDF va adjunto a este correo; a continuación el resumen.
 
-Saludos,
+Resumen de la factura
+  Proveedor: Bogotá Growth Agency SAS
+  Factura N° BGA-1
+  Fecha: 07/10/2026
+  Vence: 25/10/2026
+  Concepto: Campaña de marketing digital octubre
+  Total a pagar: 1,200.00 USD
+  Cuenta: CO-FAKE-9911
+
+Quedamos atentos a la confirmación del pago.
+
+Cordialmente,
+
+Equipo de facturación
 Bogotá Growth Agency SAS
+NIT 000.000.520-6 · Calle Ficticia 000, Of. 52, Bogotá D.C., Colombia
++00 000 000 520 · facturacion@bogotagrowthagen.example
+
+📎 Adjunto: BGA-1.pdf
