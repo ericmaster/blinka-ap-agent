@@ -116,13 +116,17 @@ export function curated() {
 }
 
 /** Random stress generator with noise. Ground truth is known by construction. */
-export function generate(seed, n = 40) {
+/** mix: "traps" (default, ~1 in 3 valid; used by the safety tests) or "realistic" (~80 % valid, 20 % traps). */
+export function generate(seed, n = 40, { mix = "traps" } = {}) {
   const r = rng(seed), keys = Object.keys(VENDORS), out = [], made = [];
   const kinds = ["valid","valid","valid","valid","valid","duplicate-exact","duplicate-fuzzy","new-payee","agreement-mismatch","over-limit","account-changed","prompt-injection","ambiguous-currency","out-of-category"];
   const units = { "andes-dev": [180000, 60, "horas de desarrollo"], "lima-support": [45, 120, "horas de soporte"], "monterrey-ops": [520, 40, "bookkeeping hours"], "rio-legal": [650, 8, "horas de consultoria"] };
   const flat = { "pixel-norte": [28000, "Diseño UI mensual"], "sampa-cloud": [2400, "Hospedagem mensal"], "maria-qa": [1600, "QA monthly fee"], "valpo-data": [950000, "Licencia analítica mensual"] };
   for (let i = 0; i < n; i++) {
-    const kind = made.length ? pick(r, kinds) : "valid", vk = pick(r, keys), v = VENDORS[vk];
+    const kind = !made.length ? "valid" : mix === "realistic" ? (r() < 0.8 ? "valid" : pick(r, kinds.filter((k) => k !== "valid"))) : pick(r, kinds);
+    let vk = pick(r, keys);
+    // realistic: a flat monthly fee is billed once; further valid invoices come from hourly vendors
+    if (mix === "realistic" && kind === "valid" && flat[vk] && made.some((m) => m.vendorKey === vk && m.tags[0] === "valid")) vk = pick(r, Object.keys(units));
     const day = 1 + Math.floor(r() * 15), date = `2026-10-${String(day).padStart(2, "0")}`, due = `2026-10-${String(day + 10).padStart(2, "0")}`;
     let amount, lines;
     if (units[vk]) { const [p, max, what] = units[vk], h = 1 + Math.floor(r() * Math.min(max, 20)); amount = p * h; lines = `${h} ${what} x ${p}`; }

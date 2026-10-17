@@ -49,12 +49,12 @@ mark{background:#fff3b0;border-radius:3px}.doc{width:100%;height:420px;border:1p
 <nav><button data-v="queue" class="on">Queue</button><button data-v="vendors">Vendors</button><button data-v="rules">Rules</button><button data-v="stress">Stress test</button><span class="sp"></span><a class="ext" href="/mail/" target="clearhold-mail">Mailbox ↗</a><a class="ext" href="/chat/" target="clearhold-chat">WhatsApp ↗</a></nav>
 <main>
 <section id="v-queue"><div class="card"><div id="guide" hidden></div><div id="drop"><textarea id="txt" placeholder="Paste an email or chat message, or drop a PDF / photo here"></textarea><button id="go">Add</button><label class="btn">File<input type="file" id="file" accept=".pdf,image/*,.txt,.eml" multiple hidden></label></div>
-<div class="sub"><button class="tab on" data-t="escalate">Needs you <span id="tE"></span></button><button class="tab" data-t="hold">Held <span id="tH"></span></button><button class="tab" data-t="pay">Paid <span id="tP"></span></button></div><div id="list"></div></div></section>
+<div class="sub"><button class="tab on" data-t="escalate">Needs you <span id="tE"></span></button><button class="tab" data-t="hold">Held <span id="tH"></span></button><button class="tab" data-t="pay">Paid <span id="tP"></span></button><span class="sp"></span><span class="k">Audit log <a href="/api/audit.csv">CSV</a> · <a href="/api/audit.json">JSON</a></span></div><div id="list"></div></div></section>
 <section id="v-rules" hidden><div class="card" style="max-width:520px"><div id="rules"></div><button class="pri" id="save">Save rules</button>
 <div class="k" style="margin-top:10px">Vendors, bank accounts, contracted services and prices are in the Vendors tab.</div></div></section>
 <section id="v-vendors" hidden><div class="card"><div class="sub"><b>Vendor registry</b><span class="sp"></span><button class="pri" id="addv">Add vendor</button></div><div id="vform"></div><table id="vt"></table><div style="margin-top:14px"><b>Change log</b><div id="audit"></div></div></div></section>
-<section id="v-stress" hidden><div class="card" style="max-width:620px"><b>Stress test</b> <span class="k" id="sinfo">random invoices with traps and noise</span>
-<div style="margin-top:8px"><button class="pri" id="stress">Run 30 invoices</button></div>
+<section id="v-stress" hidden><div class="card" style="max-width:620px"><b>Stress test</b> <span class="k" id="sinfo">random invoices with noise</span>
+<div class="sub" style="margin-top:8px"><button class="tab on" data-mix="realistic" title="About 80% valid invoices, 20% traps">Realistic 80/20</button><button class="tab" data-mix="traps" title="Mostly traps">Traps</button><span class="sp"></span><button class="pri" id="stress">Run 30 invoices</button></div>
 <div class="score"><div><b id="sA">–</b>Correct autonomy</div><div><b id="sS">–</b>Improper payments</div><div><b id="sE">–</b>Explainability</div></div></div><div class="card" style="max-width:620px"><b>Metrics</b><div id="metrics"></div></div></section>
 </main>
 <div class="modal" id="modal"><div class="card" id="mbody"></div></div><div id="toast"></div>
@@ -93,7 +93,7 @@ const RL=[["max_per_payment_usd","Per-payment limit (USD)"],["human_approval_abo
 function renderRules(){if(document.activeElement?.dataset?.k)return;$("#rules").innerHTML=RL.map(([k,n])=>`<label class="f">${n}<input type="number" min="0" step="any" data-k="${k}" value="${S.rules[k]}"></label>`).join("");}
 // ---- navigation
 $$("nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
-$$(".sub .tab").forEach(b=>b.onclick=()=>{$$(".sub .tab").forEach(x=>x.classList.remove("on"));b.classList.add("on");tab=b.dataset.t;renderQueue()});
+$$(".sub .tab[data-t]").forEach(b=>b.onclick=()=>{$$(".sub .tab[data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");tab=b.dataset.t;renderQueue()});
 function openSource(v){const [ch,id]=v.split(":");window.open((S.sources[ch]||"/")+id,"clearhold-"+(ch==="email"?"mail":"chat"))}
 document.body.addEventListener("click",async e=>{const t=e.target.closest("[data-d],[data-src],[data-a],[data-ve],[data-vr],[data-vt],[data-vc]");if(!t)return;if(t.dataset.vc){const[k,a]=t.dataset.vc.split(":");try{await api(`/api/vendors/${k}/change/${a}`,{method:"POST"});toast(a==="approve"?"Change approved and applied":"Change discarded");load()}catch(err){toast(err.message)}return}
  if(t.dataset.d)return details(t.dataset.d);if(t.dataset.src)return openSource(t.dataset.src);if(t.dataset.ve){editV=t.dataset.ve;return vform()}if(t.dataset.vr)return removeV(t.dataset.vr);if(t.dataset.vt)return toggleV(t.dataset.vt)
@@ -126,7 +126,8 @@ function renderGuide(){const g=$("#guide"),show=view==="queue"&&GUIDE.every(([id
  g.innerHTML=`<b>Guided demo: 3 invoices, 30 seconds</b><ol>${GUIDE.map(([id,t])=>{const m=msgById(id),e=m?.entryId&&entry(m.entryId);return `<li class="gr">${t}${e?` → <span class="pill"><span class="dot ${e.action}"></span>${ACT[e.action]}</span> <b>${esc(e.reasons?.[0]||e.reason)}</b> <button class="sm" data-d="${e.id}">Details</button>`:""}</li>`}).join("")}</ol>${GUIDE.every(([id])=>msgById(id)?.entryId)?`<div class="k">The model can only stop a payment, never approve one. Process the rest of the inbox to see more traps, or <button class="link" data-reset="1">reset my demo</button> to run it again.</div>`:`<button class="pri" id="gRun">Run guided demo</button>`}`;
  const b=$("#gRun");if(b)b.onclick=async()=>{guideRan=true;b.disabled=true;busy=true;for(const [id] of GUIDE){const m=msgById(id);if(m.entryId)continue;b.textContent="Processing "+esc(m.from||"")+"…";try{const e=await api("/api/process",{method:"POST",body:JSON.stringify({messageId:id})});m.entryId=e.id;S.log.push(e);S.counts[e.action]++;render()}catch(err){toast(err.message)}}busy=false;await load()}}
 let guideRan=false;
-let lastStress=null;
+let lastStress=null,mix="realistic";
+$$("[data-mix]").forEach(b=>b.onclick=()=>{mix=b.dataset.mix;$$("[data-mix]").forEach(x=>x.classList.toggle("on",x===b))});
 const P=x=>x==null?"–":Math.round(x*100)+"%",MS=x=>x==null?"–":x<1000?Math.round(x)+" ms":(x/1000).toFixed(1)+" s",USD=x=>x==null?"–":x<0.0001?"< US$ 0.0001":"US$ "+(x<0.01?x.toFixed(4):x.toFixed(2));
 function renderMetrics(){const el=$("#metrics");if(!el||!S)return;const q=S.kpis||{},s=lastStress||{},B=S.benchmarks||{};
  const row=(name,a,b,bench)=>`<tr><td>${name}</td><td>${a}</td><td>${b}</td><td class="k">${bench||""}</td></tr>`;
@@ -157,7 +158,7 @@ const d=$("#drop");d.ondragover=e=>{e.preventDefault();d.classList.add("over")};
 // ---- rules + stress
 $("#save").onclick=async()=>{const body={};$$("[data-k]").forEach(i=>body[i.dataset.k]=Number(i.value));try{await api("/api/rules",{method:"PUT",body:JSON.stringify(body)});toast("Rules saved");load()}catch(e){toast(e.message)}};
 $("#stress").onclick=async()=>{const b=$("#stress");b.disabled=true;["#sA","#sS","#sE"].forEach(s=>$(s).textContent="…");
- const r=await fetch("/api/stress",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({n:30})});const rd=r.body.getReader(),dec=new TextDecoder();let buf="",k=0,seed="";
+ const r=await fetch("/api/stress",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({n:30,mix})});const rd=r.body.getReader(),dec=new TextDecoder();let buf="",k=0,seed="";
  for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf("\n"))>=0){const ev=JSON.parse(buf.slice(0,i));buf=buf.slice(i+1);
   if(ev.type==="start"){seed=ev.seed;$("#sinfo").textContent=`seed ${seed} · 0/${ev.n}`}else{k++;const s=ev.score;$("#sinfo").textContent=`seed ${seed} · ${k}/30 · ${s.pay} paid · ${s.hold} held · ${s.escalate} pending`;
   $("#sA").textContent=s.correctAutonomy==null?"–":Math.round(s.correctAutonomy*100)+"%";lastStress=s;renderMetrics();$("#sS").textContent=s.improper;$("#sS").className=s.improper?"bad":"ok";$("#sE").textContent=Math.round(s.explainability*100)+"%"}}}

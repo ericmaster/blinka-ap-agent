@@ -244,6 +244,11 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
       if (m === "POST" && p === "/api/reset") { // "Reset my demo": default rules and vendors, empty queue, mock inbox/chat back to the seed
         const f = fresh(); f.v = st.v; f.rules.pendingChanges = {}; f.audit = [{ by: user, at: new Date().toISOString(), action: "reset demo", key: "-", name: "workspace", changes: {} }];
         await save(f); await resetMocks(); return json({ ok: true }); }
+      if (m === "GET" && (mm = p.match(/^\/api\/audit\.(csv|json)$/))) {
+        const rows = auditRows(st), stamp = new Date().toISOString().slice(0, 10);
+        if (mm[1] === "json") return new Response(JSON.stringify({ exportedAt: new Date().toISOString(), exportedBy: user, invoices: rows, vendorChanges: st.audit }, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="clearhold-audit-${stamp}.json"` } });
+        return new Response(toCsv(rows), { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="clearhold-audit-${stamp}.csv"` } });
+      }
       if (m === "GET" && p === "/api/pain001") {
         const pays = st.log.filter((l) => l.action === "pay").map((l) => ({ id: l.id, ...l.extracted }));
         return new Response(pain001(pays, { registry: st.rules.vendors, msgId: `NWR-${Date.now()}` }), { headers: { "content-type": "application/xml", "content-disposition": "attachment; filename=pain001.xml" } });
@@ -276,12 +281,30 @@ export function validateVendor(v, rules) {
 }
 export const describeTerms = (v) => `${v.category}: ` + (v.terms.type === "flat" ? `${v.currency} ${v.terms.amount} flat per month.` : `${v.currency} ${v.terms.rate} per hour, up to ${v.terms.max_units_per_period} hours per month.`) + " No other charges without written approval.";
 
+/** Audit export: one row per invoice with decision, reasons, failed rules, evidence and who/when. */
+export function auditRows(st) {
+  return st.log.map((e) => {
+    const x = e.extracted ?? {}, s = e.source ?? {}, h = e.history ?? [];
+    const ev = Object.fromEntries(Object.entries(e.schema ?? {}).map(([k, f]) => [k, f.evidence?.text ?? null]));
+    return { id: e.id, received_at: e.at, channel: s.channel ?? null, format: e.channel, source_message: s.messageId ?? s.name ?? null,
+      payee: x.payee ?? null, vendor_key: x.vendorKey ?? null, invoice_number: x.number ?? null, amount: x.amount ?? null, currency: x.currency ?? null,
+      amount_usd: e.amountUsd != null ? Math.round(e.amountUsd * 100) / 100 : null, due: x.due ?? null, bank_account: x.acct ?? null,
+      agent_decision: h[0]?.action ?? e.action, final_decision: e.action, decided_by: h.at(-1)?.by ?? "agent", decided_at: h.at(-1)?.at ?? e.at,
+      reasons: e.reason, rules_failed: (e.checks ?? []).filter((c) => !c.ok).map((c) => c.rule).join("; "),
+      model: e.model?.name ?? null, p_duplicate: e.model?.is_duplicate ?? null, p_matches_agreement: e.model?.matches_agreement ?? null,
+      evidence: JSON.stringify(ev), history: h.map((y) => `${y.at ?? ""} ${y.by} ${y.action}`).join(" | ") };
+  });
+}
+const csvCell = (v) => { const s = v == null ? "" : String(v); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
+export const toCsv = (rows) => (rows.length ? [Object.keys(rows[0]).join(","), ...rows.map((r) => Object.values(r).map(csvCell).join(","))].join("\r\n") + "\r\n" : "id\r\n");
+
 /** Stress test on a separate ledger; streams NDJSON: one line per invoice + running score. */
-function stress({ seed = Math.floor(Math.random() * 1e6), n = 30 }, rules, adapter) {
+function stress({ seed = Math.floor(Math.random() * 1e6), n = 30, mix = "realistic" }, rules, adapter) {
+  mix = mix === "traps" ? "traps" : "realistic";
   n = Math.min(Math.max(1, n | 0), 100);
-  const inv = generate(seed, n), r = rng(seed), st = { rules, ledger: newLedger(), log: [] }, enc = new TextEncoder();
+  const inv = generate(seed, n, { mix }), r = rng(seed), st = { rules, ledger: newLedger(), log: [] }, enc = new TextEncoder();
   const stream = new ReadableStream({ async start(c) {
-    c.enqueue(enc.encode(JSON.stringify({ type: "start", seed, n }) + "\n"));
+    c.enqueue(enc.encode(JSON.stringify({ type: "start", seed, n, mix }) + "\n"));
     for (const t of inv) {
       // email/chat/pdf go through the real extractors; images use their text layer here (OCR runs in the browser for channel images).
       const doc = t.format === "email" ? { kind: "email", text: renderEmail(t, r) } : t.format === "chat" ? { kind: "chat", text: renderChat(t, r) }

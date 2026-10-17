@@ -186,3 +186,18 @@ test("demo sandbox: each workspace has its own queue and mock inbox; colleagues 
   assert.equal((await J(await call("GET", "/mail/api/messages"))).messages.length, 19, "mock inbox back to the seed");
   assert.equal((await J(await call("POST", "/api/sync"))).added, 29);
 });
+
+test("audit export: CSV and JSON with decision, reasons, failed rules, evidence and who/when; CSV is formula-safe", async () => {
+  const { call, login } = mk(); await login();
+  await call("POST", "/api/sync"); await call("POST", "/api/process", { messageId: "m-C16" }); await call("POST", "/api/process", { messageId: "m-C02" });
+  await call("POST", "/api/upload", { filename: "x.txt", type: "text/plain", text: "Subject: =HYPERLINK(\"http://x\")\n\nVendor: Nobody\nTotal due: USD 5.00" });
+  const j = await J(await call("GET", "/api/audit.json"));
+  assert.equal(j.invoices.length, 3); assert.equal(j.exportedBy, "eric@example.com");
+  const held = j.invoices.find((r) => r.source_message === "m-C16");
+  assert.equal(held.final_decision, "hold"); assert.match(held.rules_failed, /Registered bank account/); assert.match(held.reasons, /MX-FAKE-9999/);
+  assert.match(JSON.parse(held.evidence).bank_account, /MX-FAKE-9999/); assert.match(held.history, /agent hold/);
+  const r = await call("GET", "/api/audit.csv"); assert.match(r.headers.get("content-type"), /text\/csv/);
+  const csv = await r.text(), lines = csv.trim().split("\r\n");
+  assert.match(lines[0], /^id,received_at,channel/); assert.ok(lines.length >= 4);
+  assert.doesNotMatch(csv, /,=HYPERLINK/, "cells starting with = are neutralised");
+});
