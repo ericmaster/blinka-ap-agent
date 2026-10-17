@@ -9,7 +9,7 @@ const call = (app, m, p, body) => app(new Request("http://x" + p, { method: m, h
 test("API: no model configured => nothing auto-pays; human approval re-checks hard rules; pain.001 lists only paid", async () => {
   const app = mk();
   const r1 = await (await call(app, "POST", "/api/invoice", { kind: "email", text: readFileSync("data/curated/C01.email.txt", "utf8") })).json();
-  assert.equal(r1.action, "escalate"); assert.match(r1.reason, /modelo/);
+  assert.equal(r1.action, "escalate"); assert.match(r1.reason, /model/);
   const ok = await call(app, "POST", `/api/invoice/${r1.id}/approve`); assert.equal(ok.status, 200);
   const r2 = await (await call(app, "POST", "/api/invoice", { kind: "email", text: readFileSync("data/curated/C16.email.txt", "utf8") })).json();
   assert.equal(r2.action, "hold");
@@ -26,7 +26,7 @@ test("API: rules validation and allowlist", async () => {
   assert.equal((await call(app, "PUT", "/api/rules", { max_per_payment_usd: -5 })).status, 400);
   assert.equal((await call(app, "PUT", "/api/rules", { allowlist: ["maria-qa"] })).status, 200);
   const r = await (await call(app, "POST", "/api/invoice", { kind: "email", text: readFileSync("data/curated/C01.email.txt", "utf8") })).json();
-  assert.match(r.reason, /no está en la lista/);
+  assert.match(r.reason, /not in the approved/);
 });
 test("API: stress stream reports score with zero improper payments", async () => {
   const lines = (await (await call(mk(), "POST", "/api/stress", { seed: 3, n: 12 })).text()).trim().split("\n").map(JSON.parse);

@@ -33,7 +33,7 @@ export function findAmount(text) {
     for (const m of seg.matchAll(AMOUNT_RE)) {
       const sym = m[1] ?? m[4], num = m[2] ?? m[3];
       const currency = CODES.includes(sym) ? sym : SYM[sym] ?? null; // bare "$" => ambiguous
-      cands.push({ isTotal, currency, amount: parseNumber(num) });
+      cands.push({ isTotal, currency, amount: parseNumber(num), raw: m[0] });
     }
   }
   const totals = cands.filter((c) => c.isTotal);
@@ -54,6 +54,12 @@ export function parseDate(s) {
   return null;
 }
 function after(text, re) { const m = text.match(re); return m ? m[1].trim() : null; }
+// Same as after() but records the evidence span (offsets into the text) for the detail view.
+function span(ev, field, text, re, conf) {
+  const m = text.match(re); if (!m) return null;
+  const v = m[1].trim(), start = m.index + m[0].indexOf(m[1]);
+  ev[field] = { text: v, start, end: start + m[1].length, confidence: conf }; return v;
+}
 
 export function matchVendor(name) {
   if (!name) return null;
@@ -73,14 +79,19 @@ export function lineItems(t) {
   });
 }
 export function extractText(text) {
-  const t = text.replace(/\r/g, "");
-  const payeeRaw = after(t, /(?:proveedor|vendor|fornecedor)\s*:\s*([^\n]+)/i) ?? after(t, /(?:factura|invoice|fatura)\s+[A-Z0-9][\w\-/]*\s+(?:de|from|da|do)\s+(.+?)(?:,|\n|$)/i);
-  const number = after(t, /(?:factura|invoice|fatura|nota fiscal)\s*(?:n[°ºo*]\.?|#|no\.?)?\s*:?\s*([A-Z0-9][A-Z0-9\-/]*\d[A-Z0-9\-/]*)/i);
-  const dueRaw = after(t, /(?:vence(?:\s+el)?|due(?: date)?|vencimento|fecha de vencimiento)\s*:?\s*([^\n,]+(?:,\s*\d{4})?)/i);
-  const acct = after(t, /(?:cuenta|account|conta)\s*:?\s*([A-Z]{2}-[A-Z0-9]+-\d+)/i);
+  const t = text.replace(/\r/g, ""), ev = {};
+  const payeeRaw = span(ev, "vendor", t, /(?:proveedor|vendor|fornecedor)\s*:\s*([^\n]+)/i, 0.97) ?? span(ev, "vendor", t, /(?:factura|invoice|fatura)\s+[A-Z0-9][\w\-/]*\s+(?:de|from|da|do)\s+(.+?)(?:,|\n|$)/i, 0.85);
+  const number = span(ev, "invoice_number", t, /(?:factura|invoice|fatura|nota fiscal)\s*(?:n[°ºo*]\.?|#|no\.?)?\s*:?\s*([A-Z0-9][A-Z0-9\-/]*\d[A-Z0-9\-/]*)/i, 0.95);
+  const dueRaw = span(ev, "due_date", t, /(?:vence(?:\s+el)?|due(?: date)?|vencimento|fecha de vencimiento)\s*:?\s*([^\n,]+(?:,\s*\d{4})?)/i, 0.93);
+  const acct = span(ev, "bank_account", t, /(?:cuenta|account|conta)\s*:?\s*([A-Z]{2}-[A-Z0-9]+-\d+)/i, 0.97);
   const dateRaw = after(t, /(?:^|\n)\s*(?:fecha|date|data)\s*:\s*([^\n]+)/i) ?? after(t, /^\[(\d{4}-\d{2}-\d{2})/);
-  const { amount, currency } = findAmount(t);
+  const am = findAmount(t), { amount, currency } = am;
+  if (amount != null && am.raw) { const st = t.indexOf(am.raw); ev.amount = { text: am.raw, start: st, end: st + am.raw.length, confidence: 0.95 }; if (currency) ev.currency = { ...ev.amount, confidence: 0.95 }; }
   const vendorKey = matchVendor(payeeRaw);
+  if (ev.vendor) ev.vendor.confidence = vendorKey ? ev.vendor.confidence : 0.6; // read fine, but not a registered vendor
+  const items = lineItems(t);
+  const d = t.match(/(?:concepto|description|descri[cç][aã]o|for|referente a)\s*:\s*([^\n]+)/i);
+  if (d) { const st = d.index + d[0].indexOf(d[1]); ev.line_items = { text: d[1].trim(), start: st, end: st + d[1].length, confidence: items.every((i) => i.unitPrice != null) ? 0.9 : 0.75 }; }
   return { payee: payeeRaw, vendorKey, number, amount, currency, due: dueRaw ? parseDate(dueRaw) : null, date: dateRaw ? parseDate(dateRaw) : null, acct,
-    injectionSuspected: INJECTION.test(t), items: lineItems(t), text: t.slice(0, 2000) };
+    injectionSuspected: INJECTION.test(t), items, evidence: ev, text: t.slice(0, 4000) };
 }

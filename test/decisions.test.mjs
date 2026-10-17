@@ -14,10 +14,10 @@ test("curated: zero improper payments, every trap stopped with a reason", { time
   assert.deepEqual(counts(log), { pay: 12, hold: 12, escalate: 5 });
   const byId = Object.fromEntries(log.map((l) => [l.id, l]));
   const want = { C09: "hold", C10: "hold", C11: "escalate", C12: "escalate", C13: "hold", C14: "hold", C15: "hold", C16: "hold", C17: "hold", C18: "escalate", C19: "escalate", C20: "hold", C21: "escalate", C26: "hold", C27: "hold", C28: "hold", C29: "hold" };
-  assert.match(byId.C27.reason, /fuera del servicio contratado/);
-  assert.match(byId.C28.reason, /Posible duplicado: mismos conceptos/);
-  assert.match(byId.C29.reason, /huella idéntica/);
-  assert.match(byId.C16.reason, /no coincide con la registrada/);
+  assert.match(byId.C27.reason, /outside the contracted service/);
+  assert.match(byId.C28.reason, /Possible duplicate: same items/);
+  assert.match(byId.C29.reason, /identical fingerprint/);
+  assert.match(byId.C16.reason, /does not match the registered/);
   for (const [id, a] of Object.entries(want)) assert.equal(byId[id].action, a, `${id}: ${byId[id].reason}`);
   for (const l of log) assert.ok(l.reason.length > 10, `${l.id} has a plain-language reason`);
 });
