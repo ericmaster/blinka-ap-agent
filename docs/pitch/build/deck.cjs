@@ -32,41 +32,43 @@ let s = pres.addSlide(); s.background = { color: C.paper };
 logo(s, X, 0.61);
 kicker(s, "30X Hackathon · Reto Blinka", 1.72);
 T(s, "El piloto automático de cuentas por pagar.", { x: X, y: 2.02, w: 6.7, h: 1.45, fontSize: 39, bold: true, lineSpacingMultiple: 0.95 });
-T(s, "Paga lo acordado, frena lo raro y te pregunta lo dudoso.", { x: X, y: 3.55, w: 6.6, h: 0.9, fontSize: 19, color: C.slate });
-box(s, { x: X, y: 4.62, w: 0.045, h: 1.18, fill: { color: C.accent } });
-T(s, "Laura, controller", { x: X + 0.25, y: 4.62, w: 6.3, h: 0.36, fontSize: 17, bold: true });
-T(s, "Pyme de EE. UU. con unos 40 proveedores en Latinoamérica. Facturas por correo, PDF, foto y WhatsApp.", { x: X + 0.25, y: 5.0, w: 6.2, h: 0.82, fontSize: 15, color: C.slate });
+T(s, "Paga lo acordado, detiene lo sospechoso y te pregunta lo dudoso.", { x: X, y: 3.5, w: 6.6, h: 0.75, fontSize: 19, color: C.slate });
+box(s, { x: X, y: 4.38, w: 0.045, h: 1.6, fill: { color: C.accent } });
+T(s, [{ text: "Laura, controller" }, { text: "   PERSONA FICTICIA", options: { fontSize: 11, color: C.muted, charSpacing: 1 } }], { x: X + 0.25, y: 4.38, w: 6.3, h: 0.36, fontSize: 17, bold: true });
+T(s, "Su empresa en EE. UU. paga a proveedores en Latinoamérica. Cierra el mes revisando a mano cientos de facturas que llegan por correo y WhatsApp. Un correo que pide cambiar la cuenta de un proveedor es justo por donde se pierde el dinero.", { x: X + 0.25, y: 4.76, w: 6.3, h: 1.22, fontSize: 14, color: C.slate });
 T(s, [{ text: "Eric Aguayo", options: { bold: true, color: C.ink } }, { text: " · Equipo Nimble", options: { breakLine: true } }, { text: "Co-fundador y Director de IA Aplicada, Nimblersoft" }], { x: X, y: 6.12, w: 6.9, h: 0.6, fontSize: 13, color: C.slate });
 box(s, { x: 7.95, y: 0.45, w: 4.95, h: 6.25, r: 0.2, fill: { color: C.ink } });
 kicker(s, "El dolor", 1.05, C.soft, 8.4);
 T(s, [{ text: "US$", options: { fontSize: 36, color: C.soft } }, { text: "3.046", options: { fontSize: 68, color: "FFFFFF" } }], { x: 8.4, y: 1.4, w: 4.45, h: 1.15, bold: true, valign: "bottom" });
 T(s, "millones", { x: 8.4, y: 2.58, w: 4, h: 0.55, fontSize: 32, bold: true, color: "FFFFFF" });
-T(s, "perdidos por fraude de correo empresarial (BEC) reportados al FBI en 2025.", { x: 8.4, y: 3.3, w: 4.1, h: 1.3, fontSize: 18, color: "E9EDF1" });
+T(s, "perdidos por fraude de correo empresarial (BEC) reportados al FBI en 2025.¹", { x: 8.4, y: 3.3, w: 4.1, h: 1.3, fontSize: 18, color: "E9EDF1" });
 rule(s, 8.4, 4.75, 4.05, "4A5263", 1);
-T(s, "24.768", { x: 8.4, y: 4.92, w: 4, h: 0.5, fontSize: 28, bold: true, color: "FFFFFF" });
-T(s, "denuncias. El truco clásico: «cambiamos de cuenta bancaria».", { x: 8.4, y: 5.45, w: 4.1, h: 0.8, fontSize: 15, color: C.pale });
-src(s, "Fuente: FBI IC3, 2025 Internet Crime Report (ic3.gov)", false, 6.8); pageno(s, 1);
+[[8.4, "79 %", "de las empresas sufrió intento o fraude de pagos en 2024.²"], [10.5, "8,2 días", "y US$9,84 cuesta procesar cada factura.³"]].forEach(([x, b, p]) => {
+  T(s, b, { x, y: 4.92, w: 1.95, h: 0.5, fontSize: 26, bold: true, color: "FFFFFF" });
+  T(s, p, { x, y: 5.45, w: 1.95, h: 1.0, fontSize: 13, color: C.pale });
+});
+src(s, "¹ FBI IC3, 2025 Internet Crime Report · ² AFP, 2025 Payments Fraud and Control Survey · ³ Ardent Partners, State of ePayables 2025", false, 11.0); pageno(s, 1);
 s.addNotes(NOTES[0]);
 
-// 2 · Regla de oro
+// 2 · Gobernanza por diseño
 s = pres.addSlide(); s.background = { color: C.ink };
-kicker(s, "La regla de oro", 0.61, C.soft);
-T(s, [{ text: "El modelo solo puede " }, { text: "frenar", options: { color: C.soft } }, { text: ", nunca pagar." }], { x: X, y: 0.9, w: CW, h: 0.8, fontSize: 40, bold: true, color: "FFFFFF" });
+kicker(s, "Gobernanza por diseño", 0.61, C.soft);
+T(s, [{ text: "La IA puede " }, { text: "detener", options: { color: C.soft } }, { text: " un pago. Lo aprueban las reglas en código y, sobre US$2.000, una persona." }], { x: X, y: 0.9, w: CW, h: 1.25, fontSize: 32, bold: true, color: "FFFFFF", lineSpacingMultiple: 0.95 });
 const sw = 3.52, ga = 0.556, sy = 2.45, sh = 2.7;
-const steps = [["01", "Las reglas en código deciden", "Proveedor y cuenta registrados, contrato, duplicados, límites y presupuesto."], ["02", "El modelo solo dice sí o no", "¿Es duplicada? ¿Cumple el contrato? Si duda o falla, te pregunta."], ["03", "Cada decisión trae su prueba", "Pagar solo si todas las reglas pasan. La duda nunca se paga."]];
+const steps = [["01", "Las reglas en código deciden", "Proveedor y cuenta registrados, contrato, duplicados, límites y presupuesto."], ["02", "El modelo solo dice sí o no", "¿Es duplicada? ¿Cumple el contrato? Solo puede detener; si duda o falla, te pregunta."], ["03", "Cada decisión trae su prueba", "Pagar solo si todas las reglas pasan. La duda nunca se paga."]];
 steps.forEach(([n, h, p], k) => {
   const x = X + k * (sw + ga), out = k === 2;
   box(s, { x, y: sy, w: sw, h: sh, r: 0.17, fill: { color: out ? C.surface : "283146" }, line: { color: out ? C.surface : "3A4356", width: 1 } });
   T(s, n, { x: x + 0.3, y: sy + 0.3, w: 1, h: 0.25, fontSize: 13, fontFace: M, color: out ? C.accent : C.soft });
   T(s, h, { x: x + 0.3, y: sy + 0.6, w: sw - 0.6, h: 0.8, fontSize: 22, bold: true, color: out ? C.ink : "FFFFFF" });
   if (out) {
-    tag(s, "Pagar", x + 0.3, sy + 1.45, 0.88, "DDEDE5", "14633F"); tag(s, "Frenar", x + 1.26, sy + 1.45, 0.92, "F4E8D0", "8A5D06"); tag(s, "Escalar", x + 2.26, sy + 1.45, 0.96, "F5E0D7", "9A330A");
+    tag(s, "Pagar", x + 0.3, sy + 1.45, 0.88, "DDEDE5", "14633F"); tag(s, "Detener", x + 1.26, sy + 1.45, 0.92, "F4E8D0", "8A5D06"); tag(s, "Escalar", x + 2.26, sy + 1.45, 0.96, "F5E0D7", "9A330A");
     T(s, p, { x: x + 0.3, y: sy + 1.98, w: sw - 0.6, h: 0.6, fontSize: 14, color: C.slate });
   } else T(s, p, { x: x + 0.3, y: sy + 1.45, w: sw - 0.6, h: 1.1, fontSize: 16, color: C.pale });
   if (k < 2) T(s, "→", { x: x + sw, y: sy + 1.0, w: ga, h: 0.6, fontSize: 28, color: C.soft, align: "center", valign: "middle" });
 });
 box(s, { x: X, y: 5.6, w: CW, h: 0.9, r: 0.14, fill: { color: "252E42" } });
-tag(s, "Frenada", X + 0.25, 5.84, 1.25, C.hold, "FFFFFF", 15);
+tag(s, "Detenida", X + 0.25, 5.84, 1.25, C.hold, "FFFFFF", 15);
 T(s, [{ text: "«La cuenta " }, { text: "MX-FAKE-9999", options: { fontFace: M, color: C.soft } }, { text: " no coincide con la registrada para Monterrey Ops Partners S.C.»" }], { x: X + 1.75, y: 5.6, w: CW - 1.9, h: 0.9, fontSize: 17, color: "FFFFFF", valign: "middle" });
 src(s, "Ejemplo real de la demo, con datos sintéticos.", true); pageno(s, 2, true);
 s.addNotes(NOTES[1]);
@@ -74,7 +76,7 @@ s.addNotes(NOTES[1]);
 // 3 · Demo
 s = pres.addSlide(); s.background = { color: C.paper };
 kicker(s, "Demo", 0.44);
-T(s, "Tres facturas. Dos trampas frenadas.", { x: X, y: 0.77, w: 8.5, h: 0.6, fontSize: 28, bold: true });
+T(s, "Tres facturas. Dos trampas detenidas.", { x: X, y: 0.77, w: 8.5, h: 0.6, fontSize: 28, bold: true });
 box(s, { x: R - 2.75, y: 0.66, w: 2.75, h: 0.55, r: 0.27, fill: { color: C.ink } });
 s.addShape(pres.shapes.OVAL, { x: R - 2.48, y: 0.88, w: 0.11, h: 0.11, fill: { color: C.hold }, line: { type: "none" } });
 T(s, "Datos sintéticos", { x: R - 2.3, y: 0.66, w: 2.1, h: 0.55, fontSize: 15, bold: true, color: "FFFFFF", valign: "middle" });
@@ -84,7 +86,7 @@ const hasVideo = fs.existsSync(VIDEO);
 if (hasVideo) s.addMedia({ type: "video", path: VIDEO, cover: fs.readFileSync(POSTER).toString("base64").replace(/^/, "image/png;base64,"), x: vx, y: vy, w: vw, h: vh });
 else s.addImage({ path: POSTER, x: vx, y: vy, w: vw, h: vh, altText: "Demo guiada de Clearhold (datos sintéticos)", hyperlink: { url: LIVE, tooltip: "Abrir la demo en vivo" } });
 const sx = R - 3.33;
-[["Normal → pagada", "Proveedor con contrato y cuenta registrada."], ["Otra cuenta → frenada", "Te dice por qué, en una línea."], ["Reenviada → frenada", "La misma factura, ahora por WhatsApp."]].forEach(([b, p], k) => {
+[["Normal → pagada", "Proveedor con contrato y cuenta registrada."], ["Otra cuenta → detenida", "Te dice por qué, en una línea."], ["Reenviada → detenida", "La misma factura, ahora por WhatsApp."]].forEach(([b, p], k) => {
   const y = 1.72 + k * 1.28; rule(s, sx, y, 3.33, C.line, 1.5);
   T(s, b, { x: sx, y: y + 0.13, w: 3.4, h: 0.38, fontSize: 19, bold: true });
   T(s, p, { x: sx, y: y + 0.52, w: 3.33, h: 0.6, fontSize: 15, color: C.slate });
@@ -144,7 +146,7 @@ s.addNotes(NOTES[4]);
 // 6 · Por qué Blinka
 s = pres.addSlide(); s.background = { color: C.paper };
 kicker(s, "Por qué Blinka", 0.61);
-T(s, "Los mismos proveedores, las mismas monedas, ahora con frenos.", { x: X, y: 0.9, w: CW, h: 1.2, fontSize: 32, bold: true });
+T(s, "Los mismos proveedores, las mismas monedas, ahora con controles.", { x: X, y: 0.9, w: CW, h: 1.2, fontSize: 32, bold: true });
 const fw = 5.53; let fy = 2.3;
 ["Plataforma bancaria para empresas globales, con respaldo de Y Combinator", "Cuentas en USD y pagos con rutas locales a COP, MXN, BRL, PEN, CLP y ARS", "Gestión de proveedores, facturación y contabilidad con automatizaciones"].forEach(t => {
   box(s, { x: X, y: fy + 0.25, w: 0.125, h: 0.125, fill: { color: C.accent } });
@@ -176,7 +178,7 @@ T(s, [{ text: "¿Cuántos pagos aprobó tu equipo esta semana " }, { text: "sin 
   T(s, l.toUpperCase(), { x, y: 5.1, w: 5, h: 0.3, fontSize: 12, bold: true, charSpacing: 1, color: C.pale2 });
   T(s, [{ text: t, options: { hyperlink: { url } } }], { x, y: 5.45, w: 5.7, h: 0.4, fontSize: 17, fontFace: M, color: "FFFFFF" });
 });
-T(s, "PAGA LO ACORDADO. FRENA LO RARO.", { x: X, y: 6.55, w: 5, h: 0.3, fontSize: 12, bold: true, charSpacing: 1.5, color: C.soft });
+T(s, "PAGA LO ACORDADO. DETIENE LO SOSPECHOSO.", { x: X, y: 6.55, w: 5.6, h: 0.3, fontSize: 12, bold: true, charSpacing: 1.5, color: C.soft });
 T(s, [{ text: "Eric Aguayo", options: { bold: true, color: "FFFFFF" } }, { text: " · Nimblersoft · Equipo Nimble" }], { x: R - 6, y: 6.5, w: 6, h: 0.35, fontSize: 13, color: C.pale, align: "right" });
 pageno(s, 7, true);
 s.addNotes(NOTES[6]);

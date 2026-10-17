@@ -20,8 +20,8 @@ Abrir `index.html` en Chrome o Edge. Se ve bien a 1920×1080 y en laptop: la dia
 ## Guion (3:00)
 | # | Diapositiva | Tiempo |
 |---|---|---|
-| 1 | Portada + dolor (FBI IC3 2025, Laura) | 0:00–0:25 |
-| 2 | Regla de oro: el modelo solo puede frenar, nunca pagar | 0:25–0:50 |
+| 1 | Portada + dolor: Laura (persona ficticia) y las cifras (FBI IC3, AFP, Ardent) | 0:00–0:25 |
+| 2 | Gobernanza por diseño: la IA puede detener un pago; lo aprueban las reglas en código y, sobre US$2.000, una persona | 0:25–0:50 |
 | 3 | Demo (video narrado; si falla, la demo en vivo) | 0:50–2:05 |
 | 4 | Real vs simulado | 2:05–2:20 |
 | 5 | Costo e impacto, y diferencia con Ramp, BILL y Tipalti | 2:20–2:35 |
@@ -30,13 +30,19 @@ Abrir `index.html` en Chrome o Edge. Se ve bien a 1920×1080 y en laptop: la dia
 
 ## Cifras y fuentes
 - US$3.046 millones perdidos por BEC en 2025, en 24.768 denuncias: FBI IC3, *2025 Internet Crime Report*, https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf (ver `../MARKET.md` §3)
-- US$9,84 de costo promedio por factura: Ardent Partners, *State of ePayables 2025* (`../MARKET.md` §4)
+- 79 % de las organizaciones sufrió intento o fraude real de pagos en 2024: AFP, *2025 Payments Fraud and Control Survey*, https://www.afponline.org/about/learn-more/press-releases/Details/survey-79-percent-of-organizations-were-victims-of-attempted-or-actual-payments-fraud-activity-in-2024 (`../MARKET.md` §3)
+- US$9,84 de costo promedio y 8,2 días de proceso por factura: Ardent Partners, *State of ePayables 2025* (`../MARKET.md` §4)
+- Laura es una persona ficticia (controller de una empresa de EE. UU. que paga a proveedores en Latinoamérica); su caso ilustra el dolor, las cifras lo respaldan.
+- Aprobación humana sobre US$2.000: `human_approval_above_usd` en `../../config/rules.json` (valor de la demo, configurable).
 - 21 % «muy seguro» de detectar un cambio fraudulento de cuenta antes de pagar: Tipalti, *2026 Global Finance Outlook*, https://tipalti.com/press/2026-global-finance-outlook-index-ai-adoption/
 - Menos de 1 centavo por factura: modelo ~US$0,0001 por factura (US$0,0031 por 30, `../../bench/RESULTS.md`) más hosting serverless
 - 0 pagos indebidos en 629 facturas sintéticas (29 curadas + 600 generadas), también con el modelo «temerario»: `../../test/decisions.test.mjs`
 - 28 % de escalamiento en vivo (8 de 29) y meta de piloto ≤ 35 %: `../MARKET.md` §5
 - Hechos de Blinka: blinka.co, según `../PITCH.md` §5 · Piloto: `../RUNBOOK-PRODUCTION.md` §3
 - Real vs simulado: `../REAL-VS-SIMULATED.md`
+
+## Pendiente: volver a generar el video del pitch
+El 17 oct 2026 cambió el texto de la narración (diapositivas 1, 2, 4 y 7 en `build/pitch-narration.json` y `pitch-narration.md`): Laura con un dolor concreto, «detiene lo sospechoso» en vez de «frena lo raro» y «gobernanza por diseño» en vez de «el modelo solo puede frenar». **`clearhold-pitch-3min.mp4` todavía tiene la narración y las diapositivas anteriores**; hay que volver a generarlo (con la voz de Eric o con Fish). Las tomas nuevas suman unos 3–4 s con Fish, así que puede acercarse al tope de 2:58. `demo-narrated.mp4` no cambió: su voz y sus subtítulos fijos todavía dicen «frenada» y «el modelo solo puede frenar, nunca pagar» (`demo-narration.md`, `build/demo-beats.json`).
 
 ## Volver a generar
 Necesita Python 3, Node con `pptxgenjs` y Google Chrome.
@@ -61,7 +67,7 @@ El texto y las notas viven en `build/template.html`. `deck.cjs` toma las notas d
 | Archivo | Qué es | Duración de referencia (Fish) |
 |---|---|---|
 | `1.wav` | Portada y dolor | 23,0 s |
-| `2.wav` | Regla de oro | 15,5 s |
+| `2.wav` | Gobernanza por diseño | 15,5 s |
 | `4.wav` | Real vs simulado | 13,0 s |
 | `5.wav` | Costo e impacto | 20,9 s |
 | `6.wav` | Por qué Blinka | 13,3 s |

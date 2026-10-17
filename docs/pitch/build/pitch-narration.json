@@ -1,9 +1,9 @@
 {
   "_comment": "Narración del video de pitch de 3:00, por diapositiva. La diapositiva 3 usa ../demo-narrated.mp4 completo (su propia narración). Editar el texto aquí y correr pitch_video.py.",
-  "1": "Esto es Clearhold, del equipo Nimble: el piloto automático de cuentas por pagar. Paga lo acordado y frena lo raro. Laura es controller de una pyme en Estados Unidos con cuarenta proveedores en Latinoamérica. En 2025 se reportaron al FBI más de tres mil millones de dólares perdidos por fraude de correo empresarial. El truco más común: «cambiamos de cuenta».",
-  "2": "¿Cómo dejar que un agente pague sin miedo? Con una regla de oro: el modelo solo puede frenar, nunca pagar. Las reglas en código deciden; el modelo solo responde sí o no, y si duda, te pregunta. Cada decisión trae su prueba en una línea.",
-  "4": "Para ser claros: lo que decide es real. La extracción, las reglas, los modelos y la auditoría corren hoy en Cloudflare. Lo simulado es el correo, WhatsApp y los pagos de Blinka: no se mueve dinero.",
+  "1": "Esto es Clearhold: el piloto automático de cuentas por pagar. Paga lo acordado y detiene lo sospechoso. Laura, nuestra controller ficticia, cierra el mes revisando a mano cientos de facturas de proveedores latinoamericanos que llegan por correo y WhatsApp. Un correo que pide cambiar la cuenta de un proveedor es justo por donde se pierde el dinero. En 2025, ese fraude de correo empresarial sumó más de tres mil millones de dólares en denuncias al FBI.",
+  "2": "¿Cómo dejar que un agente pague sin miedo? Con gobernanza por diseño: la IA puede detener un pago, pero lo aprueban las reglas en código y, sobre dos mil dólares, una persona. Si el modelo duda, te pregunta. Cada decisión trae su prueba en una línea.",
+  "4": "Lo que decide es real. La extracción, las reglas, los modelos y la auditoría corren hoy en Cloudflare. Lo simulado es el correo, WhatsApp y los pagos de Blinka: no se mueve dinero.",
   "5": "Cuesta menos de un centavo por factura, frente a casi diez dólares en promedio hoy. En seiscientas veintinueve facturas de prueba, incluso con un modelo programado para aprobar todo: cero pagos indebidos. Hoy, el veintiocho por ciento se escala a una persona. Otros recomiendan; nosotros probamos que ningún modelo puede aprobar un pago.",
   "6": "Blinka ya mueve pagos a pesos, reales y soles. Clearhold decide qué pagar antes de que Blinka lo pague. Proponemos un piloto en sombra con tres clientes: decide sobre facturas reales, sin pagar nada.",
-  "7": "Clearhold: paga lo acordado, frena lo raro. ¿Cuántos pagos aprobó tu equipo esta semana sin mirar la cuenta bancaria?"
+  "7": "Clearhold: paga lo acordado, detiene lo sospechoso. ¿Cuántos pagos aprobó tu equipo esta semana sin mirar la cuenta bancaria?"
 }
