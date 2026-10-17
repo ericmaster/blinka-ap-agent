@@ -7,3 +7,6 @@ compatibility_flags = ["nodejs_compat"]
 binding = "STATE"
 id = "35536029a2244107bfdb69254a64f871"
 # Secrets (never in repo): npx wrangler secret put FASTINO_API_KEY ; npx wrangler secret put JEV_API_KEY
+
+[ai]
+binding = "AI"
