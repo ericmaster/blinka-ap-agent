@@ -1,1 +1,5 @@
-[2026-10-16 09:59] Camila: hola! te paso la factura LI-1002 de Lima Support Desk SAC, total PEN 135,00, vence 18 de octubre de 2026, cuenta PE-FAKE-4004, concepto: Servidores dedicados y hardware
+[2026-10-16 09:58] Camila: hola! te paso la factura LI-1002 de Lima Support Desk SAC
+total PEN 135,00
+vence 2026-10-18
+cuenta PE-FAKE-4004
+concepto: Servidores dedicados y hardware

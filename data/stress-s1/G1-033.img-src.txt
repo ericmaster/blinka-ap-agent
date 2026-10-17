@@ -1,7 +1,0 @@
-Proveedor: Lima Support Desk SAC
-Factura N° LI-1032
-Fecha: 4 de octubre de 2026
-Vence: 14 de octubre de 2026
-Concepto: 3 horas de soporte x 45
-Total a pagar: 135,00 PEN
-Cuenta: PE-FAKE-9032

@@ -19,7 +19,8 @@
   "amount": 7200000,
   "lines": "Desarrollo de software octubre: 40 horas x COP 180.000",
   "format": "email",
-  "file": "C01.email.txt"
+  "file": "C01.email.txt",
+  "attachment": "C01.att.pdf"
  },
  {
   "id": "C02",
@@ -41,7 +42,8 @@
   "amount": 28000,
   "lines": "Diseño UI octubre 2026, tarifa fija mensual",
   "format": "email",
-  "file": "C02.email.txt"
+  "file": "C02.email.txt",
+  "attachment": "C02.att.pdf"
  },
  {
   "id": "C03",
@@ -85,7 +87,11 @@
   "amount": 4500,
   "lines": "Soporte nivel 1: 100 horas x PEN 45.00",
   "format": "image",
-  "file": "C04.png"
+  "layout": {
+   "style": "modern",
+   "pages": 1
+  },
+  "file": "C04.jpg"
  },
  {
   "id": "C05",
@@ -151,7 +157,12 @@
   "amount": 950000,
   "lines": "Licencia analítica octubre 2026",
   "format": "email",
-  "file": "C07.email.txt"
+  "layout": {
+   "style": "sii",
+   "pages": 2
+  },
+  "file": "C07.email.txt",
+  "attachment": "C07.att.pdf"
  },
  {
   "id": "C08",
@@ -173,7 +184,11 @@
   "amount": 15600,
   "lines": "Bookkeeping October: 30 hours x MXN 520.00",
   "format": "image",
-  "file": "C08.png"
+  "layout": {
+   "style": "spreadsheet",
+   "pages": 1
+  },
+  "file": "C08.jpg"
  },
  {
   "id": "C09",
@@ -239,7 +254,8 @@
    "trap:new-payee"
   ],
   "format": "email",
-  "file": "C11.email.txt"
+  "file": "C11.email.txt",
+  "attachment": "C11.att.pdf"
  },
  {
   "id": "C12",
@@ -284,7 +300,8 @@
   "amount": 1040,
   "lines": "Soporte nivel 1: 20 horas x PEN 52.00",
   "format": "email",
-  "file": "C13.email.txt"
+  "file": "C13.email.txt",
+  "attachment": "C13.att.pdf"
  },
  {
   "id": "C14",
@@ -306,7 +323,11 @@
   "amount": 2200,
   "lines": "Consultoria: 2 horas x BRL 650,00 + despesas de viagem BRL 900,00 (sem aprovação prévia)",
   "format": "image",
-  "file": "C14.png"
+  "layout": {
+   "style": "modern",
+   "pages": 1
+  },
+  "file": "C14.jpg"
  },
  {
   "id": "C15",
@@ -350,7 +371,8 @@
   "amount": 5200,
   "lines": "Bookkeeping, week of Oct 12: 10 hours x MXN 520.00",
   "format": "email",
-  "file": "C16.email.txt"
+  "file": "C16.email.txt",
+  "attachment": "C16.att.pdf"
  },
  {
   "id": "C17",
@@ -395,7 +417,8 @@
   "amount": 10800000,
   "lines": "Desarrollo de software: 60 horas x COP 180.000",
   "format": "email",
-  "file": "C18.email.txt"
+  "file": "C18.email.txt",
+  "attachment": "C18.att.pdf"
  },
  {
   "id": "C19",
@@ -483,7 +506,11 @@
   "amount": 2700000,
   "lines": "Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000",
   "format": "image",
-  "file": "C22.png"
+  "layout": {
+   "style": "modern",
+   "pages": 1
+  },
+  "file": "C22.jpg"
  },
  {
   "id": "C23",
@@ -505,6 +532,10 @@
   "amount": 4160,
   "lines": "Bookkeeping, quarter-close support Oct 26-30: 8 hours x MXN 520.00",
   "format": "pdf",
+  "layout": {
+   "style": "spreadsheet",
+   "pages": 2
+  },
   "file": "C23.pdf"
  },
  {
@@ -527,7 +558,8 @@
   "amount": 6500,
   "lines": "Consultoria jurídica, revisão de contratos de fornecedores: 10 horas x BRL 650,00",
   "format": "email",
-  "file": "C24.email.txt"
+  "file": "C24.email.txt",
+  "attachment": "C24.att.pdf"
  },
  {
   "id": "C25",
@@ -571,7 +603,8 @@
   "amount": 3900,
   "lines": "Consultoria jurídica, registro de marca no INPI: 6 horas x BRL 650,00",
   "format": "email",
-  "file": "C26.email.txt"
+  "file": "C26.email.txt",
+  "attachment": "C26.att.pdf"
  },
  {
   "id": "C27",
@@ -593,7 +626,11 @@
   "amount": 1040,
   "lines": "Licencias de servidores dedicados: 2 hours x MXN 520.00",
   "format": "email",
-  "file": "C27.email.txt"
+  "layout": {
+   "style": "modern"
+  },
+  "file": "C27.email.txt",
+  "attachment": "C27.att.pdf"
  },
  {
   "id": "C28",
@@ -615,7 +652,8 @@
   "amount": 2700000,
   "lines": "Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000",
   "format": "email",
-  "file": "C28.email.txt"
+  "file": "C28.email.txt",
+  "attachment": "C28.att.pdf"
  },
  {
   "id": "C29",
@@ -637,6 +675,7 @@
   "amount": 1300,
   "lines": "Consultoria jurídica: 2 horas x BRL 650,00",
   "format": "email",
-  "file": "C29.email.txt"
+  "file": "C29.email.txt",
+  "attachment": "C29.att.pdf"
  }
 ]

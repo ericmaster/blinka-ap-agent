@@ -1,40 +1,14 @@
 // Seeded invoice generator. FAKE data only. Produces invoice facts + ground truth + rendered text.
 import { VENDORS, HISTORY } from "../data/vendors.mjs";
 
-export function rng(seed) { // mulberry32
-  let a = seed >>> 0;
-  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-}
-const pick = (r, xs) => xs[Math.floor(r() * xs.length)];
-
-const MONTHS = {
-  es: ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
-  pt: ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"],
-  en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
-};
-export function fmtDate(iso, lang, style) {
-  const [y, m, d] = iso.split("-").map(Number);
-  if (style === 0) return iso;
-  if (style === 1 && lang !== "en") return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`;
-  if (lang === "en") return `${MONTHS.en[m-1]} ${d}, ${y}`;
-  return `${d} de ${MONTHS[lang][m-1]} de ${y}`;
-}
-export function fmtAmount(n, cur, lang, style = 0) {
-  const dec = ["COP", "CLP"].includes(cur) ? 0 : 2;
-  const [i, f] = n.toFixed(dec).split(".");
-  const latin = (lang !== "en" && cur !== "USD") || style === 1; // 1.234,56 vs 1,234.56
-  const g = i.replace(/\B(?=(\d{3})+(?!\d))/g, latin ? "." : ",");
-  const num = f ? g + (latin ? "," : ".") + f : g;
-  if (cur === null) return `$ ${num}`; // ambiguous currency trap
-  const sym = { BRL: "R$", USD: "US$" }[cur];
-  if (style === 2 && sym) return `${sym} ${num}`;
-  return style === 3 ? `${num} ${cur}` : `${cur} ${num}`;
-}
+import { rng, pick, fmtDate, fmtAmount } from "./format.mjs";
+import { billingEmail, invoiceModel } from "./invoice.mjs";
+export { rng, fmtDate, fmtAmount };
 
 const L = {
-  es: { vendor: "Proveedor", num: "Factura N°", date: "Fecha", due: "Vence", total: "Total a pagar", acct: "Cuenta", desc: "Concepto", hi: "Hola equipo de Northwind,", bye: "Saludos," },
-  en: { vendor: "Vendor", num: "Invoice #", date: "Date", due: "Due date", total: "Total due", acct: "Account", desc: "Description", hi: "Hi Northwind team,", bye: "Best regards," },
-  pt: { vendor: "Fornecedor", num: "Fatura nº", date: "Data", due: "Vencimento", total: "Total a pagar", acct: "Conta", desc: "Descrição", hi: "Olá equipe Northwind,", bye: "Atenciosamente," },
+  es: { vendor: "Proveedor", num: "Factura N°", date: "Fecha", due: "Vence", total: "Total a pagar", acct: "Cuenta", desc: "Concepto" },
+  en: { vendor: "Vendor", num: "Invoice #", date: "Date", due: "Due date", total: "Total due", acct: "Account", desc: "Description" },
+  pt: { vendor: "Fornecedor", num: "Fatura nº", date: "Data", due: "Vencimento", total: "Total a pagar", acct: "Conta", desc: "Descrição" },
 };
 
 /** Body lines shared by email, PDF and image renders. */
@@ -53,11 +27,32 @@ export function bodyLines(inv, r = rng(1)) {
   if (inv.injection) lines.splice(4, 0, inv.injection);
   return lines;
 }
+const EMAIL = {
+  es: { subj: [(i, m) => `Factura electrónica ${i.number} — ${m.legal}`, (i) => `Factura N° ${i.number}`, (i, m) => `${m.legal}: factura ${i.number}${m.due ? ` (vence ${m.due})` : ""}`],
+    hi: ["Buenos días, equipo de Cuentas por Pagar de Northwind:", "Hola equipo de Northwind,", "Estimados señores de Northwind Ridge:"],
+    intro: (i) => [`Adjuntamos la factura ${i.number} por los servicios del periodo. El PDF va adjunto a este correo; a continuación el resumen.`, `Les compartimos la factura electrónica ${i.number}. Encontrarán la representación gráfica en PDF adjunta.`],
+    sum: "Resumen de la factura", close: ["Por favor confirmen la recepción. Cualquier inquietud con gusto la resolvemos.", "Quedamos atentos a la confirmación del pago."], bye: ["Cordialmente,", "Saludos,"], att: "Adjunto", changed: "Nota: actualizamos nuestros datos bancarios; por favor usen la cuenta indicada abajo." },
+  en: { subj: [(i, m) => `Invoice ${i.number} from ${m.legal}`, (i, m) => `[${m.legal}] Invoice ${i.number} is ready`, (i) => `Invoice # ${i.number}`],
+    hi: ["Dear Northwind Ridge Inc.,", "Hi Northwind team,", "Hello Accounts Payable,"],
+    intro: (i) => [`Here's your invoice! We appreciate your prompt payment. The PDF for invoice ${i.number} is attached.`, `Please find attached invoice ${i.number}. A summary is below for your records.`],
+    sum: "Invoice details", close: ["Let us know if you have any questions.", "Thanks for your business!"], bye: ["Best regards,", "Kind regards,"], att: "Attachment", changed: "Please note our banking details have changed; kindly use the account below." },
+  pt: { subj: [(i, m) => `NFS-e ${i.number} — ${m.legal}`, (i, m) => `Fatura ${i.number} — ${m.legal}`],
+    hi: ["Olá, equipe Northwind,", "Prezados, bom dia."], intro: (i) => [`Segue em anexo a fatura ${i.number} referente aos serviços do período, com o resumo abaixo.`, `Encaminhamos a nota fiscal ${i.number} (PDF em anexo).`],
+    sum: "Resumo", close: ["Qualquer dúvida, estamos à disposição.", "Por gentileza, confirmem o recebimento."], bye: ["Atenciosamente,", "Abraços,"], att: "Anexo", changed: "Atenção: atualizamos nossos dados bancários; utilizem a conta abaixo." },
+};
+const signature = (m) => [m.p.contact[0], `${m.p.contact[1] ? m.p.contact[1] + " · " : ""}${m.legal}`, `${m.p.taxLabel} ${m.p.taxId} · ${m.p.addr.join(", ")}`, `${m.p.phone} · ${billingEmail(m)}`].filter((x) => x && x.trim());
+/** A real-looking vendor email: headers, greeting, short intro, summary block (labelled fields), closing, signature with tax id, PDF attachment line. */
 export function renderEmail(inv, r) {
-  const l = L[inv.lang], dom = inv.payeeName.toLowerCase().replace(/[^a-z]+/g, "").slice(0, 12) + ".example";
-  const pad = r() < 0.3 ? "  " : "";
-  return [`From: billing@${dom}`, `To: ap@northwind-ridge.example`, `Subject: ${l.num} ${inv.number}`, "", l.hi, "",
-    ...bodyLines(inv, r).map((x) => pad + x), "", l.bye, inv.payeeName].join("\n");
+  const m = invoiceModel(inv), E = EMAIL[inv.lang], pad = r() < 0.5 ? "  " : "";
+  return [`From: ${m.legal} <${billingEmail(m)}>`, `To: ap@northwind-ridge.example`, `Subject: ${pick(r, E.subj)(inv, m)}`, `Attachment: ${inv.number}.pdf`, "",
+    pick(r, E.hi), "", pick(r, E.intro(inv)), ...(inv.tags?.includes("trap:account-changed") ? ["", E.changed] : []), "", E.sum, ...bodyLines(inv, r).map((x) => pad + x), "",
+    pick(r, E.close), "", pick(r, E.bye), "", ...signature(m), "", `📎 ${E.att}: ${inv.number}.pdf`].join("\n");
+}
+/** Short cover note for an email whose invoice is only in the attached PDF (no fields in the body). */
+export function coverEmail(inv, r) {
+  const m = invoiceModel(inv), E = EMAIL[inv.lang];
+  return { from: billingEmail(m), fromName: m.legal, subject: pick(r, E.subj)(inv, m),
+    body: [pick(r, E.hi), "", E.intro(inv)[1], "", pick(r, E.close), "", pick(r, E.bye), "", ...signature(m)].join("\n") };
 }
 export function renderChat(inv, r) {
   const amt = fmtAmount(inv.amount, inv.currency, inv.lang, Math.floor(r() * 4));
@@ -112,6 +107,10 @@ export function curated() {
   add("monterrey-ops", { number: "MOP-2214", amount: 1040, lines: "Licencias de servidores dedicados: 2 hours x MXN 520.00", truth: { is_duplicate: false, matches_agreement: false }, tags: ["trap:out-of-category"], format: "email" });
   add("andes-dev", { number: "AD-1050", date: "2026-10-12", amount: 2700000, lines: "Desarrollo de software, integración de pagos (sprint 21): 15 horas x COP 180.000", truth: { is_duplicate: true, matches_agreement: true }, tags: ["trap:near-duplicate"], format: "email" });
   add("rio-legal", { number: "RL-77", amount: 1300, lines: "Consultoria jurídica: 2 horas x BRL 650,00", truth: { is_duplicate: true, matches_agreement: true }, tags: ["trap:duplicate-exact-fingerprint"], format: "email" });
+  // Visual layout of each document (see docs/INVOICE-FORMATS.md). Photos are single-page; everything else follows the vendor's letterhead style.
+  const LAYOUT = { C04: { style: "modern", pages: 1 }, C08: { style: "spreadsheet", pages: 1 }, C14: { style: "modern", pages: 1 }, C22: { style: "modern", pages: 1 },
+    C23: { style: "spreadsheet", pages: 2 }, C27: { style: "modern" }, C07: { style: "sii", pages: 2 } };
+  for (const x of I) if (LAYOUT[x.id]) x.layout = LAYOUT[x.id];
   return I;
 }
 

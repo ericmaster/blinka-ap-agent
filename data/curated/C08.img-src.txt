@@ -1,7 +1,0 @@
-VENDOR: Monterrey Ops Partners S.C.
-INVOICE # MOP-2210
-DATE: October 5, 2026
-DUE DATE: October 30, 2026
-DESCRIPTION: Bookkeeping October: 30 hours x MXN 520.00
-TOTAL DUE: 15,600.00 MXN
-ACCOUNT: MX-FAKE-8008

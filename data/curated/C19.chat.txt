@@ -1,4 +1,4 @@
-[2026-10-16 09:35] Sofia: hi! sending invoice MOP-2212 from Monterrey Ops Partners S.C.
+[2026-10-16 09:25] Sofia: hi! sending invoice MOP-2212 from Monterrey Ops Partners S.C.
 total $ 5,200.00
 due October 30, 2026
 account MX-FAKE-8008

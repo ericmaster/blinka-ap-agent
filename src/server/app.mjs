@@ -7,8 +7,9 @@ import { processDoc } from "../pipeline.mjs";
 import { newLedger, approve, registry, DUP_RE } from "../engine/decide.mjs";
 import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
-import { generate, renderEmail, renderChat, bodyLines, rng } from "../gen/generator.mjs";
-import { textPdf } from "../gen/pdf.mjs";
+import { generate, renderEmail, renderChat, rng } from "../gen/generator.mjs";
+import { invoicePdf } from "../gen/invoice.mjs";
+import { pdfText } from "../extract/index.mjs";
 import { score, counts, improper } from "../score.mjs";
 import { curated } from "../gen/generator.mjs";
 import { metrics, BENCHMARKS } from "../metrics.mjs";
@@ -326,9 +327,9 @@ function stress({ seed = Math.floor(Math.random() * 1e6), n = 30, mix = "realist
   const stream = new ReadableStream({ async start(c) {
     c.enqueue(enc.encode(JSON.stringify({ type: "start", seed, n, mix }) + "\n"));
     for (const t of inv) {
-      // email/chat/pdf go through the real extractors; images use their text layer here (OCR runs in the browser for channel images).
+      // email/chat/pdf go through the real extractors; images use the invoice PDF's text layer as a perfect-OCR stand-in (OCR runs in the browser for channel images).
       const doc = t.format === "email" ? { kind: "email", text: renderEmail(t, r) } : t.format === "chat" ? { kind: "chat", text: renderChat(t, r) }
-        : t.format === "pdf" ? { kind: "pdf", buffer: textPdf(bodyLines(t, r)) } : { kind: "image", text: bodyLines(t, r).join("\n"), ocrConfidence: 95 };
+        : t.format === "pdf" ? { kind: "pdf", buffer: invoicePdf(t) } : { kind: "image", text: (await pdfText(invoicePdf(t, { pages: 1 }))).replace(/\t/g, "  "), ocrConfidence: 95 };
       const e = await processDoc({ ...doc, id: t.id }, { ledger: st.ledger, rules, adapter, mapExtracted: (x) => withAllow(rules, x) });
       e.history = [{ by: "agent", action: e.action }]; st.log.push(e);
       const s = { ...score(st.log, inv, rules), ...metrics(st.log, (x) => inv.find((m) => m.id === x.id)) };

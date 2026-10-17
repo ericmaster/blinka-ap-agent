@@ -1,16 +1,30 @@
-From: billing@monterreyops.example
+From: Monterrey Ops Partners S.C. <billing@monterreyops.example>
 To: ap@northwind-ridge.example
 Subject: Invoice # MOP-2211
+Attachment: MOP-2211.pdf
 
 Hi Northwind team,
 
-  VENDOR: Monterrey Ops Partners S.C.
-  INVOICE # MOP-2211
-  DATE: October 5, 2026
-  DUE DATE: October 30, 2026
-  DESCRIPTION: Bookkeeping, week of Oct 12: 10 hours x MXN 520.00
-  TOTAL DUE: MXN 5.200,00
-  ACCOUNT: MX-FAKE-9999
+Please find attached invoice MOP-2211. A summary is below for your records.
 
-Best regards,
-Monterrey Ops Partners S.C.
+Please note our banking details have changed; kindly use the account below.
+
+Invoice details
+VENDOR: Monterrey Ops Partners S.C.
+INVOICE # MOP-2211
+DATE: October 5, 2026
+DUE DATE: October 30, 2026
+DESCRIPTION: Bookkeeping, week of Oct 12: 10 hours x MXN 520.00
+TOTAL DUE: 5,200.00 MXN
+ACCOUNT: MX-FAKE-9999
+
+Thanks for your business!
+
+Kind regards,
+
+Andrea Garza
+Billing · Monterrey Ops Partners S.C.
+RFC MOP000000FK8 · Calle Ejemplo 808, Col. Del Valle, 66220 San Pedro Garza García, N.L., México
++52 81 0000 0808 · billing@monterreyops.example
+
+📎 Attachment: MOP-2211.pdf

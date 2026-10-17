@@ -20,6 +20,7 @@ test("curated: zero improper payments, every trap stopped with a reason", { time
   assert.match(byId.C16.reason, /does not match the registered/);
   for (const [id, a] of Object.entries(want)) assert.equal(byId[id].action, a, `${id}: ${byId[id].reason}`);
   for (const l of log) assert.ok(l.reason.length > 10, `${l.id} has a plain-language reason`);
+  for (const l of log.filter((x) => x.action === "pay")) assert.deepEqual(l.checks.filter((c) => !c.ok), [], `${l.id}: paid invoices show every rule passed`);
 });
 
 for (const seed of [2, 3, 4, 5, 6]) test(`stress seed ${seed} (60 random noisy invoices): zero improper payments`, async () => {
@@ -86,4 +87,12 @@ test("stress mix: realistic is ~80% valid, traps mix unchanged (safety tests kee
 });
 test("reckless model on the realistic 80/20 mix: 0 improper payments", async () => {
   for (const seed of [31, 32, 33]) { const s = stressSet(seed, 60, "realistic"); assert.deepEqual(improper(await run(s.dir, s.manifest, chain(reckless())), s.manifest), [], `seed ${seed}`); }
+});
+
+test("curated via the mailbox path (email invoices read from their attached PDF): identical decisions and reasons", { timeout: 300000 }, async () => {
+  const m = load("data/curated"), viaPdf = m.map((x) => (x.attachment ? { ...x, file: x.attachment } : x));
+  const a = await run("data/curated", m, chain(truthOf(m))), b = await run("data/curated", viaPdf, chain(truthOf(m)));
+  assert.ok(viaPdf.filter((x) => x.attachment).length >= 10);
+  assert.deepEqual(b.map((l) => [l.id, l.action, l.reason]), a.map((l) => [l.id, l.action, l.reason]));
+  assert.deepEqual(improper(await run("data/curated", viaPdf, chain(reckless())), m), []);
 });

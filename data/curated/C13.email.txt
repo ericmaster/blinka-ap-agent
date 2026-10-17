@@ -1,16 +1,28 @@
-From: billing@limasupportd.example
+From: Lima Support Desk SAC <facturacion@limasupportdesk.example>
 To: ap@northwind-ridge.example
-Subject: Factura N° LSD-311
+Subject: Factura electrónica LSD-311 — Lima Support Desk SAC
+Attachment: LSD-311.pdf
 
-Hola equipo de Northwind,
+Buenos días, equipo de Cuentas por Pagar de Northwind:
 
-Proveedor: Lima Support Desk SAC
-Factura N° LSD-311
-Fecha: 5 de octubre de 2026
-Vence: 30 de octubre de 2026
-Concepto: Soporte nivel 1: 20 horas x PEN 52.00
-Total a pagar: PEN 1.040,00
-Cuenta: PE-FAKE-4004
+Les compartimos la factura electrónica LSD-311. Encontrarán la representación gráfica en PDF adjunta.
 
-Saludos,
-Lima Support Desk SAC
+Resumen de la factura
+  Proveedor: Lima Support Desk SAC
+  Factura N° LSD-311
+  Fecha: 2026-10-05
+  Vence: 2026-10-30
+  Concepto: Soporte nivel 1: 20 horas x PEN 52.00
+  Total a pagar: PEN 1.040,00
+  Cuenta: PE-FAKE-4004
+
+Por favor confirmen la recepción. Cualquier inquietud con gusto la resolvemos.
+
+Cordialmente,
+
+Rosa Quispe
+Administración · Lima Support Desk SAC
+RUC 00000000404 · Av. Ejemplo 404, Of. 12, Miraflores, Lima 15074, Perú
++51 1 000 0404 · facturacion@limasupportdesk.example
+
+📎 Adjunto: LSD-311.pdf

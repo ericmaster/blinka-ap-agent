@@ -1,16 +1,28 @@
-From: billing@sampacloudse.example
+From: Sampa Cloud Serviços Ltda <financeiro@sampacloud.example>
 To: ap@northwind-ridge.example
-Subject: Fatura nº SA-1031
+Subject: Fatura SA-1031 — Sampa Cloud Serviços Ltda
+Attachment: SA-1031.pdf
 
-Olá equipe Northwind,
+Prezados, bom dia.
 
+Segue em anexo a fatura SA-1031 referente aos serviços do período, com o resumo abaixo.
+
+Resumo
 Fornecedor: Sampa Cloud Serviços Ltda
 Fatura nº SA-1031
-Data: 2 de outubro de 2026
-Vencimento: 12 de outubro de 2026
+Data: 2026-10-02
+Vencimento: 2026-10-12
 Descrição: Hospedagem mensal 2026-10 #31
 Total a pagar: BRL 2.400,00
 Conta: BR-FAKE-3003
 
-Atenciosamente,
-Sampa Cloud Serviços Ltda
+Qualquer dúvida, estamos à disposição.
+
+Abraços,
+
+Juliana Prado
+Financeiro · Sampa Cloud Serviços Ltda
+CNPJ 00.000.003/0001-03 · Rua Exemplo, 300 — 4º andar, Vila Olímpia, 04551-000 São Paulo — SP, Brasil
++55 11 0000-0303 · financeiro@sampacloud.example
+
+📎 Anexo: SA-1031.pdf

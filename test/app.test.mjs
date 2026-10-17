@@ -38,7 +38,7 @@ test("channels: seeded inbox + WhatsApp flow into the queue, entries link to sou
   const img = st.channels.chats.find((c) => c.attachment);
   assert.equal((await call("POST", "/api/process", { messageId: img.id })).status, 422, "image needs OCR text from the browser");
   const blob = await call("GET", `/api/blob/${img.attachment.id}?download`);
-  assert.equal(blob.headers.get("content-type"), "image/png"); assert.match(blob.headers.get("content-disposition"), /^attachment/);
+  assert.equal(blob.headers.get("content-type"), "image/jpeg"); assert.match(blob.headers.get("content-disposition"), /^attachment/);
   const big = st.channels.emails.find((e) => /AD-1045/.test(e.subject));
   const e2 = await J(await call("POST", "/api/process", { messageId: big.id }));
   assert.equal(e2.action, "escalate"); // no model configured => escalate

@@ -1,0 +1,110 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [9 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>
+endobj
+8 0 obj
+<< /Length 4277 >>
+stream
+BT /HB 30 Tf 0.059 0.463 0.431 rg 40 771.89 Td (INVOICE) Tj ET
+BT /HB 12 Tf 0.000 0.000 0.000 rg 430.58 793.89 Td (Maria Fernanda Rojas) Tj ET
+BT /H 8.5 Tf 0.333 0.333 0.333 rg 411.66 780.89 Td (QA Engineer \(independent contractor\)) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 421.02 767.89 Td (Tax ID \(NIT\) 000.005.005-5 \(fictitious\)) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 460.11 757.39 Td (Calle 00 # 05-05, Apto 505) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 486.82 746.89 Td (MedellÌn, Colombia) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 384.64 736.39 Td (billing@mfrojas-qa.example ∑ +57 300 000 0505) Tj ET
+q 1.2 w 0.059 0.463 0.431 RG 40 713.89 m 555.28 713.89 l S Q
+BT /HB 8 Tf 0.059 0.463 0.431 rg 40 693.89 Td (BILLED TO) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 680.89 Td (Northwind Ridge Inc.) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 670.39 Td (EIN 00-0000001 \(fictitious\)) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 659.89 Td (400 Example Ave, Suite 12) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 649.39 Td (Wilmington, DE 19899, USA) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 40 638.89 Td (ap@northwind-ridge.example) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 330 691.89 Td (Invoice No.:) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 400 691.89 Td (MA-1037) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 330 678.89 Td (Issue date:) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 400 678.89 Td (October 1, 2026) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 330 665.89 Td (Due date:) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 400 665.89 Td (October 11, 2026) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 330 652.89 Td (PO:) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 400 652.89 Td (NWR-PO-2477) Tj ET
+q 0.5 w 1.000 1.000 1.000 rg 40 592.89 515 17 re f Q
+BT /HB 8.5 Tf 0.059 0.463 0.431 rg 44 597.89 Td (DESCRIPTION) Tj ET
+BT /HB 8.5 Tf 0.059 0.463 0.431 rg 363.52 597.89 Td (QTY) Tj ET
+BT /HB 8.5 Tf 0.059 0.463 0.431 rg 442.86 597.89 Td (RATE) Tj ET
+BT /HB 8.5 Tf 0.059 0.463 0.431 rg 513.7 597.89 Td (AMOUNT) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 44 581.89 Td (QA monthly fee 2026-10 #37) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 376.27 581.89 Td (1) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 432.92 581.89 Td (1,600.00) Tj ET
+BT /H 8.5 Tf 0.000 0.000 0.000 rg 517.92 581.89 Td (1,600.00) Tj ET
+q 0.5 w 0.898 0.906 0.922 RG 40 575.89 m 555 575.89 l S Q
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 555.89 Td (Subtotal) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 494.75 555.89 Td (USD 1,600.00) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 541.89 Td (Tax \(0%\)) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 512.27 541.89 Td (USD 0.00) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 527.89 Td (Total) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 494.75 527.89 Td (USD 1,600.00) Tj ET
+BT /H 9 Tf 0.333 0.333 0.333 rg 340 513.89 Td (Amount paid) Tj ET
+BT /H 9 Tf 0.067 0.067 0.067 rg 512.27 513.89 Td (USD 0.00) Tj ET
+q 0.5 w 0.925 0.992 0.961 rg 334 493.89 221.28 18 re f Q
+BT /HB 9 Tf 0.059 0.463 0.431 rg 340 499.89 Td (Balance due \(USD\)) Tj ET
+BT /HB 9 Tf 0.059 0.463 0.431 rg 494.75 499.89 Td (USD 1,600.00) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 40 463.89 Td (Payment instructions) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 450.89 Td (Bank: Banco Ficticio de Colombia) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 439.39 Td (Account holder: Maria Fernanda Rojas) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 427.89 Td (Account number \(USD savings account\): CO-FAKE-5005) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 416.39 Td (SWIFT/BIC: FAKECOB1XXX) Tj ET
+BT /H 8 Tf 0.000 0.000 0.000 rg 40 404.89 Td (Reference: MA-1037) Tj ET
+BT /HB 9 Tf 0.000 0.000 0.000 rg 320 463.89 Td (Notes) Tj ET
+BT /H 8 Tf 0.200 0.200 0.200 rg 320 451.89 Td (Terms: Net 10. Please pay by bank transfer and quote the invoice) Tj ET
+BT /H 8 Tf 0.200 0.200 0.200 rg 320 441.09 Td (number as reference. Sender pays all bank fees.) Tj ET
+BT /H 8 Tf 0.333 0.333 0.333 rg 320 428.29 Td (Thank you for your business!) Tj ET
+q 0.5 w 0.898 0.906 0.922 RG 40 35.89 m 555.28 35.89 l S Q
+BT /H 6.5 Tf 0.533 0.533 0.533 rg 40 23.89 Td (Maria Fernanda Rojas ∑ Tax ID \(NIT\) 000.005.005-5) Tj ET
+BT /H 6.5 Tf 0.533 0.533 0.533 rg 522.03 23.89 Td (Page 1 of 1) Tj ET
+BT /H 6 Tf 0.667 0.667 0.667 rg 40 13.89 Td (Synthetic sample document ó fictional company and data \(Clearhold demo\).) Tj ET
+
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /H 3 0 R /HB 4 0 R /HI 5 0 R /C 6 0 R /CB 7 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Producer (Clearhold synthetic invoice generator \(fictional data\)) /Title (INVOICE MA-1037 - Maria Fernanda Rojas \(contractor\)) /Creator (Maria Fernanda Rojas \(contractor\) billing \(synthetic\)) >>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000320 00000 n 
+0000000425 00000 n 
+0000000520 00000 n 
+0000000620 00000 n 
+0000004949 00000 n 
+0000005119 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R /Info 10 0 R >>
+startxref
+5342
+%%EOF

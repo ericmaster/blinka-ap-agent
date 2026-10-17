@@ -8,7 +8,7 @@ export const kindOf = (f) => (f.endsWith(".pdf") ? "pdf" : f.endsWith(".png") ||
 export async function processDoc(doc, { ledger, rules, adapter, mapExtracted = (x) => x }) {
   const t0 = Date.now();
   let x;
-  try { const raw = await extract(doc); x = mapExtracted({ ...raw, vendorKey: matchVendor(raw.payee, registry(rules)), id: doc.id }); }
+  try { const raw = await extract({ ...doc, registry: registry(rules) }); x = mapExtracted({ ...raw, vendorKey: matchVendor(raw.payee, registry(rules)), id: doc.id }); }
   catch (e) { return { id: doc.id, channel: doc.kind, action: "escalate", reasons: [`Could not read the document (${e.message}).`], extracted: null }; }
   // Ask the model only when hard rules didn't already hold it and the payee is known (questions need the agreement).
   const pre = hardChecks(x, ledger, rules);

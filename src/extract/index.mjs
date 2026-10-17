@@ -13,11 +13,25 @@ async function ocr(buf) {
 }
 export async function closeOcr() { if (ocrWorker) { await ocrWorker.terminate(); ocrWorker = null; } }
 
+/** Layout-aware PDF text: text items grouped into lines by baseline, sorted by x; wide gaps (table columns) become tabs. */
 export async function pdfText(buf) {
-  const { extractText: ex, getDocumentProxy } = await import("unpdf");
+  const { extractTextItems, getDocumentProxy } = await import("unpdf");
   const pdf = await getDocumentProxy(new Uint8Array(buf));
-  const { text } = await ex(pdf, { mergePages: true });
-  return text;
+  const { items } = await extractTextItems(pdf);
+  return items.map(layoutLines).join("\n\n");
+}
+export function layoutLines(items) {
+  const its = items.filter((i) => i.str && i.str.trim()).map((i) => ({ ...i, fontSize: i.fontSize || i.height || 10 })).sort((a, b) => b.y - a.y || a.x - b.x);
+  const lines = [];
+  for (const it of its) {
+    const l = lines.find((L) => Math.abs(L.y - it.y) <= Math.max(1, 0.25 * Math.min(L.size, it.fontSize)));
+    if (l) l.items.push(it); else lines.push({ y: it.y, size: it.fontSize, items: [it] });
+  }
+  return lines.sort((a, b) => b.y - a.y).map((L) => {
+    const xs = L.items.sort((a, b) => a.x - b.x); let s = "", end = null;
+    for (const it of xs) { const gap = end == null ? 0 : it.x - end; s += end == null ? "" : gap > Math.max(3, it.fontSize * 0.55) ? "\t" : gap > it.fontSize * 0.12 ? " " : ""; s += it.str.trim(); end = it.x + (it.width || 0); }
+    return s;
+  }).join("\n");
 }
 /** doc: {kind: 'email'|'chat'|'pdf'|'image', path?|content?|buffer?} */
 export async function extract(doc) {
@@ -29,7 +43,7 @@ export async function extract(doc) {
     else if (doc.kind === "image") ({ text, confidence: ocrConfidence } = await ocr(buf));
     else text = new TextDecoder().decode(buf);
   }
-  const fields = extractText(text);
+  const fields = extractText(text, doc.registry);
   return { ...fields, channel: doc.kind, ocrConfidence, clientOcr: !!doc.clientOcr, lang: detectLang(text) };
 }
 

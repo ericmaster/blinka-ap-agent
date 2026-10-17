@@ -1,1 +1,5 @@
-[2026-10-16 09:07] Luis: oi! segue a fatura RI-1025 da Rio Legal Consultoria Ltda, total R$ 650,00, vencimento 23/10/2026, conta BR-FAKE-6006, referente a: 1 horas de consultoria x 650
+[2026-10-16 09:08] Luis: oi! segue a fatura RI-1025 da Rio Legal Consultoria Ltda
+total BRL 650,00
+vencimento 23 de outubro de 2026
+conta BR-FAKE-6006
+referente a: 1 horas de consultoria x 650
