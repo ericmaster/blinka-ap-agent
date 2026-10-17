@@ -1,23 +1,23 @@
 // Runtime-agnostic HTTP app (Request -> Response) for the Cloudflare Worker and the local Node server.
 // store: { load, save, getBlob(id), putBlob(id, b64) }. env: FASTINO_API_KEY, JEV_API_KEY, AI (Workers AI binding), DEMO_MODE. Secrets are never returned.
 import defaultRules from "../../config/rules.json" with { type: "json" };
-import { VENDORS } from "../data/vendors.mjs";
+import { VENDORS, COMPANY } from "../data/vendors.mjs";
+import { contractMarkdown, contractHtml, contractPdf } from "../contracts.mjs";
 import { processDoc } from "../pipeline.mjs";
-import { newLedger, approve } from "../engine/decide.mjs";
+import { newLedger, approve, registry } from "../engine/decide.mjs";
 import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, bodyLines, rng } from "../gen/generator.mjs";
 import { textPdf } from "../gen/pdf.mjs";
 import { score, counts } from "../score.mjs";
 import { UI } from "./ui.mjs";
-import { SEED, SEED_BLOBS } from "./seed.mjs";
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const rand = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b) => b.toString(16).padStart(2, "0")).join("");
-const channels = () => ({ emails: SEED.emails.map((e) => ({ ...e })), chats: SEED.chats.map((c) => ({ ...c })) });
+const channels = () => ({ emails: [], chats: [] }); // filled by /api/sync from the connectors
 const fresh = (prev = {}) => ({ rules: prev.rules ?? structuredClone(defaultRules), ledger: newLedger(), log: [], seq: 0, channels: channels(), uploads: [],
-  users: prev.users ?? {}, sessions: prev.sessions ?? {}, otps: {} });
+  users: prev.users ?? {}, sessions: prev.sessions ?? {}, otps: {}, audit: prev.audit ?? [] });
 const noModel = { name: "no model configured", async ask() { return { error: "model not configured" }; } };
 const MAX_UPLOAD = 4 * 1024 * 1024;
 
@@ -27,17 +27,22 @@ export function validateRules(r) {
   if (r.human_approval_above_usd > r.max_per_payment_usd) return "Human approval threshold must be ≤ the per-payment limit";
   const [lo, hi] = r.uncertain_band ?? [];
   if (!(0 <= lo && lo < hi && hi <= 1)) return "invalid uncertain_band";
-  if (!Array.isArray(r.allowlist) || r.allowlist.some((k) => !VENDORS[k])) return "invalid allowlist";
+  if (!Array.isArray(r.allowlist) || r.allowlist.some((k) => !registry(r)[k])) return "invalid allowlist";
   return null;
 }
-const withAllow = (rules, x) => (x.vendorKey && !(rules.allowlist ?? Object.keys(VENDORS)).includes(x.vendorKey) ? { ...x, vendorKey: null } : x);
+const withAllow = (rules, x) => (x.vendorKey && !(rules.allowlist ?? Object.keys(registry(rules))).includes(x.vendorKey) ? { ...x, vendorKey: null } : x);
 const cookie = (req) => Object.fromEntries((req.headers.get("cookie") ?? "").split(/;\s*/).filter(Boolean).map((c) => c.split("=")));
 
-export function createApp({ store, env = {} }) {
+export function createApp({ store, env = {}, connectors = {} }) {
   const demo = env.DEMO_MODE !== "false";
   const adapter = () => fromEnv(env) ?? noModel;
-  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.allowlist ??= Object.keys(VENDORS); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; return s; };
-  const blob = async (id) => SEED_BLOBS[id] ?? (await store.getBlob?.(id)) ?? null;
+  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.vendors ??= structuredClone(VENDORS); s.rules.allowlist ??= Object.keys(s.rules.vendors); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; s.audit ??= []; return s; };
+  const conn = (channel) => connectors[channel === "email" ? "email" : "whatsapp"];
+  const attOf = (st, id) => { for (const e of st.channels.emails) { const a = e.attachments?.find((x) => x.id === id); if (a) return { ...a, channel: "email" }; }
+    for (const c of st.channels.chats) if (c.attachment?.id === id) return { ...c.attachment, channel: "whatsapp" }; return null; };
+  async function blobBytes(st, id) { // uploads live in Clearhold storage; channel attachments are fetched through the connector
+    const up = await store.getBlob?.(id); if (up) return { bytes: fromB64(up) };
+    const a = attOf(st, id); if (!a) return null; return conn(a.channel)?.attachment(id) ?? null; }
   const msgOf = (st, id) => st.channels.emails.find((e) => e.id === id) ?? st.channels.chats.find((c) => c.id === id);
 
   async function run(st, doc, source) {
@@ -48,7 +53,7 @@ export function createApp({ store, env = {} }) {
   }
 
   return async function handle(req) {
-    const url = new URL(req.url), p = url.pathname, m = req.method;
+    const url = new URL(req.url), p = url.pathname, m = req.method; let mm;
     try {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
       // ---- auth: email + one-time code. DEMO MODE returns the code in the response (no email is sent).
@@ -74,18 +79,51 @@ export function createApp({ store, env = {} }) {
       }
       const st = st0;
       if (m === "GET" && p === "/api/state") {
-        return json({ user, demo, rules: st.rules, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
-          vendors: Object.fromEntries(Object.entries(VENDORS).map(([k, v]) => [k, { name: v.name, country: v.country, currency: v.currency }])),
+        return json({ user, demo, rules: st.rules, audit: st.audit.slice(-50).reverse(), sources: { email: connectors.email?.ui("") ?? null, whatsapp: connectors.whatsapp?.ui("") ?? null }, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
           log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), spentUsd: st.ledger.spentUsd, channels: st.channels });
+      }
+      // ---- connectors: pull new messages from the external email / WhatsApp services (poll)
+      if (m === "POST" && p === "/api/sync") {
+        let added = 0;
+        for (const [ch, list] of [["email", st.channels.emails], ["whatsapp", st.channels.chats]]) {
+          const c = connectors[ch]; if (!c) continue;
+          const after = list.reduce((a, x) => (x.at > a ? x.at : a), "");
+          for (const msg of await c.list(after)) if (!list.some((x) => x.id === msg.id)) { list.push({ ...msg, channel: ch }); added++; }
+        }
+        if (added) await store.save(st); return json({ added });
+      }
+      // ---- vendor registry (feeds the hard rules) with audit trail
+      if ((p === "/api/vendors" && m === "POST") || ((mm = p.match(/^\/api\/vendors\/([\w-]+)$/)) && ["PUT", "DELETE"].includes(m))) {
+        const reg = st.rules.vendors, at = new Date().toISOString();
+        if (m === "DELETE") {
+          const k = mm[1]; if (!reg[k]) return json({ error: "not found" }, 404);
+          st.audit.push({ by: user, at, action: "remove vendor", key: k, name: reg[k].name }); delete reg[k]; st.rules.allowlist = st.rules.allowlist.filter((x) => x !== k);
+          await store.save(st); return json({ ok: true });
+        }
+        const b = await req.json();
+        const k = m === "POST" ? String(b.key || b.name || "").toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) : mm[1];
+        if (m === "PUT" && !reg[k]) return json({ error: "not found" }, 404);
+        if (m === "POST" && (!k || reg[k])) return json({ error: "Vendor already exists or name missing" }, 409);
+        const prev = reg[k] ?? {}, v = { ...prev, ...pickVendor(b) }, err = validateVendor(v, st.rules); if (err) return json({ error: err }, 400);
+        const changes = Object.fromEntries(Object.keys(v).filter((f) => JSON.stringify(prev[f]) !== JSON.stringify(v[f])).map((f) => [f, [prev[f] ?? null, v[f]]]));
+        reg[k] = v; if (m === "POST") st.rules.allowlist.push(k);
+        st.audit.push({ by: user, at, action: m === "POST" ? "add vendor" : "edit vendor", key: k, name: v.name, changes });
+        await store.save(st); return json({ key: k, ...v });
+      }
+      if (m === "GET" && (mm = p.match(/^\/api\/vendors\/([\w-]+)\/contract(\.pdf|\.md)?$/))) {
+        const v = st.rules.vendors[mm[1]]; if (!v) return json({ error: "not found" }, 404);
+        if (mm[2] === ".pdf") return new Response(contractPdf(mm[1], v, COMPANY), { headers: { "content-type": "application/pdf", "content-disposition": `attachment; filename="contract-${mm[1]}.pdf"` } });
+        if (mm[2] === ".md") return new Response(contractMarkdown(mm[1], v, COMPANY), { headers: { "content-type": "text/markdown; charset=utf-8" } });
+        return new Response(contractHtml(mm[1], v, COMPANY), { headers: { "content-type": "text/html; charset=utf-8" } });
       }
       // ---- channel feed -> queue
       if (m === "POST" && p === "/api/process") {
         const { messageId, ocr } = await req.json(), msg = msgOf(st, messageId);
         if (!msg) return json({ error: "No such message" }, 404);
         if (msg.entryId) return json({ error: "Already processed" }, 409);
-        const att = msg.attachment ?? msg.attachments?.[0], channel = messageId.startsWith("m-") ? "email" : "whatsapp";
+        const att = msg.attachment ?? msg.attachments?.[0], channel = msg.channel ?? (messageId.startsWith("m-") ? "email" : "whatsapp");
         let doc;
-        if (att?.type === "application/pdf") doc = { kind: "pdf", buffer: fromB64(await blob(att.id)) };
+        if (att?.type === "application/pdf") { const b = await conn(channel).attachment(att.id); if (!b) return json({ error: "attachment unavailable" }, 502); doc = { kind: "pdf", buffer: b.bytes }; }
         else if (att?.type?.startsWith("image/")) { if (!ocr?.text) return json({ error: "needs OCR", needOcr: att.id }, 422); doc = { kind: "image", text: ocr.text, ocrConfidence: ocr.confidence }; }
         else doc = { kind: channel === "email" ? "email" : "chat", text: channel === "email" ? `Subject: ${msg.subject}\n\n${msg.body}` : `[${msg.at.slice(0, 10)}] ${msg.from}: ${msg.text}` };
         const e = await run(st, doc, { channel, messageId, attachmentId: att?.id ?? null, name: att?.name ?? null, type: att?.type ?? "text/plain" });
@@ -102,13 +140,11 @@ export function createApp({ store, env = {} }) {
         const e = await run(st, doc, { channel: "upload", messageId: null, attachmentId: attId, name: b.filename ?? null, type: b.type ?? "text/plain" });
         st.uploads.push({ entryId: e.id, by: user, at: e.at, name: b.filename }); await store.save(st); return json(e);
       }
-      let mm;
       if (m === "GET" && (mm = p.match(/^\/api\/blob\/([\w-]+)$/))) {
-        const b = await blob(mm[1]); if (!b) return json({ error: "not found" }, 404);
-        const att = [...st.channels.emails.flatMap((e) => e.attachments), ...st.channels.chats.map((c) => c.attachment).filter(Boolean)].find((a) => a.id === mm[1])
-          ?? st.log.map((e) => e.source).find((s) => s?.attachmentId === mm[1]);
+        const b = await blobBytes(st, mm[1]); if (!b) return json({ error: "not found" }, 404);
+        const att = attOf(st, mm[1]) ?? st.log.map((e) => e.source).find((s) => s?.attachmentId === mm[1]);
         const name = att?.name ?? mm[1], type = att?.type ?? "application/octet-stream";
-        return new Response(fromB64(b), { headers: { "content-type": type, "content-disposition": `${url.searchParams.has("download") ? "attachment" : "inline"}; filename="${name.replace(/[^\w.\-]/g, "_")}"` } });
+        return new Response(b.bytes, { headers: { "content-type": type, "content-disposition": `${url.searchParams.has("download") ? "attachment" : "inline"}; filename="${name.replace(/[^\w.\-]/g, "_")}"` } });
       }
       if (m === "GET" && (mm = p.match(/^\/api\/entry\/(F\d+)$/))) {
         const e = st.log.find((l) => l.id === mm[1]); return e ? json(e) : json({ error: "not found" }, 404);
@@ -140,20 +176,42 @@ export function createApp({ store, env = {} }) {
       }
       if (m === "PUT" && p === "/api/rules") {
         const r = { ...st.rules, ...(await req.json()) };
-        for (const k of ["fx_to_usd", "agreements", "vendors", "company", "period", "base_currency"]) r[k] = st.rules[k];
+        for (const k of ["fx_to_usd", "vendors", "company", "period", "base_currency"]) r[k] = st.rules[k];
         const err = validateRules(r); if (err) return json({ error: err }, 400);
         st.rules = r; await store.save(st); return json(r);
       }
       if (m === "POST" && p === "/api/reset") { await store.save(fresh(st)); return json({ ok: true }); }
       if (m === "GET" && p === "/api/pain001") {
         const pays = st.log.filter((l) => l.action === "pay").map((l) => ({ id: l.id, ...l.extracted }));
-        return new Response(pain001(pays, { msgId: `NWR-${Date.now()}` }), { headers: { "content-type": "application/xml", "content-disposition": "attachment; filename=pain001.xml" } });
+        return new Response(pain001(pays, { registry: st.rules.vendors, msgId: `NWR-${Date.now()}` }), { headers: { "content-type": "application/xml", "content-disposition": "attachment; filename=pain001.xml" } });
       }
       if (m === "POST" && p === "/api/stress") return stress(await req.json().catch(() => ({})), st.rules, adapter());
       return json({ error: "not found" }, 404);
     } catch (e) { return json({ error: String(e?.message ?? e) }, 500); }
   };
 }
+
+const VFIELDS = ["name", "aliases", "country", "currency", "lang", "acct", "category", "keywords", "terms", "agreement"];
+function pickVendor(b) {
+  const v = Object.fromEntries(VFIELDS.filter((f) => b[f] !== undefined).map((f) => [f, b[f]]));
+  if (typeof v.keywords === "string") v.keywords = v.keywords.split(",");
+  if (Array.isArray(v.keywords)) v.keywords = v.keywords.map((k) => String(k).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")).filter(Boolean);
+  if (typeof v.aliases === "string") v.aliases = v.aliases.split(",").map((x) => x.trim()).filter(Boolean);
+  if (v.terms) v.terms = v.terms.type === "flat" ? { type: "flat", amount: Number(v.terms.amount) } : { type: "hourly", rate: Number(v.terms.rate), max_units_per_period: Number(v.terms.max_units_per_period) };
+  return v;
+}
+export function validateVendor(v, rules) {
+  if (!v.name?.trim()) return "Name is required";
+  if (!/^[A-Z]{2}-[A-Z0-9]+-\d+$/.test(v.acct ?? "")) return "Bank account must look like CO-FAKE-1234";
+  if (rules.fx_to_usd[v.currency] == null) return `Currency must be one of ${Object.keys(rules.fx_to_usd).join(", ")}`;
+  if (!v.category?.trim()) return "Category is required";
+  if (!v.keywords?.length) return "At least one allowed keyword is required";
+  const t = v.terms ?? {};
+  if (t.type === "flat" ? !(t.amount > 0) : !(t.rate > 0 && t.max_units_per_period > 0)) return "Contracted price is required (flat amount, or hourly rate + max hours)";
+  v.aliases ??= []; v.lang ??= "en"; v.country ??= v.acct.slice(0, 2);
+  v.agreement = describeTerms(v); return null;
+}
+export const describeTerms = (v) => `${v.category}: ` + (v.terms.type === "flat" ? `${v.currency} ${v.terms.amount} flat per month.` : `${v.currency} ${v.terms.rate} per hour, up to ${v.terms.max_units_per_period} hours per month.`) + " No other charges without written approval.";
 
 /** Stress test on a separate ledger; streams NDJSON: one line per invoice + running score. */
 function stress({ seed = Math.floor(Math.random() * 1e6), n = 30 }, rules, adapter) {
