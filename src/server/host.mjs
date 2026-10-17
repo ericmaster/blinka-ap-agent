@@ -11,7 +11,7 @@ const PUBLIC = new Set(["gmail.com", "googlemail.com", "outlook.com", "hotmail.c
 export const workspaceOf = (email) => { const [u, d = ""] = String(email).toLowerCase().split("@"); return (PUBLIC.has(d) ? `${u}@${d}` : d).replace(/[^a-z0-9@._+-]/g, "_").slice(0, 120); };
 
 /** kv: { get(key) -> parsed JSON | null, put(key, obj), getBlob(id), putBlob(id, b64) } */
-export function createHost({ kv, env = {} }) {
+export function createHost({ kv, env = {}, model = null }) { // model: test-only decision adapter (e.g. reckless)
   const auth = { load: () => kv.get("auth"), save: (a) => kv.put("auth", a) };
   const spaces = new Map();
   function space(id) {
@@ -26,7 +26,7 @@ export function createHost({ kv, env = {} }) {
       payouts: payoutsConnector("http://internal/blinka/api", blinka),
     };
     const resetMocks = async () => { for (const k of ["mail", "chat"]) await local(new Request(`http://internal/${k}/api/reset`, { method: "POST" })); await blinka(new Request("http://internal/blinka/api/reset", { method: "POST" })); };
-    const app = createApp({ store: { load: () => kvw.load("state"), save: (s) => kvw.save("state", s), getBlob: kvw.getBlob, putBlob: kvw.putBlob }, auth, env, connectors, resetMocks });
+    const app = createApp({ store: { load: () => kvw.load("state"), save: (s) => kvw.save("state", s), getBlob: kvw.getBlob, putBlob: kvw.putBlob }, auth, env, connectors, resetMocks, model });
     const s = { app, mail, chat, blinka }; spaces.set(id, s); return s;
   }
   const anon = space("_public"); // serves the UI, the auth endpoints and 401s; holds no customer data

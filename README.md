@@ -23,6 +23,8 @@ Full table, verified against the code (EN/ES): [`docs/REAL-VS-SIMULATED.md`](doc
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
+**Held invoices** — *Move to pending* or *Approve…* through a warning modal (why it was held, typed reason, logged in the audit log). Every hard rule is re-checked; bank/terms changes keep their second approver, exact duplicates, limits and budget can never be overridden, and above the human-approval threshold an override needs a second, different person. Paid/held rows show who made the final decision (**AGENT** / **USER**, also `decision_source` in the audit export). Screenshots: [`docs/screenshots/hold-approve-modal.png`](docs/screenshots/hold-approve-modal.png), [`docs/screenshots/decision-labels.png`](docs/screenshots/decision-labels.png).
+
 **UI EN / ES** — toggle **EN · ES** top right, next to your email (saved in this browser; shared by Clearhold, Mailbox, WhatsApp and Blinka mock pages). Decision reasons are translated with keyed templates (`src/i18n/`); evidence quotes and invoice text stay in their original language. English is the default. Screenshots: [`docs/screenshots/i18n-es.png`](docs/screenshots/i18n-es.png), realistic invoice in details: [`docs/screenshots/realistic-invoice.png`](docs/screenshots/realistic-invoice.png).
 
 **ES** — **Clearhold** es un agente de cuentas por pagar para el reto **Blinka** (30X Hackathon). Recibe facturas por PDF, imagen, correo o chat, extrae beneficiario, monto, moneda y vencimiento, y decide **pagar / frenar / escalar** con reglas configurables, registro explicable y tablero. El modelo nunca autoriza un pago: las reglas duras viven en código y la duda se escala.

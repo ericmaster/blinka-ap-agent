@@ -49,6 +49,17 @@ export const ES = [
   [R`Approved by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo."],
   [R`Rejected by (\S+) at (\S+)\.`, "Rechazada por $1 el $2."],
   [R`Vendor details changed at (\S+); re-checked on approval\.`, "Los datos del proveedor cambiaron el $1; se verifican de nuevo al aprobar."],
+  // hold overrides (held -> pending, approve over a hold, dual control above the threshold)
+  [R`Moved to pending by (\S+) at (\S+): "([\s\S]*)"\.`, "Movida a pendientes por $1 el $2: \"$3\"."],
+  [R`Override requested by (\S+) at (\S+): "([\s\S]*)"\.`, "Excepción solicitada por $1 el $2: \"$3\"."],
+  [R`Above US\$(\S+), a second person must approve\.`, "Por encima de US$$1, otra persona debe aprobar."],
+  [R`Approved over a hold by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada sobre una retención por $1 el $2; reglas duras verificadas de nuevo."],
+  [R`Reason: "([\s\S]*)"\.`, "Motivo: \"$1\"."],
+  [R`Second approver after (\S+)\.`, "Segundo aprobador después de $1."],
+  [R`Duplicate override: "([\s\S]*)"\.`, "Excepción de duplicado: \"$1\"."],
+  [R`Only held invoices can be moved to pending\.`, "Solo las facturas retenidas se pueden mover a pendientes."],
+  [R`Give a reason \(at least 5 characters\); it is logged\.`, "Indica un motivo (al menos 5 caracteres); queda registrado."],
+  [R`A different person must approve this override\.`, "Otra persona debe aprobar esta excepción."],
   // approval refusals
   [R`Only pending invoices can be approved\.`, "Solo se pueden aprobar facturas pendientes."],
   [R`Vendor not in registry: add it to the vendor registry before approving\.`, "El proveedor no está registrado: agrégalo al registro de proveedores antes de aprobar."],
@@ -128,6 +139,8 @@ export function translateReason(s, lang = "en") {
   const one = (x) => {
     for (const [re, tpl] of table) {
       const m = x.match(re);
+      // a verbatim capture (vendor name, number) never spans a sentence break, or "… for Acme S.C. Moved to pending …" would swallow the next reason; quoted captures may
+      if (m && m.slice(1).some((c, i) => c && !tpl.includes(`"$${i + 1}"`) && !tpl.includes(`{{${i + 1}}}`) && /[.)]\s+(?:Also: |[A-Z][a-z]|")/.test(c))) continue;
       if (m) return tpl.replace(/\{\{(F?)(\d)\}\}|\$(\d)/g, (_, f, a, b) => (b ? m[b] ?? "" : f ? m[a].split(", ").map((x) => LABELS[lang][x] ?? x).join(", ") : translateReason(m[a], lang)));
     }
     return null;

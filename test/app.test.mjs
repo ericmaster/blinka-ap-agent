@@ -57,7 +57,8 @@ test("safety: held invoice and unknown payee cannot be approved; pain.001 only p
   const up = async (f) => J(await call("POST", "/api/upload", { filename: f, type: "text/plain", text: readFileSync(`data/curated/${f}`, "utf8") }));
   const held = await up("C16.email.txt"), unknown = await up("C11.email.txt");
   assert.equal(held.action, "hold"); assert.equal(held.source.channel, "upload");
-  assert.equal((await call("POST", `/api/entry/${held.id}/approve`)).status, 409);
+  assert.equal((await call("POST", `/api/entry/${held.id}/approve`)).status, 400, "overriding a hold needs a typed reason");
+  assert.equal((await call("POST", `/api/entry/${held.id}/approve`, { reason: "pay it anyway please" })).status, 409, "and still cannot pay a wrong account");
   assert.equal((await call("POST", `/api/entry/${unknown.id}/approve`)).status, 409);
   const rj = await J(await call("POST", `/api/entry/${unknown.id}/reject`)); assert.match(rj.reason, /Rejected by eric@example\.com/);
   assert.equal(((await (await call("GET", "/api/pain001")).text()).match(/<CdtTrfTxInf>/g) ?? []).length, 0);
