@@ -141,4 +141,5 @@ export function translateReason(s, lang = "en") {
 /** True when a message has a translation (used by the coverage test). */
 export const hasTranslation = (s, lang) => translateReason(s, lang) !== s;
 /** Browser copy of translateReason (inlined into the UI by scripts/build-ui.mjs, so client and tests share one table). */
-export const reasonsClientJs = () => `const TABLES={es:${JSON.stringify(ES)}.map(([re,tpl])=>[new RegExp("^"+re+"$"),tpl])},LABELS={es:${JSON.stringify(FIELDS)}};\n${translateReason.toString()}`;
+// The __name shim: when this module runs bundled (wrangler/esbuild keepNames), translateReason.toString() contains __name(...) calls.
+export const reasonsClientJs = () => `var __name=globalThis.__name||((f)=>f);\nconst TABLES={es:${JSON.stringify(ES)}.map(([re,tpl])=>[new RegExp("^"+re+"$"),tpl])},LABELS={es:${JSON.stringify(FIELDS)}};\n${translateReason.toString()}`;

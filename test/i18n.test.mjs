@@ -41,6 +41,9 @@ test("i18n: captures (names, numbers, quotes from the invoice) stay in the origi
   assert.equal(es("Something the engine never says."), "Something the engine never says.");
   // the browser copy is the same function and table
   const f = new Function(`${reasonsClientJs()}; return translateReason;`)();
+  // bundled (esbuild keepNames) copies call __name(); the client snippet must define it
+  const g = new Function(`${reasonsClientJs().replace("function translateReason(s", "const _k=__name(function(){},'x');function translateReason(s")}; return translateReason;`)();
+  assert.equal(g("Wrong code", "es"), "Código incorrecto");
   assert.equal(f("Bank account MX-FAKE-9999 does not match the registered account for Monterrey Ops Partners S.C..", "es"), es("Bank account MX-FAKE-9999 does not match the registered account for Monterrey Ops Partners S.C.."));
 });
 
