@@ -84,29 +84,78 @@ test("connectors: a new email composed in the mock Mailbox (with PDF) and a What
   assert.equal((await call("GET", "/mail/")).status, 200); assert.equal((await call("GET", "/chat/")).status, 200);
 });
 
-test("vendors: add/edit/remove feed the hard rules, with audit and generated contract", async () => {
-  const { call, login } = mk(); await login();
+test("vendors: bank/terms changes need a second approver; invoices held meanwhile; edits feed the hard rules with audit", async () => {
+  const { call, login } = mk(); await login("eric@example.com");
   const text = readFileSync("data/curated/C01.email.txt", "utf8");
-  // edit: lower the hourly cap below the invoice's 40h -> code holds it
-  const ed = await call("PUT", "/api/vendors/andes-dev", { terms: { type: "hourly", rate: 180000, max_units_per_period: 10 } }); assert.equal(ed.status, 200);
+  // propose: lower the hourly cap -> pending, vendor held while pending
+  const ed = await call("PUT", "/api/vendors/andes-dev", { terms: { type: "hourly", rate: 180000, max_units_per_period: 10 } }); assert.equal(ed.status, 202);
+  const e0 = await J(await call("POST", "/api/upload", { filename: "a.txt", type: "text/plain", text }));
+  assert.equal(e0.action, "hold"); assert.match(e0.reason, /waiting for a second approver/);
+  assert.equal((await call("POST", "/api/vendors/andes-dev/change/approve")).status, 403, "proposer cannot approve own change");
+  await login("ana@example.com");
+  assert.equal((await call("POST", "/api/vendors/andes-dev/change/approve")).status, 200);
+  await call("POST", "/api/reset"); // fresh ledger, registry kept
   const e1 = await J(await call("POST", "/api/upload", { filename: "a.txt", type: "text/plain", text }));
   assert.equal(e1.action, "hold"); assert.match(e1.reason, /10 contracted hours/);
-  // change registered account -> hold
-  await call("PUT", "/api/vendors/maria-qa", { acct: "CO-FAKE-0001" });
+  // bank account change: pending until approved, then mismatching invoices are held
+  assert.equal((await call("PUT", "/api/vendors/maria-qa", { acct: "CO-FAKE-0001" })).status, 202);
+  await login("eric@example.com"); assert.equal((await call("POST", "/api/vendors/maria-qa/change/approve")).status, 200);
   const e2 = await J(await call("POST", "/api/upload", { filename: "b.txt", type: "text/plain", text: readFileSync("data/curated/C05.chat.txt", "utf8") }));
   assert.match(e2.reason, /does not match the registered account/);
-  // remove -> unknown vendor -> escalate, cannot approve
+  // non-sensitive edit applies directly
+  assert.equal((await call("PUT", "/api/vendors/maria-qa", { category: "QA" })).status, 200);
+  // remove -> unknown vendor -> escalate
   assert.equal((await call("DELETE", "/api/vendors/valpo-data")).status, 200);
   const e3 = await J(await call("POST", "/api/upload", { filename: "c.txt", type: "text/plain", text: readFileSync("data/curated/C07.email.txt", "utf8") }));
   assert.equal(e3.action, "escalate"); assert.match(e3.reason, /not in the approved vendor registry/);
-  // add a new vendor; invalid input rejected
+  // new vendor: inactive until a second person approves
   assert.equal((await call("POST", "/api/vendors", { name: "Quito Bytes", acct: "bad" })).status, 400);
-  const nv = await J(await call("POST", "/api/vendors", { name: "Quito Bytes", acct: "EC-FAKE-1212", currency: "USD", category: "data labeling", keywords: "labeling, annotation", terms: { type: "flat", amount: 900 } }));
-  assert.equal(nv.key, "quito-bytes");
-  const st = await J(await call("GET", "/api/state"));
-  assert.ok(st.rules.allowlist.includes("quito-bytes"));
-  assert.deepEqual(st.audit.map((a) => a.action), ["add vendor", "remove vendor", "edit vendor", "edit vendor"]);
-  assert.equal(st.audit[3].by, "eric@example.com"); assert.ok(st.audit[3].changes.terms);
+  const nv = await call("POST", "/api/vendors", { name: "Quito Bytes", acct: "EC-FAKE-1212", currency: "USD", category: "data labeling", keywords: "labeling, annotation", terms: { type: "flat", amount: 900 } });
+  assert.equal(nv.status, 202);
+  let st = await J(await call("GET", "/api/state")); assert.ok(!st.rules.allowlist.includes("quito-bytes"));
+  assert.equal((await call("PUT", "/api/rules", { allowlist: [...st.rules.allowlist, "quito-bytes"] })).status, 400, "cannot activate a pending vendor via the toggle");
+  await login("ana@example.com"); await call("POST", "/api/vendors/quito-bytes/change/approve");
+  st = await J(await call("GET", "/api/state")); assert.ok(st.rules.allowlist.includes("quito-bytes"));
+  assert.deepEqual(st.audit.map((a) => a.action).slice(0, 4), ["approve change", "propose new vendor", "remove vendor", "edit vendor"]);
+  assert.equal(st.audit[0].proposedBy, "eric@example.com"); assert.equal(st.audit[0].by, "ana@example.com");
   const html = await (await call("GET", "/api/vendors/quito-bytes/contract")).text(); assert.match(html, /USD 900 flat fee/);
   assert.equal((await call("GET", "/api/vendors/quito-bytes/contract.pdf")).headers.get("content-type"), "application/pdf");
+});
+
+test("auth hardening: logout kills the server session, OTP requests rate-limited, mock writes need a session, demo off fails closed", async () => {
+  const { call, login } = mk(); await login();
+  assert.equal((await call("POST", "/mail/api/messages", { from: "a@b.co", subject: "x", body: "y" })).status, 201);
+  await call("POST", "/api/auth/logout");
+  assert.equal((await call("GET", "/api/state")).status, 401);
+  assert.equal((await call("POST", "/mail/api/messages", { from: "a@b.co", subject: "x", body: "y" })).status, 401);
+  assert.equal((await call("POST", "/chat/api/reset")).status, 401);
+  assert.equal((await call("POST", "/api/reset")).status, 401);
+  for (let i = 0; i < 4; i++) await call("POST", "/api/auth/start", { email: "eric@example.com" });
+  assert.equal((await call("POST", "/api/auth/start", { email: "eric@example.com" })).status, 429);
+  const { call: c2 } = mk({ DEMO_MODE: "false" });
+  assert.equal((await c2("POST", "/api/auth/start", { email: "a@b.co" })).status, 503);
+});
+
+test("approve: still-flagged duplicates need an explicit, logged override; client OCR never auto-pays", async () => {
+  const { call, login } = mk(); await login();
+  const a = "Subject: Invoice MFR-10\n\nVendor: Maria Fernanda Rojas (contractor)\nInvoice # MFR-10\nDate: 2026-10-05\nDue date: 2026-10-30\nDescription: QA services October 2026\nTotal due: USD 1,600.00\nAccount: CO-FAKE-5005";
+  const b = a.replaceAll("MFR-10", "MFR-10B").replace("2026-10-05", "2026-10-20");
+  await J(await call("PUT", "/api/rules", { human_approval_above_usd: 1000 }));
+  const e1 = await J(await call("POST", "/api/upload", { filename: "a.txt", type: "text/plain", text: a }));
+  const e2 = await J(await call("POST", "/api/upload", { filename: "b.txt", type: "text/plain", text: b }));
+  assert.equal(e2.action, "escalate"); assert.match(e2.reason, /duplicate|resend/i);
+  const r = await call("POST", `/api/entry/${e2.id}/approve`); assert.equal(r.status, 409); assert.equal((await J(r)).needsOverride, true);
+  void e1;
+  // client-side OCR text is capped: escalates even when it claims 99% confidence
+  const ocrText = a.replaceAll("MFR-10", "MFR-77").replace("QA services October 2026", "QA testing");
+  const e3 = await J(await call("POST", "/api/upload", { filename: "x.png", type: "image/png", fileBase64: "iVBORw0KGgo=", ocr: { text: ocrText, confidence: 99 } }));
+  assert.notEqual(e3.action, "pay"); assert.match(e3.reason, /read in the browser|Low OCR/);
+});
+
+test("concurrency: overlapping writes never lose an update", async () => {
+  const { call, login } = mk(); await login();
+  const t = (n) => `Subject: Invoice VD-${n}\n\nProveedor: Valpo Data SpA\nFactura N° VD-${n}\nFecha: 2026-10-05\nVence: 2026-10-30\nConcepto: Licencia analítica octubre 2026\nTotal a pagar: CLP 950.000\nCuenta: CL-FAKE-7007`;
+  const rs = await Promise.all([1, 2, 3, 4].map((n) => call("POST", "/api/upload", { filename: `${n}.txt`, type: "text/plain", text: t(9000 + n) }).then(J)));
+  const st = await J(await call("GET", "/api/state"));
+  assert.equal(st.log.length, 4); assert.ok(rs.filter((e) => e.action === "pay").length <= 1, "flat monthly fee paid at most once");
 });

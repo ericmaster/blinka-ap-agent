@@ -13,11 +13,14 @@ export function createHost({ kv, env = {} }) {
     whatsapp: connector("whatsapp", env.CHAT_API_URL ?? "http://internal/chat/api", env.CHAT_API_URL ? fetch : local),
   };
   const app = createApp({ store: { load: () => kv.get("state"), save: (s) => kv.put("state", s), getBlob: kv.getBlob, putBlob: kv.putBlob }, env, connectors });
-  return (req) => {
+  return async (req) => {
     const p = new URL(req.url).pathname;
     if (p === "/mail" || p === "/chat") return Response.redirect(new URL(p + "/", req.url).toString(), 301);
-    if (p.startsWith("/mail/")) return mail(req);
-    if (p.startsWith("/chat/")) return chat(req);
+    if (p.startsWith("/mail/") || p.startsWith("/chat/")) {
+      // Writes to the mock services (compose, reset) require a signed-in Clearhold user, so strangers cannot plant invoices.
+      if (req.method !== "GET" && req.method !== "HEAD" && !(await app.userOf(req))) return new Response(JSON.stringify({ error: "Sign in to Clearhold first" }), { status: 401, headers: { "content-type": "application/json" } });
+      return p.startsWith("/mail/") ? mail(req) : chat(req);
+    }
     return app(req);
   };
 }

@@ -4,7 +4,7 @@ import defaultRules from "../../config/rules.json" with { type: "json" };
 import { VENDORS, COMPANY } from "../data/vendors.mjs";
 import { contractMarkdown, contractHtml, contractPdf } from "../contracts.mjs";
 import { processDoc } from "../pipeline.mjs";
-import { newLedger, approve, registry } from "../engine/decide.mjs";
+import { newLedger, approve, registry, DUP_RE } from "../engine/decide.mjs";
 import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, bodyLines, rng } from "../gen/generator.mjs";
@@ -31,6 +31,9 @@ const fresh = (prev = {}) => ({ rules: prev.rules ?? structuredClone(defaultRule
   users: prev.users ?? {}, sessions: prev.sessions ?? {}, otps: {}, audit: prev.audit ?? [] });
 const noModel = { name: "no model configured", async ask() { return { error: "model not configured" }; } };
 const MAX_UPLOAD = 4 * 1024 * 1024;
+const SESSION_TTL = 7 * 864e5, OTP_MAX_PER_10MIN = 5;
+class Conflict extends Error {}
+const SENSITIVE = ["acct", "terms", "currency"]; // vendor fields that need a second approver
 
 export function validateRules(r) {
   for (const k of ["max_per_payment_usd", "human_approval_above_usd", "vendor_period_cap_usd", "period_budget_usd", "duplicate_window_days"])
@@ -39,15 +42,21 @@ export function validateRules(r) {
   const [lo, hi] = r.uncertain_band ?? [];
   if (!(0 <= lo && lo < hi && hi <= 1)) return "invalid uncertain_band";
   if (!Array.isArray(r.allowlist) || r.allowlist.some((k) => !registry(r)[k])) return "invalid allowlist";
+  if (r.allowlist.some((k) => r.pendingChanges?.[k]?.type === "add")) return "That vendor is waiting for a second approver";
   return null;
 }
 const withAllow = (rules, x) => (x.vendorKey && !(rules.allowlist ?? Object.keys(registry(rules))).includes(x.vendorKey) ? { ...x, vendorKey: null } : x);
-const cookie = (req) => Object.fromEntries((req.headers.get("cookie") ?? "").split(/;\s*/).filter(Boolean).map((c) => c.split("=")));
+const cookie = (req) => Object.fromEntries((req.headers.get("cookie") ?? "").split(/;\s*/).filter(Boolean).map((c) => { const i = c.indexOf("="); return [c.slice(0, i), c.slice(i + 1)]; }));
 
 export function createApp({ store, env = {}, connectors = {} }) {
   const demo = env.DEMO_MODE !== "false";
   const adapter = () => fromEnv(env) ?? noModel;
-  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.vendors ??= structuredClone(VENDORS); s.rules.allowlist ??= Object.keys(s.rules.vendors); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; s.audit ??= []; return s; };
+  // Optimistic concurrency: every save checks the stored version; a conflicting request is re-run from fresh state
+  // (so the hard rules are re-evaluated against the current ledger before anything is booked). Requests are also serialized per isolate.
+  const save = async (st) => { const cur = await store.load(); if ((cur?.v ?? 0) !== (st.v ?? 0)) throw new Conflict("state changed"); st.v = (st.v ?? 0) + 1; await store.save(st); };
+  let chain = Promise.resolve();
+  const serial = (fn) => { const r = chain.then(fn, fn); chain = r.catch(() => {}); return r; };
+  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.pendingChanges ??= {}; s.otpLog ??= {}; s.rules.vendors ??= structuredClone(VENDORS); s.rules.allowlist ??= Object.keys(s.rules.vendors); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; s.audit ??= []; return s; };
   const conn = (channel) => connectors[channel === "email" ? "email" : "whatsapp"];
   const attOf = (st, id) => { for (const e of st.channels.emails) { const a = e.attachments?.find((x) => x.id === id); if (a) return { ...a, channel: "email" }; }
     for (const c of st.channels.chats) if (c.attachment?.id === id) return { ...c.attachment, channel: "whatsapp" }; return null; };
@@ -63,7 +72,16 @@ export function createApp({ store, env = {}, connectors = {} }) {
     st.log.push(e); return e;
   }
 
-  return async function handle(req) {
+  const userOf = async (req) => { const st = await load(), s = st.sessions[cookie(req).sid]; return s && Date.now() - s.at < SESSION_TTL ? s.email : null; };
+  async function handle(req0) {
+    const body = req0.method === "GET" || req0.method === "HEAD" ? null : await req0.arrayBuffer();
+    const mk = () => new Request(req0.url, { method: req0.method, headers: req0.headers, body });
+    if (!body) return inner(mk());
+    return serial(async () => { for (let i = 0; ; i++) { try { return await inner(mk(), true); } catch (e) { if (!(e instanceof Conflict)) return json({ error: String(e?.message ?? e) }, 500); if (i >= 4) return json({ error: "Busy, please retry" }, 503); } } });
+  }
+  handle.userOf = userOf;
+  return handle;
+  async function inner(req, rethrow) {
     const url = new URL(req.url), p = url.pathname, m = req.method; let mm;
     try {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
@@ -71,21 +89,24 @@ export function createApp({ store, env = {}, connectors = {} }) {
       if (m === "POST" && p === "/api/auth/start") {
         const { email } = await req.json(), st = await load();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email ?? "")) return json({ error: "Enter a valid email" }, 400);
+        const ek = email.toLowerCase(), now = Date.now(); st.otpLog[ek] = (st.otpLog[ek] ?? []).filter((t) => now - t < 10 * 60000);
+        if (st.otpLog[ek].length >= OTP_MAX_PER_10MIN) return json({ error: "Too many codes requested. Try again in 10 minutes." }, 429);
+        st.otpLog[ek].push(now);
         const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1e6).padStart(6, "0");
-        st.otps[email.toLowerCase()] = { code, exp: Date.now() + 10 * 60000, tries: 0 }; await store.save(st);
-        return json(demo ? { sent: false, demo: true, code } : { sent: true });
+        st.otps[email.toLowerCase()] = { code, exp: Date.now() + 10 * 60000, tries: 0 }; await save(st);
+        return json(demo ? { sent: false, demo: true, code } : { sent: false, error: "Email delivery is not configured on this deployment." }, demo ? 200 : 503);
       }
       if (m === "POST" && p === "/api/auth/verify") {
         const { email, code } = await req.json(), st = await load(), k = (email ?? "").toLowerCase(), o = st.otps[k];
         if (!o || o.exp < Date.now() || o.tries >= 5) return json({ error: "Code expired, request a new one" }, 401);
-        if (o.code !== String(code).trim()) { o.tries++; await store.save(st); return json({ error: "Wrong code" }, 401); }
+        if (o.code !== String(code).trim()) { o.tries++; await save(st); return json({ error: "Wrong code" }, 401); }
         delete st.otps[k]; st.users[k] ??= { email: k, createdAt: new Date().toISOString() }; // auto-register
-        const sid = rand(24); st.sessions[sid] = { email: k, at: Date.now() }; await store.save(st);
+        const sid = rand(24); st.sessions[sid] = { email: k, at: Date.now() }; await save(st);
         return json({ email: k }, 200, { "set-cookie": `sid=${sid}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800${url.protocol === "https:" ? "; Secure" : ""}` });
       }
-      if (m === "POST" && p === "/api/auth/logout") return json({ ok: true }, 200, { "set-cookie": "sid=; Path=/; Max-Age=0" });
+      if (m === "POST" && p === "/api/auth/logout") { const st = await load(), sid = cookie(req).sid; if (sid && st.sessions[sid]) { delete st.sessions[sid]; await save(st); } return json({ ok: true }, 200, { "set-cookie": "sid=; Path=/; Max-Age=0" }); }
       if (p.startsWith("/api/")) {
-        var st0 = await load(), user = st0.sessions[cookie(req).sid]?.email;
+        var st0 = await load(), ses = st0.sessions[cookie(req).sid], user = ses && Date.now() - ses.at < SESSION_TTL ? ses.email : null;
         if (!user) return json({ error: "auth required" }, 401);
       }
       const st = st0;
@@ -101,7 +122,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
           const after = list.reduce((a, x) => (x.at > a ? x.at : a), "");
           for (const msg of await c.list(after)) if (!list.some((x) => x.id === msg.id)) { list.push({ ...msg, channel: ch }); added++; }
         }
-        if (added) await store.save(st); return json({ added });
+        if (added) await save(st); return json({ added });
       }
       // ---- vendor registry (feeds the hard rules) with audit trail
       if ((p === "/api/vendors" && m === "POST") || ((mm = p.match(/^\/api\/vendors\/([\w-]+)$/)) && ["PUT", "DELETE"].includes(m))) {
@@ -109,7 +130,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
         if (m === "DELETE") {
           const k = mm[1]; if (!reg[k]) return json({ error: "not found" }, 404);
           st.audit.push({ by: user, at, action: "remove vendor", key: k, name: reg[k].name }); delete reg[k]; st.rules.allowlist = st.rules.allowlist.filter((x) => x !== k);
-          await store.save(st); return json({ ok: true });
+          await save(st); return json({ ok: true });
         }
         const b = await req.json();
         const k = m === "POST" ? String(b.key || b.name || "").toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) : mm[1];
@@ -117,9 +138,32 @@ export function createApp({ store, env = {}, connectors = {} }) {
         if (m === "POST" && (!k || reg[k])) return json({ error: "Vendor already exists or name missing" }, 409);
         const prev = reg[k] ?? {}, v = { ...prev, ...pickVendor(b) }, err = validateVendor(v, st.rules); if (err) return json({ error: err }, 400);
         const changes = Object.fromEntries(Object.keys(v).filter((f) => f !== "agreement" && JSON.stringify(prev[f]) !== JSON.stringify(v[f])).map((f) => [f, [prev[f] ?? null, v[f]]]));
-        reg[k] = v; if (m === "POST") st.rules.allowlist.push(k);
-        st.audit.push({ by: user, at, action: m === "POST" ? "add vendor" : "edit vendor", key: k, name: v.name, changes });
-        await store.save(st); return json({ key: k, ...v });
+        if (!Object.keys(changes).length) return json({ key: k, ...reg[k] });
+        // Dual control: a new vendor, or a change to bank account / terms / currency, waits for a second person. Invoices to that vendor are held meanwhile.
+        const sensitive = m === "POST" || SENSITIVE.some((f) => f in changes);
+        if (sensitive) {
+          const pend = { by: user, at, type: m === "POST" ? "add" : "edit", proposed: v, changes };
+          if (m === "POST") { reg[k] = v; } // registered but not active (not in allowlist) until approved
+          else { const safe = Object.fromEntries(Object.entries(v).filter(([f]) => !SENSITIVE.includes(f) && f !== "agreement")); reg[k] = { ...prev, ...safe }; }
+          st.rules.pendingChanges[k] = pend;
+          st.audit.push({ by: user, at, action: m === "POST" ? "propose new vendor" : "propose bank/terms change", key: k, name: v.name, changes });
+          await save(st); return json({ key: k, pending: true, ...reg[k] }, 202);
+        }
+        reg[k] = v;
+        st.audit.push({ by: user, at, action: "edit vendor", key: k, name: v.name, changes });
+        await save(st); return json({ key: k, ...v });
+      }
+      if (m === "POST" && (mm = p.match(/^\/api\/vendors\/([\w-]+)\/change\/(approve|reject)$/))) {
+        const k = mm[1], pend = st.rules.pendingChanges[k], at = new Date().toISOString(); if (!pend) return json({ error: "No pending change" }, 404);
+        if (mm[2] === "approve") {
+          if (pend.by === user) return json({ error: "A different person must approve this change." }, 403);
+          st.rules.vendors[k] = { ...st.rules.vendors[k], ...pend.proposed }; if (pend.type === "add" && !st.rules.allowlist.includes(k)) st.rules.allowlist.push(k);
+          // Invalidate pending approvals: invoices waiting for a human are re-checked against the new details on approval.
+          for (const e of st.log) if (e.action === "escalate" && e.extracted?.vendorKey === k) { e.reasons = [...e.reasons, `Vendor details changed at ${at}; re-checked on approval.`]; e.reason = e.reasons.join(" "); }
+        } else if (pend.type === "add") { delete st.rules.vendors[k]; }
+        delete st.rules.pendingChanges[k];
+        st.audit.push({ by: user, at, action: mm[2] === "approve" ? "approve change" : "reject change", key: k, name: pend.proposed.name, changes: pend.changes, proposedBy: pend.by });
+        await save(st); return json({ ok: true });
       }
       if (m === "GET" && (mm = p.match(/^\/api\/vendors\/([\w-]+)\/contract(\.pdf|\.md)?$/))) {
         const v = st.rules.vendors[mm[1]]; if (!v) return json({ error: "not found" }, 404);
@@ -135,10 +179,10 @@ export function createApp({ store, env = {}, connectors = {} }) {
         const att = msg.attachment ?? msg.attachments?.[0], channel = msg.channel ?? (messageId.startsWith("m-") ? "email" : "whatsapp");
         let doc;
         if (att?.type === "application/pdf") { const b = await conn(channel).attachment(att.id); if (!b) return json({ error: "attachment unavailable" }, 502); doc = { kind: "pdf", buffer: b.bytes }; }
-        else if (att?.type?.startsWith("image/")) { if (!ocr?.text) return json({ error: "needs OCR", needOcr: att.id }, 422); doc = { kind: "image", text: ocr.text, ocrConfidence: ocr.confidence }; }
+        else if (att?.type?.startsWith("image/")) { if (!ocr?.text) return json({ error: "needs OCR", needOcr: att.id }, 422); doc = { kind: "image", text: ocr.text, ocrConfidence: Math.min(Number(ocr.confidence) || 0, 79), clientOcr: true }; }
         else doc = { kind: channel === "email" ? "email" : "chat", text: channel === "email" ? `Subject: ${msg.subject}\n\n${msg.body}` : `[${msg.at.slice(0, 10)}] ${msg.from}: ${msg.text}` };
         const e = await run(st, doc, { channel, messageId, attachmentId: att?.id ?? null, name: att?.name ?? null, type: att?.type ?? "text/plain" });
-        msg.entryId = e.id; await store.save(st); return json(e);
+        msg.entryId = e.id; await save(st); return json(e);
       }
       if (m === "POST" && p === "/api/upload") {
         const b = await req.json();
@@ -147,9 +191,9 @@ export function createApp({ store, env = {}, connectors = {} }) {
         if (kind === "image" && !b.ocr?.text) return json({ error: "needs OCR" }, 422);
         const attId = b.fileBase64 ? `u-${rand(8)}` : null;
         if (attId) await store.putBlob(attId, b.fileBase64);
-        const doc = kind === "pdf" ? { kind, buffer: fromB64(b.fileBase64) } : kind === "image" ? { kind, text: b.ocr.text, ocrConfidence: b.ocr.confidence } : { kind, text: b.text };
+        const doc = kind === "pdf" ? { kind, buffer: fromB64(b.fileBase64) } : kind === "image" ? { kind, text: b.ocr.text, ocrConfidence: Math.min(Number(b.ocr.confidence) || 0, 79), clientOcr: true } : { kind, text: b.text };
         const e = await run(st, doc, { channel: "upload", messageId: null, attachmentId: attId, name: b.filename ?? null, type: b.type ?? "text/plain" });
-        st.uploads.push({ entryId: e.id, by: user, at: e.at, name: b.filename }); await store.save(st); return json(e);
+        st.uploads.push({ entryId: e.id, by: user, at: e.at, name: b.filename }); await save(st); return json(e);
       }
       if (m === "GET" && (mm = p.match(/^\/api\/blob\/([\w-]+)$/))) {
         const b = await blobBytes(st, mm[1]); if (!b) return json({ error: "not found" }, 404);
@@ -169,36 +213,37 @@ export function createApp({ store, env = {}, connectors = {} }) {
         const parts = (e.sourceText ?? "").split("\n"), out = [];
         for (const line of parts) out.push(line.trim() ? (await env.AI.run("@cf/meta/m2m100-1.2b", { text: line, source_lang: lang, target_lang: "en" })).translated_text : line);
         e.translation = { text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
-        await store.save(st); return json(e.translation);
+        await save(st); return json(e.translation);
       }
       if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|reject)$/))) {
         const e = st.log.find((l) => l.id === mm[1]);
         if (!e) return json({ error: "not found" }, 404);
         if (e.action !== "escalate") return json({ error: "Only pending invoices can be decided" }, 409);
         const at = new Date().toISOString();
+        const ab = await req.json().catch(() => ({}));
         if (mm[2] === "reject") { e.action = "hold"; e.reasons = [...e.reasons, `Rejected by ${user} at ${at}.`]; }
         else {
-          const r = approve(e, st.ledger, st.rules);
-          if (!r.ok) return json({ error: r.reason }, 409);
-          e.action = "pay"; e.reasons = [...e.reasons, `Approved by ${user} at ${at}; hard rules re-checked.`];
+          const r = approve(e, st.ledger, st.rules, { override: ab.override });
+          if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
+          e.action = "pay"; e.reasons = [...e.reasons, `Approved by ${user} at ${at}; hard rules re-checked.` + (ab.override && e.reasons.some((x) => DUP_RE.test(x)) ? ` Duplicate override: "${String(ab.override).slice(0, 200)}".` : "")];
         }
         e.reason = e.reasons.join(" "); e.decidedBy = user; e.history = [...(e.history ?? []), { by: user, at, action: e.action }];
-        await store.save(st); return json(e);
+        await save(st); return json(e);
       }
       if (m === "PUT" && p === "/api/rules") {
         const r = { ...st.rules, ...(await req.json()) };
-        for (const k of ["fx_to_usd", "vendors", "company", "period", "base_currency"]) r[k] = st.rules[k];
+        for (const k of ["fx_to_usd", "vendors", "company", "period", "base_currency", "pendingChanges"]) r[k] = st.rules[k];
         const err = validateRules(r); if (err) return json({ error: err }, 400);
-        st.rules = r; await store.save(st); return json(r);
+        st.rules = r; await save(st); return json(r);
       }
-      if (m === "POST" && p === "/api/reset") { await store.save(fresh(st)); return json({ ok: true }); }
+      if (m === "POST" && p === "/api/reset") { const f = fresh(st); f.v = st.v; f.rules.pendingChanges = {}; await save(f); return json({ ok: true }); }
       if (m === "GET" && p === "/api/pain001") {
         const pays = st.log.filter((l) => l.action === "pay").map((l) => ({ id: l.id, ...l.extracted }));
         return new Response(pain001(pays, { registry: st.rules.vendors, msgId: `NWR-${Date.now()}` }), { headers: { "content-type": "application/xml", "content-disposition": "attachment; filename=pain001.xml" } });
       }
       if (m === "POST" && p === "/api/stress") return stress(await req.json().catch(() => ({})), st.rules, adapter());
       return json({ error: "not found" }, 404);
-    } catch (e) { return json({ error: String(e?.message ?? e) }, 500); }
+    } catch (e) { if (e instanceof Conflict && rethrow) throw e; return json({ error: String(e?.message ?? e) }, 500); }
   };
 }
 
