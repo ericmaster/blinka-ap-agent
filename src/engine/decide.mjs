@@ -57,7 +57,7 @@ export function hardChecks(x, ledger, rules) {
   if (x.injectionSuspected) hold.push("Invoice contains instructions addressed to the agent (possible prompt injection); ignored and held.");
   for (const [k, label] of [["payee", "vendor"], ["amount", "amount"], ["currency", "currency"], ["due", "due date"], ["number", "invoice number"], ["acct", "bank account"]])
     if (x[k] == null) esc.push(`Could not read with confidence: ${label}.`);
-  if (x.channel === "image" && x.ocrConfidence != null && x.ocrConfidence < 80) esc.push(`Low OCR confidence (${x.ocrConfidence}%).`);
+  if (x.channel === "image" && !x.clientOcr && x.ocrConfidence != null && x.ocrConfidence < 80) esc.push(`Low OCR confidence (${x.ocrConfidence}%).`);
   if (x.payee && !v) esc.push(`Vendor "${x.payee}" is not in the approved vendor registry.`);
   const reg = v;
   if (v && x.acct && x.acct !== (reg?.acct ?? v.acct)) hold.push(`Bank account ${x.acct} does not match the registered account for ${v.name.replace(/\.$/, "")}.`);

@@ -56,7 +56,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
   const save = async (st) => { const cur = await store.load(); if ((cur?.v ?? 0) !== (st.v ?? 0)) throw new Conflict("state changed"); st.v = (st.v ?? 0) + 1; await store.save(st); };
   let chain = Promise.resolve();
   const serial = (fn) => { const r = chain.then(fn, fn); chain = r.catch(() => {}); return r; };
-  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.pendingChanges ??= {}; s.otpLog ??= {}; s.rules.vendors ??= structuredClone(VENDORS); s.rules.allowlist ??= Object.keys(s.rules.vendors); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; s.audit ??= []; return s; };
+  const load = async () => { const s = (await store.load()) ?? fresh(); s.rules.pendingChanges ??= {}; s.otpLog ??= {}; s.rules.vendors ??= structuredClone(VENDORS); for (const [k, v] of Object.entries(s.rules.vendors)) if (!v.name || !v.terms) s.rules.vendors[k] = VENDORS[k] ? { ...structuredClone(VENDORS[k]), ...v, name: v.name ?? VENDORS[k].name, terms: v.terms ?? VENDORS[k].terms } : v; s.rules.allowlist ??= Object.keys(s.rules.vendors); s.channels ??= channels(); s.users ??= {}; s.sessions ??= {}; s.otps ??= {}; s.uploads ??= []; s.audit ??= []; return s; };
   const conn = (channel) => connectors[channel === "email" ? "email" : "whatsapp"];
   const attOf = (st, id) => { for (const e of st.channels.emails) { const a = e.attachments?.find((x) => x.id === id); if (a) return { ...a, channel: "email" }; }
     for (const c of st.channels.chats) if (c.attachment?.id === id) return { ...c.attachment, channel: "whatsapp" }; return null; };

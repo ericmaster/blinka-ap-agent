@@ -159,3 +159,10 @@ test("concurrency: overlapping writes never lose an update", async () => {
   const st = await J(await call("GET", "/api/state"));
   assert.equal(st.log.length, 4); assert.ok(rs.filter((e) => e.action === "pay").length <= 1, "flat monthly fee paid at most once");
 });
+
+test("migration: older partial vendor records are filled from defaults instead of crashing extraction", async () => {
+  const mem = new Map([["state", { rules: { ...JSON.parse(readFileSync("config/rules.json", "utf8")), vendors: { "lima-support": { acct: "PE-FAKE-4004", category: "soporte", keywords: ["soporte"] } } }, ledger: { seen: [], spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} }, log: [], seq: 0, users: {}, sessions: { s1: { email: "e@x.co", at: Date.now() } }, otps: {}, audit: [] }]]);
+  const app = createHost({ kv: { get: async (k) => structuredClone(mem.get(k) ?? null), put: async (k, v) => mem.set(k, structuredClone(v)), getBlob: async () => null, putBlob: async () => {} } });
+  const r = await app(new Request("http://x/api/upload", { method: "POST", headers: { "content-type": "application/json", cookie: "sid=s1" }, body: JSON.stringify({ filename: "a.txt", type: "text/plain", text: readFileSync("data/curated/C13.email.txt", "utf8") }) }));
+  const e = await r.json(); assert.equal(r.status, 200); assert.doesNotMatch(e.reason, /Could not read the document/);
+});
