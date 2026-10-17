@@ -2,7 +2,8 @@
 import { createApp } from "./server/app.mjs";
 export default {
   async fetch(req, env) {
-    const store = { load: async () => env.STATE.get("state", "json"), save: async (s) => env.STATE.put("state", JSON.stringify(s)) };
+    const store = { load: async () => env.STATE.get("state", "json"), save: async (s) => env.STATE.put("state", JSON.stringify(s)),
+      getBlob: async (k) => env.STATE.get("blob:" + k), putBlob: async (k, v) => env.STATE.put("blob:" + k, v) };
     return createApp({ store, env })(req);
   },
 };

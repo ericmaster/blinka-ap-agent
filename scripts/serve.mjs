@@ -1,8 +1,8 @@
 // Local server: node scripts/serve.mjs [port]. In-memory state. Keys (optional) from env, never logged.
 import { createServer } from "node:http";
 import { createApp } from "../src/server/app.mjs";
-let state = null;
-const app = createApp({ store: { load: async () => state && structuredClone(state), save: async (s) => { state = structuredClone(s); } }, env: process.env });
+let state = null; const blobs = new Map();
+const app = createApp({ store: { load: async () => state && structuredClone(state), save: async (s) => { state = structuredClone(s); }, getBlob: async (k) => blobs.get(k), putBlob: async (k, v) => { blobs.set(k, v); } }, env: process.env });
 const port = Number(process.argv[2] ?? process.env.PORT ?? 8796);
 createServer(async (req, res) => {
   const chunks = []; for await (const c of req) chunks.push(c);
