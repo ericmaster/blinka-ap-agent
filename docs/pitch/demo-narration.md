@@ -4,7 +4,8 @@ Segmento de demo de ~75 s para el pitch (encaja en 0:50–2:05). Grabado en el s
 
 - **Voz:** Fish Audio, modelo `s2.1-pro-free`, voz «Voz tik tok» (masculina, español latinoamericano, cálida y pausada), `reference_id` **`a508e76ec74e4b57ad77d907992a536e`**
 - **Audio:** un archivo por bloque, sin silencios al inicio y al final, normalizado a −16 LUFS y acelerado 3 % (atempo 1.03). Cada bloque empieza 0,25 s después de que arranca su parte del video.
-- **Video:** 1920×1080, 30 fps, H.264 + AAC estéreo; captura de la UI a 1440×810 CSS escalada ×1.333 (nativo a 1080p, sin reescalar). Zoom y recortes hechos en postproducción; cursor y resaltado inyectados en la página.
+- **Video:** 1920×1080, 30 fps, H.264 + AAC estéreo; captura de la UI a 1440×810 CSS escalada ×1.333 (nativo a 1080p, sin reescalar). Zoom y recortes hechos en postproducción; cursor y resaltado inyectados en la página. Acercamientos suaves (0,8–1 s) donde el texto de la app es chico: registro de proveedores y formulario de cuenta (0:46–0:50, ×1,4–1,55), el cambio pendiente (×1,8) y la tarjeta del stress test con «0 pagos indebidos» (desde 0:56, ×1,6 → ×1,8).
+- **Voz propia:** las ventanas de cada bloque están en `build/demo-beats.json`; ver «Usar la voz de Eric» en `README.md`.
 
 | Tiempo | Bloque | Narración | Subtítulos en pantalla |
 |---|---|---|---|

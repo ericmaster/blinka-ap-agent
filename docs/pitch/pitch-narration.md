@@ -5,6 +5,8 @@ Duración: **173.6 s** (2:53.6), con un tope de 3:00. 1920×1080, 30 fps, H.264 
 - **Voz:** Fish Audio `s2.1-pro-free`, `VOICE_ID = a508e76ec74e4b57ad77d907992a536e` («Voz tik tok», masculina, español latinoamericano). Es la misma voz del demo. La voz narra como el equipo de producto; no se presenta como Eric.
 - **Quién presenta:** solo en el texto de la portada: Eric Aguayo, Co-fundador y Director de IA Aplicada de Nimblersoft · Equipo Nimble.
 - **Diapositivas:** capturas de `index.html` a 1920×1080, con fundidos de 0,5 s. En la diapositiva 3 va `demo-narrated.mp4` completo (74,7 s), con su propia narración (ver `demo-narration.md`).
+- **Diapositiva 5:** el recuadro «0 pagos indebidos» crece un poco y se ilumina en verde (0,47 s) justo cuando la voz dice «cero pagos indebidos» (2:20).
+- **Voz propia de Eric:** ver «Usar la voz de Eric» en `README.md` (`--voice-dir` o `--track` + `--timing`).
 - **Cambiar la voz o el texto:** se edita `build/pitch-narration.json` y se corre `VOICE_ID=<id> python3 build/pitch_video.py`. El script solo vuelve a generar los audios que cambiaron y se detiene si el video pasa de 2:58.
 
 | Tiempo | Diapositiva | Narración |
