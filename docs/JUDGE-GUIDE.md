@@ -49,4 +49,6 @@ All data is synthetic: the company, the 8 vendors, accounts (`XX-FAKE-NNNN`) and
 ## Real vs simulated · Real vs simulado
 | Real | Simulated |
 |---|---|
-| Extraction (regex + PDF text + OCR), rules engine, decision models (Fastino GLiDE → TypeSafe JEV, yes/no only), translation (Workers AI), pain.001 XML, audit log | Mailbox and WhatsApp (mock services with their own API, [CONNECTORS.md](CONNECTORS.md)), login email (code shown on screen), bank and Blinka Payments (mock, no money moves), outbound notifications (simulated, no email is sent) |
+| Extraction (regex + PDF text + OCR), rules engine, decision models (Fastino GLiDE → TypeSafe JEV, yes/no only), decision log, OTP login, vendor dual approval, pain.001 XML, translation (Workers AI), audit export | Mailbox and WhatsApp (mock services with their own API, [CONNECTORS.md](CONNECTORS.md)), login email (code shown on screen), bank and Blinka Payments (mock, no money moves), outbound notifications (simulated, no email is sent), fixed FX table, synthetic data (fictional Northwind Ridge Inc.) |
+
+Full table / tabla completa (EN/ES): [REAL-VS-SIMULATED.md](REAL-VS-SIMULATED.md)

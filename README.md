@@ -15,7 +15,9 @@ Equipo / Team: Nimble · 30X Hackathon, reto Blinka.
 
 | Real | Simulated |
 |---|---|
-| Extraction (regex, PDF text, OCR), rules engine, decision models (Fastino GLiDE → TypeSafe JEV, yes/no only), translation (Workers AI), ISO 20022 pain.001, audit log | Mailbox and WhatsApp (mock services with their own API), login email (code on screen), bank (no money moves). All data is synthetic. |
+| Extraction (regex, PDF text via unpdf, OCR via tesseract.js), deterministic rules engine, decision models (Fastino GLiDE → TypeSafe JEV, yes/no only), decision log, OTP login and sessions, vendor dual approval, ISO 20022 pain.001 XML, translation (Workers AI), audit export (CSV/JSON), Cloudflare deploy | Mailbox and WhatsApp (mock services with their own API), Blinka payouts (mock, no money moves), notifications and login email (none sent; code shown on screen), fixed FX table. All data is synthetic (fictional Northwind Ridge Inc.). |
+
+Full table, verified against the code (EN/ES): [`docs/REAL-VS-SIMULATED.md`](docs/REAL-VS-SIMULATED.md)
 
 ![Dashboard](docs/screenshots/dashboard.png)
 

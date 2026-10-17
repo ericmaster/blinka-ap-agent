@@ -62,8 +62,10 @@ Sistemas externos vía adaptadores: modelos en `src/adapters/index.mjs` (`fromEn
 | Extracción y motor de reglas | Real |
 | Modelos GLiDE / JEV | Real (API); fake en CI |
 | Facturas, proveedores, empresa | Simulado (sintético) |
-| Banco / pago | Simulado: solo archivo pain.001 |
-| WhatsApp | Simulado |
+| Banco / pago | Simulado: archivo pain.001 + sandbox mock de Blinka Payments (no se mueve dinero) |
+| Correo y WhatsApp | Simulado (servicios mock vía conectores) |
+
+Tabla completa verificada contra el código: [REAL-VS-SIMULATED.md](REAL-VS-SIMULATED.md).
 
 ## 10. MVP (MoSCoW)
 - **Must:** extracción (correo, PDF, chat); pantalla de reglas; motor reglas + GLiDE/JEV con banda de escalamiento; decisión con razón y evidencia; tablero con aprobar/rechazar; dataset con trampas; demo desplegada + repo público = demo.
