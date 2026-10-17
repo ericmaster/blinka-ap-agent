@@ -8,6 +8,7 @@
 | `clearhold-pitch.pptx` | La misma presentación, con texto editable y notas del orador cronometradas en cada diapositiva. |
 | `clearhold-pitch.pdf` | Exportado del HTML. En la diapositiva del demo se ve el póster y la URL en vivo. |
 | `demo-narrated.mp4` | Video narrado del demo (75 s, 1920×1080). Narración y voz: `demo-narration.md`. |
+| `clearhold-pitch-3min.mp4` | Video del pitch de 3:00 (2:54): las diapositivas narradas, con el demo en la diapositiva 3. Guion y voz: `pitch-narration.md`. |
 | `build/` | Fuentes para volver a generar todo (ver abajo). |
 
 ## Presentar (HTML)
@@ -44,8 +45,9 @@ cd docs/pitch/build
 python3 build_html.py          # -> ../index.html (embebe póster y logo)
 node deck.cjs                  # -> ../clearhold-pitch.pptx (inserta ../demo-narrated.mp4 si existe; si no, póster + enlace)
 google-chrome --headless=new --no-pdf-header-footer --print-to-pdf=../clearhold-pitch.pdf ../index.html
+npm i --no-save playwright-core && FISH_AUDIO_API_KEY=... python3 pitch_video.py   # -> ../clearhold-pitch-3min.mp4 (VOICE_ID=<id> para otra voz)
 ```
 El texto y las notas viven en `build/template.html`. `deck.cjs` toma las notas de ahí y repite el texto de las diapositivas, así que un cambio de texto se hace en los dos archivos.
 
 ## Publicado
-El Worker sirve esta carpeta como assets estáticos en https://blinka-ap-agent.ericmaster.workers.dev/pitch/ (`index.html`, `demo-narrated.mp4`, PPTX y PDF). Los archivos que se suben están en `../.assetsignore` y la configuración en `[assets]` de `wrangler.toml`.
+El Worker sirve esta carpeta como assets estáticos en https://blinka-ap-agent.ericmaster.workers.dev/pitch/ (`index.html`, `demo-narrated.mp4`, `clearhold-pitch-3min.mp4`, PPTX y PDF). Los archivos que se suben están en `../.assetsignore` y la configuración en `[assets]` de `wrangler.toml`.

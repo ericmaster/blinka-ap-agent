@@ -15,3 +15,4 @@ docs/private/
 out/
 .wrangler/
 !docs/pitch/build/
+docs/pitch/build/.pitch-video/

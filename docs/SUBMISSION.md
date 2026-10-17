@@ -4,11 +4,13 @@
 - **Reto:** Blinka (agente de cuentas por pagar)
 - **Repo:** https://github.com/ericmaster/blinka-ap-agent
 - **Demo:** https://blinka-ap-agent.ericmaster.workers.dev
-- **Video (3 min):** _pendiente: pegar el enlace de YouTube (no listado)_
-- **Largo de la descripción:** **4456 caracteres** (límite 5000; contado con `python3 -c "print(len(open('desc.txt').read().strip()))"` sobre el bloque de abajo, con espacios y saltos de línea).
+- **Presentación (HTML):** https://blinka-ap-agent.ericmaster.workers.dev/pitch/ · PPTX y PDF en `docs/pitch/`
+- **Video del pitch (2:54):** _pendiente: Eric sube `docs/pitch/clearhold-pitch-3min.mp4` a YouTube (no listado) o Drive y pega el enlace aquí_ · copia servida: https://blinka-ap-agent.ericmaster.workers.dev/pitch/clearhold-pitch-3min.mp4
+- **Demo narrado (75 s):** https://blinka-ap-agent.ericmaster.workers.dev/pitch/demo-narrated.mp4
+- **Largo de la descripción:** **4568 caracteres** (límite 5000; contado con `python3 -c "print(len(open('desc.txt').read().strip()))"` sobre el bloque de abajo, con espacios y saltos de línea).
 
 Antes de pegar:
-1. Resetear la demo en vivo para que «Run guided demo» aparezca (hoy la cola ya está procesada).
+1. Cada correo tiene su propio sandbox; con «Reset my demo» vuelve a aparecer «Run guided demo».
 2. Confirmar que las cifras siguen iguales a `docs/MARKET.md` (FBI IC3 2025, Tipalti 2026, Ardent 2025).
 3. Si HackRadar no acepta Markdown, el texto ya es plano (solo guiones y números).
 
@@ -37,7 +39,7 @@ La guía completa está en docs/JUDGE-GUIDE.md.
 EVIDENCIA
 - 0 pagos indebidos en 29 facturas curadas, 300 de stress corridas en vivo el 17 de octubre y 600 corridas en los tests con un modelo programado para aprobar todo. La seguridad está en el código, no en el modelo.
 - Bench de 4 motores sobre 30 facturas: Fastino GLiDE acertó el 100 % de las decisiones con 0 indebidos (p50 de 373 ms); GLiNER aprobó 4 indebidos con alta confianza. Por eso elegimos el modelo por evidencia y JEV (TypeSafe, de 30X) quedó de respaldo.
-- 30 tests y CI con gitleaks en GitHub Actions.
+- 37 tests y CI con gitleaks en GitHub Actions.
 
 VIABILIDAD
 - Corre hoy en Cloudflare Workers. El modelo cuesta unos US$0,0001 por factura y el hosting es serverless.
@@ -46,9 +48,9 @@ VIABILIDAD
 - Plan a producción con fases, gates y rollback en docs/RUNBOOK-PRODUCTION.md. Propuesta: un piloto en sombra de 6 semanas con 3 clientes de Blinka, con 0 pagos indebidos como gate.
 
 REAL VS SIMULADO
-Real: extracción (regex ES/EN/PT, texto de PDF y OCR), motor de reglas, modelos de decisión (GLiDE → JEV), traducción (Workers AI), pain.001 y auditoría. Simulado: buzón y WhatsApp (servicios mock con su propia API), correo de login (código en pantalla) y banco. Todos los datos son sintéticos: empresa, 8 proveedores, cuentas XX-FAKE y facturas.
+Real: extracción (regex ES/EN/PT, texto de PDF y OCR), motor de reglas, modelos de decisión (GLiDE → JEV), traducción (Workers AI), pain.001 y auditoría. Simulado: buzón y WhatsApp (servicios mock con su propia API), correo de login (código en pantalla), banco y pagos de Blinka (simulador, no se mueve dinero). Todos los datos son sintéticos: empresa, 8 proveedores, cuentas XX-FAKE y facturas.
 
 Stack: Node 22, Cloudflare Workers + KV + Workers AI, unpdf, tesseract.js. Licencia MIT.
 
-Demo: https://blinka-ap-agent.ericmaster.workers.dev · Repo: https://github.com/ericmaster/blinka-ap-agent
+Demo: https://blinka-ap-agent.ericmaster.workers.dev · Pitch: https://blinka-ap-agent.ericmaster.workers.dev/pitch/ · Repo: https://github.com/ericmaster/blinka-ap-agent
 ```
