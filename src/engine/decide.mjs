@@ -1,6 +1,7 @@
 // Deterministic decision engine. Code applies the rules; models only answer typed yes/no questions.
 // A model answer can only add reasons to hold/escalate — it can never override a rule to authorize payment.
 import { VENDORS, HISTORY } from "../data/vendors.mjs";
+export const registry = (rules) => rules?.vendors ?? VENDORS;
 
 export const newLedger = () => ({ seen: HISTORY.map((h) => ({ ...h, paid: true })), spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} });
 // Duplicate fingerprint (FNV-1a, runtime-agnostic): items + vendor + total + currency + date + number + account.
@@ -13,7 +14,7 @@ const days = (a, b) => (a && b ? Math.abs(Date.parse(a) - Date.parse(b)) / 864e5
 
 /** Agreement check in code (config.agreements). Returns {fail?: reason, units?} */
 export function agreementCheck(x, ledger, rules) {
-  const a = rules.agreements?.[x.vendorKey];
+  const reg = registry(rules)[x.vendorKey], a = reg?.terms && { ...reg.terms, currency: reg.currency };
   if (!a) return { fail: "No agreement configured for this vendor." };
   if (x.currency !== a.currency) return { fail: `Currency ${x.currency} differs from the contracted currency (${a.currency}).` };
   if (a.type === "flat") {
@@ -31,8 +32,8 @@ export function agreementCheck(x, ledger, rules) {
 const nnum = (s) => (s ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 export const toUsd = (amt, cur, rules) => (rules.fx_to_usd[cur] != null ? amt * rules.fx_to_usd[cur] : null);
 
-export function questionsFor(x, ledger) {
-  const v = VENDORS[x.vendorKey];
+export function questionsFor(x, ledger, rules) {
+  const v = registry(rules)[x.vendorKey];
   const prior = ledger.seen.filter((h) => h.vendor === x.vendorKey).map(({ number, date, amount, currency, lines }) => ({ number, date, amount, currency, lines }));
   const inv = { number: x.number, amount: x.amount, currency: x.currency, invoice_text: x.text };
   return {
@@ -47,13 +48,13 @@ const fmt = (n) => n.toLocaleString("en-US", { maximumFractionDigits: 2 });
 /** Hard checks that need no model. Returns {hold:[], escalate:[]} reasons in plain language. */
 export function hardChecks(x, ledger, rules) {
   const hold = [], esc = [];
-  const v = x.vendorKey ? VENDORS[x.vendorKey] : null;
+  const v = x.vendorKey ? registry(rules)[x.vendorKey] : null;
   if (x.injectionSuspected) hold.push("Invoice contains instructions addressed to the agent (possible prompt injection); ignored and held.");
   for (const [k, label] of [["payee", "vendor"], ["amount", "amount"], ["currency", "currency"], ["due", "due date"], ["number", "invoice number"], ["acct", "bank account"]])
     if (x[k] == null) esc.push(`Could not read with confidence: ${label}.`);
   if (x.channel === "image" && x.ocrConfidence != null && x.ocrConfidence < 80) esc.push(`Low OCR confidence (${x.ocrConfidence}%).`);
   if (x.payee && !v) esc.push(`Vendor "${x.payee}" is not in the approved vendor registry.`);
-  const reg = rules.vendors?.[x.vendorKey];
+  const reg = v;
   if (v && x.acct && x.acct !== (reg?.acct ?? v.acct)) hold.push(`Bank account ${x.acct} does not match the registered account for ${v.name.replace(/\.$/, "")}.`);
   if (v && x.number && ledger.seen.some((h) => h.vendor === x.vendorKey && nnum(h.number) === nnum(x.number))) hold.push(`Exact duplicate: ${v.name} already submitted invoice ${x.number}.`);
   if (v && x.items?.length && reg?.keywords?.length) {

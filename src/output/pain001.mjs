@@ -2,13 +2,13 @@
 import { COMPANY, VENDORS } from "../data/vendors.mjs";
 const x = (s) => String(s).replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]);
 const dec = (n, cur) => (["COP", "CLP"].includes(cur) ? n.toFixed(0) : n.toFixed(2));
-export function pain001(payments, { msgId = "NWR-" + Date.now(), now = new Date().toISOString().slice(0, 19), execDate } = {}) {
+export function pain001(payments, { registry = VENDORS, msgId = "NWR-" + Date.now(), now = new Date().toISOString().slice(0, 19), execDate } = {}) {
   const ctrl = payments.reduce((s, p) => s + p.amount, 0);
   const tx = payments.map((p, i) => `
       <CdtTrfTxInf>
         <PmtId><InstrId>${x(p.id)}</InstrId><EndToEndId>${x(p.number)}</EndToEndId></PmtId>
         <Amt><InstdAmt Ccy="${x(p.currency)}">${dec(p.amount, p.currency)}</InstdAmt></Amt>
-        <Cdtr><Nm>${x(VENDORS[p.vendorKey].name)}</Nm><PstlAdr><Ctry>${VENDORS[p.vendorKey].country}</Ctry></PstlAdr></Cdtr>
+        <Cdtr><Nm>${x(registry[p.vendorKey]?.name ?? p.payee)}</Nm><PstlAdr><Ctry>${registry[p.vendorKey]?.country ?? "XX"}</Ctry></PstlAdr></Cdtr>
         <CdtrAcct><Id><Othr><Id>${x(p.acct)}</Id></Othr></Id></CdtrAcct>
         <RmtInf><Ustrd>${x("Invoice " + p.number)}</Ustrd></RmtInf>
       </CdtTrfTxInf>`).join("");

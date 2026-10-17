@@ -23,54 +23,15 @@
     "CLP": 0.00105
   },
   "duplicate_window_days": 3,
-  "agreements": {
-    "andes-dev": {
-      "type": "hourly",
-      "currency": "COP",
-      "rate": 180000,
-      "max_units_per_period": 120
-    },
-    "pixel-norte": {
-      "type": "flat",
-      "currency": "MXN",
-      "amount": 28000
-    },
-    "sampa-cloud": {
-      "type": "flat",
-      "currency": "BRL",
-      "amount": 2400
-    },
-    "lima-support": {
-      "type": "hourly",
-      "currency": "PEN",
-      "rate": 45,
-      "max_units_per_period": 120
-    },
-    "maria-qa": {
-      "type": "flat",
-      "currency": "USD",
-      "amount": 1600
-    },
-    "rio-legal": {
-      "type": "hourly",
-      "currency": "BRL",
-      "rate": 650,
-      "max_units_per_period": 20
-    },
-    "valpo-data": {
-      "type": "flat",
-      "currency": "CLP",
-      "amount": 950000
-    },
-    "monterrey-ops": {
-      "type": "hourly",
-      "currency": "MXN",
-      "rate": 520,
-      "max_units_per_period": 40
-    }
-  },
   "vendors": {
     "andes-dev": {
+      "name": "Andes Dev Studio SAS",
+      "aliases": [
+        "Andes Dev Studio"
+      ],
+      "country": "CO",
+      "currency": "COP",
+      "lang": "es",
       "acct": "CO-FAKE-1001",
       "category": "desarrollo de software",
       "keywords": [
@@ -79,9 +40,22 @@
         "development",
         "integracion",
         "sprint"
-      ]
+      ],
+      "terms": {
+        "type": "hourly",
+        "rate": 180000,
+        "max_units_per_period": 120
+      },
+      "agreement": "Desarrollo de software: COP 180.000 por hora, máximo 120 horas al mes. Sin cargos adicionales."
     },
     "pixel-norte": {
+      "name": "Pixel Norte S.A. de C.V.",
+      "aliases": [
+        "Pixel Norte"
+      ],
+      "country": "MX",
+      "currency": "MXN",
+      "lang": "es",
       "acct": "MX-FAKE-2002",
       "category": "diseño UI",
       "keywords": [
@@ -89,9 +63,21 @@
         "design",
         "ui",
         "ux"
-      ]
+      ],
+      "terms": {
+        "type": "flat",
+        "amount": 28000
+      },
+      "agreement": "Diseño UI: tarifa fija MXN 28,000.00 por mes."
     },
     "sampa-cloud": {
+      "name": "Sampa Cloud Serviços Ltda",
+      "aliases": [
+        "Sampa Cloud"
+      ],
+      "country": "BR",
+      "currency": "BRL",
+      "lang": "pt",
       "acct": "BR-FAKE-3003",
       "category": "hospedagem em nuvem",
       "keywords": [
@@ -99,26 +85,63 @@
         "nuvem",
         "cloud",
         "hosting"
-      ]
+      ],
+      "terms": {
+        "type": "flat",
+        "amount": 2400
+      },
+      "agreement": "Hospedagem em nuvem: BRL 2.400,00 por mês, plano fixo. Sem taxas extras."
     },
     "lima-support": {
+      "name": "Lima Support Desk SAC",
+      "aliases": [
+        "Lima Support Desk"
+      ],
+      "country": "PE",
+      "currency": "PEN",
+      "lang": "es",
       "acct": "PE-FAKE-4004",
       "category": "soporte al cliente",
       "keywords": [
         "soporte",
         "support"
-      ]
+      ],
+      "terms": {
+        "type": "hourly",
+        "rate": 45,
+        "max_units_per_period": 120
+      },
+      "agreement": "Soporte al cliente nivel 1: PEN 45.00 por hora, hasta 120 horas al mes."
     },
     "maria-qa": {
+      "name": "Maria Fernanda Rojas (contractor)",
+      "aliases": [
+        "Maria Fernanda Rojas"
+      ],
+      "country": "CO",
+      "currency": "USD",
+      "lang": "en",
       "acct": "CO-FAKE-5005",
       "category": "QA / testing",
       "keywords": [
         "qa",
         "testing",
         "quality"
-      ]
+      ],
+      "terms": {
+        "type": "flat",
+        "amount": 1600
+      },
+      "agreement": "QA contractor: USD 1,600.00 flat per month."
     },
     "rio-legal": {
+      "name": "Rio Legal Consultoria Ltda",
+      "aliases": [
+        "Rio Legal Consultoria"
+      ],
+      "country": "BR",
+      "currency": "BRL",
+      "lang": "pt",
       "acct": "BR-FAKE-6006",
       "category": "consultoria jurídica",
       "keywords": [
@@ -127,25 +150,56 @@
         "legal",
         "contratos",
         "marca"
-      ]
+      ],
+      "terms": {
+        "type": "hourly",
+        "rate": 650,
+        "max_units_per_period": 20
+      },
+      "agreement": "Consultoria jurídica: BRL 650,00 por hora. Despesas só com aprovação prévia por escrito."
     },
     "valpo-data": {
+      "name": "Valpo Data SpA",
+      "aliases": [
+        "Valpo Data"
+      ],
+      "country": "CL",
+      "currency": "CLP",
+      "lang": "es",
       "acct": "CL-FAKE-7007",
       "category": "licencia analítica",
       "keywords": [
         "licencia",
         "analitica",
         "analytics"
-      ]
+      ],
+      "terms": {
+        "type": "flat",
+        "amount": 950000
+      },
+      "agreement": "Licencia analítica: CLP 950.000 por mes."
     },
     "monterrey-ops": {
+      "name": "Monterrey Ops Partners S.C.",
+      "aliases": [
+        "Monterrey Ops Partners"
+      ],
+      "country": "MX",
+      "currency": "MXN",
+      "lang": "en",
       "acct": "MX-FAKE-8008",
       "category": "bookkeeping",
       "keywords": [
         "bookkeeping",
         "contabilidad",
         "accounting"
-      ]
+      ],
+      "terms": {
+        "type": "hourly",
+        "rate": 520,
+        "max_units_per_period": 40
+      },
+      "agreement": "Bookkeeping services: MXN 520.00 per hour, up to 40 hours per month."
     }
   }
 }

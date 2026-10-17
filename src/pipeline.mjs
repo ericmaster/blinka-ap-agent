@@ -1,18 +1,19 @@
 // End-to-end: document -> extraction -> rules (+ model questions) -> decision log entry.
 import { extract } from "./extract/index.mjs";
-import { decide, questionsFor, hardChecks, toUsd } from "./engine/decide.mjs";
+import { decide, questionsFor, hardChecks, toUsd, registry } from "./engine/decide.mjs";
+import { matchVendor } from "./extract/text.mjs";
 
 export const kindOf = (f) => (f.endsWith(".pdf") ? "pdf" : f.endsWith(".png") || f.endsWith(".jpg") ? "image" : f.includes(".chat.") ? "chat" : "email");
 
 export async function processDoc(doc, { ledger, rules, adapter, mapExtracted = (x) => x }) {
   const t0 = Date.now();
   let x;
-  try { x = mapExtracted({ ...(await extract(doc)), id: doc.id }); }
+  try { const raw = await extract(doc); x = mapExtracted({ ...raw, vendorKey: matchVendor(raw.payee, registry(rules)), id: doc.id }); }
   catch (e) { return { id: doc.id, channel: doc.kind, action: "escalate", reasons: [`Could not read the document (${e.message}).`], extracted: null }; }
   // Ask the model only when hard rules didn't already hold it and the payee is known (questions need the agreement).
   const pre = hardChecks(x, ledger, rules);
   let answers = null;
-  if (!pre.hold.length && x.vendorKey) answers = await adapter.ask(questionsFor(x, ledger), { id: doc.id });
+  if (!pre.hold.length && x.vendorKey) answers = await adapter.ask(questionsFor(x, ledger, rules), { id: doc.id });
   const { action, reasons, checks } = decide(x, answers, ledger, rules);
   const { text, evidence, ...fields } = x;
   const ocr = x.ocrConfidence != null ? x.ocrConfidence / 100 : 1;

@@ -61,10 +61,10 @@ function span(ev, field, text, re, conf) {
   ev[field] = { text: v, start, end: start + m[1].length, confidence: conf }; return v;
 }
 
-export function matchVendor(name) {
+export function matchVendor(name, reg = VENDORS) {
   if (!name) return null;
   const n = norm(name);
-  for (const [k, v] of Object.entries(VENDORS)) if ([v.name, ...v.aliases].some((a) => norm(a) === n)) return k;
+  for (const [k, v] of Object.entries(reg)) if ([v.name, ...(v.aliases ?? [])].some((a) => norm(a) === n)) return k;
   return null;
 }
 const INJECTION = /(ignor[ae]?r?|disregard|olvida|esque[cç]a)\b[^\n]{0,40}\b(regla|rule|instruc|regra|polic)|\b(system|sistema)\s*:|\b(aprueba|approve|aprove)\b[^\n]{0,30}\b(ahora|now|agora|inmediato|immediately)|nota para el agente|note to the agent|aten[cç][aã]o agente/i;
