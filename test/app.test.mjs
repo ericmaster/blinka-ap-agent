@@ -225,3 +225,15 @@ test("mock Blinka payouts: only paid invoices, rail per country/currency, idempo
   await call("POST", "/api/reset"); assert.equal((await J(await call("GET", "/blinka/api/payment-intents"))).data.length, 0);
   await login("other@gmail.com"); assert.equal((await J(await call("GET", "/blinka/api/payment-intents"))).data.length, 0, "per workspace");
 });
+
+import { createNotifier } from "../src/notify/index.mjs";
+test("notifications: behind an interface, simulated by default; bank-change verification goes to the contact on file, never the sender", async () => {
+  const n = createNotifier({}), v = { name: "Monterrey Ops Partners S.C." };
+  const sent = await n.notify({ id: "F1", action: "hold", reason: "Bank account MX-FAKE-9999 does not match the registered account for X." }, v);
+  assert.equal(sent.length, 1); assert.equal(sent[0].status, "simulated"); assert.equal(sent[0].kind, "vendor_verification"); assert.match(sent[0].to, /contact on file/);
+  assert.equal((await n.notify({ id: "F2", action: "escalate", reason: "x" }))[0].kind, "approval_request");
+  assert.equal((await n.notify({ id: "F3", action: "pay", reason: "x" })).length, 0);
+  let got = null; const real = createNotifier({ EMAIL_ENABLED: "1" }, { name: "test", async send(x) { got = x; return { status: "sent", id: "m1" }; } });
+  assert.equal((await real.notify({ id: "F2", action: "escalate", reason: "x" }))[0].status, "sent"); assert.equal(got.entryId, "F2");
+  assert.equal(createNotifier({}, { name: "test", async send() { throw new Error("must not send"); } }).transport, "simulated", "no flag, no email");
+});

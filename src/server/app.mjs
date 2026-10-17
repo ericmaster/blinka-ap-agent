@@ -12,6 +12,7 @@ import { textPdf } from "../gen/pdf.mjs";
 import { score, counts, improper } from "../score.mjs";
 import { curated } from "../gen/generator.mjs";
 import { metrics, BENCHMARKS } from "../metrics.mjs";
+import { createNotifier } from "../notify/index.mjs";
 const MANIFEST = curated();
 /** Header KPIs. Improper payments are judged against ground truth for seeded (fake) cases paid by the agent on its own. */
 export function kpis(st) {
@@ -55,6 +56,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
   const saveA = async (a) => { const cur = await auth.load(); if ((cur?.v ?? 0) !== (a.v ?? 0)) throw new Conflict("auth changed"); a.v = (a.v ?? 0) + 1; await auth.save(a); };
   const demo = env.DEMO_MODE !== "false";
   const adapter = () => fromEnv(env) ?? noModel;
+  const notifier = createNotifier(env);
   // Optimistic concurrency: every save checks the stored version; a conflicting request is re-run from fresh state
   // (so the hard rules are re-evaluated against the current ledger before anything is booked). Requests are also serialized per isolate.
   const save = async (st) => { const cur = await store.load(); if ((cur?.v ?? 0) !== (st.v ?? 0)) throw new Conflict("state changed"); st.v = (st.v ?? 0) + 1; await store.save(st); };
@@ -73,6 +75,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
     const id = `F${String(++st.seq).padStart(3, "0")}`;
     const e = await processDoc({ ...doc, id }, { ledger: st.ledger, rules: st.rules, adapter: adapter(), mapExtracted: (x) => withAllow(st.rules, x) });
     e.source = source; e.at = new Date().toISOString(); e.history = [{ by: "agent", at: e.at, action: e.action }];
+    e.notifications = await notifier.notify(e, st.rules.vendors[e.extracted?.vendorKey]);
     st.log.push(e); return e;
   }
 
