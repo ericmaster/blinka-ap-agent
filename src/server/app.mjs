@@ -116,7 +116,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
       }
       const st = st0;
       if (m === "GET" && p === "/api/state") {
-        return json({ user, demo, rules: st.rules, audit: st.audit.slice(-50).reverse(), sources: { email: connectors.email?.ui("") ?? null, whatsapp: connectors.whatsapp?.ui("") ?? null }, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
+        return json({ user, demo, rules: st.rules, audit: st.audit.slice(-50).reverse(), sources: { email: connectors.email?.ui("") ?? null, whatsapp: connectors.whatsapp?.ui("") ?? null, payouts: connectors.payouts?.ui("") ?? null }, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
           log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), kpis: kpis(st), benchmarks: BENCHMARKS, spentUsd: st.ledger.spentUsd, channels: st.channels });
       }
       // ---- connectors: pull new messages from the external email / WhatsApp services (poll)
@@ -248,6 +248,23 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
         const rows = auditRows(st), stamp = new Date().toISOString().slice(0, 10);
         if (mm[1] === "json") return new Response(JSON.stringify({ exportedAt: new Date().toISOString(), exportedBy: user, invoices: rows, vendorChanges: st.audit }, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="clearhold-audit-${stamp}.json"` } });
         return new Response(toCsv(rows), { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="clearhold-audit-${stamp}.csv"` } });
+      }
+      // ---- send paid invoices to the MOCK Blinka Payments sandbox (idempotent per invoice); also refreshes statuses
+      if (m === "POST" && p === "/api/payouts") {
+        const pc = connectors.payouts; if (!pc) return json({ error: "No payouts service configured" }, 501);
+        let sent = 0, replayed = 0, failed = 0;
+        for (const e of st.log) {
+          if (e.action !== "pay") continue; // only invoices that passed every hard rule (or a re-checked human approval)
+          const x = e.extracted ?? {}, v = st.rules.vendors[x.vendorKey];
+          if (e.payout?.status === "settled") continue;
+          if (e.payout?.id) { const cur = await pc.get(e.payout.id); if (cur) e.payout.status = cur.status; continue; }
+          if (!v) { e.payout = { error: "vendor no longer in registry" }; failed++; continue; }
+          try {
+            const r = await pc.create({ amount: x.amount, currency: x.currency, beneficiary: { name: v.name, account: v.acct, country: v.country }, reference: `${x.number} · ${e.id}` }, `clearhold:${e.id}:${x.number}`);
+            e.payout = { id: r.id, rail: r.rail, status: r.status, at: new Date().toISOString(), by: user }; r.idempotent_replay ? replayed++ : sent++;
+          } catch (err) { e.payout = { error: String(err.message).slice(0, 200) }; failed++; }
+        }
+        await save(st); return json({ sent, replayed, failed, ui: pc.ui("") });
       }
       if (m === "GET" && p === "/api/pain001") {
         const pays = st.log.filter((l) => l.action === "pay").map((l) => ({ id: l.id, ...l.extracted }));

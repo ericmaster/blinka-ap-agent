@@ -201,3 +201,27 @@ test("audit export: CSV and JSON with decision, reasons, failed rules, evidence 
   assert.match(lines[0], /^id,received_at,channel/); assert.ok(lines.length >= 4);
   assert.doesNotMatch(csv, /,=HYPERLINK/, "cells starting with = are neutralised");
 });
+
+import { railFor, createBlinkaMock } from "../src/mocks/blinka.mjs";
+test("mock Blinka payouts: only paid invoices, rail per country/currency, idempotent, per workspace, reset clears", async () => {
+  assert.equal(railFor("BR", "BRL").rail, "Brazil · Pix"); assert.equal(railFor("CO", "USD").rail, "SWIFT (USD)"); assert.equal(railFor("MX", "COP").supported, false);
+  const { call, login } = mk(); await login();
+  await call("POST", "/api/sync");
+  for (const id of ["m-C02", "m-C03", "m-C16", "w-C10"]) { const e = await J(await call("POST", "/api/process", { messageId: id })); if (e.action === "escalate") await call("POST", `/api/entry/${e.id}/approve`); } // no model in tests: a person approves
+  const r1 = await J(await call("POST", "/api/payouts")); assert.equal(r1.sent, 2); assert.equal(r1.failed, 0);
+  const st = await J(await call("GET", "/api/state"));
+  const paid = st.log.filter((e) => e.action === "pay"), held = st.log.filter((e) => e.action !== "pay");
+  assert.ok(paid.every((e) => e.payout?.id)); assert.ok(held.every((e) => !e.payout), "held invoices never reach the payouts service");
+  assert.deepEqual(paid.map((e) => e.payout.rail).sort(), ["Brazil · Pix", "Mexico · MXN local transfer"]);
+  const r2 = await J(await call("POST", "/api/payouts")); assert.equal(r2.sent, 0, "second click sends nothing new");
+  const list = await J(await call("GET", "/blinka/api/payment-intents")); assert.equal(list.data.length, 2);
+  // the mock itself is idempotent on the key and rejects key reuse with another body
+  const body = { amount: 10, currency: "PEN", beneficiary: { name: "Lima", account: "PE-FAKE-4004", country: "PE" }, reference: "x" };
+  assert.match((await J(await call("POST", "/blinka/api/payment-intents", body))).error, /Idempotency-Key/);
+  const mem = new Map(), mock = createBlinkaMock({ load: async (k) => structuredClone(mem.get(k) ?? null), save: async (k, v) => mem.set(k, structuredClone(v)) });
+  const post = (b, key) => mock(new Request("http://x/blinka/api/payment-intents", { method: "POST", headers: { "content-type": "application/json", "idempotency-key": key }, body: JSON.stringify(b) }));
+  const p1 = await post(body, "k1"), p2 = await post(body, "k1"), p3 = await post({ ...body, amount: 11 }, "k1");
+  assert.equal(p1.status, 201); assert.equal(p2.status, 200); assert.equal((await p2.json()).id, (await p1.json()).id); assert.equal(p3.status, 409);
+  await call("POST", "/api/reset"); assert.equal((await J(await call("GET", "/blinka/api/payment-intents"))).data.length, 0);
+  await login("other@gmail.com"); assert.equal((await J(await call("GET", "/blinka/api/payment-intents"))).data.length, 0, "per workspace");
+});
