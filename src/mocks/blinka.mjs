@@ -22,14 +22,17 @@ export function railFor(country, currency) {
 const statusOf = (x, now = Date.now()) => { const t = now - Date.parse(x.createdAt); return t >= 20000 ? "settled" : t >= 5000 ? "submitted" : "created"; };
 const view = (x) => ({ ...x, status: statusOf(x) });
 
+import { mockI18n, LNG_CSS } from "../i18n/ui.mjs";
+import { reasonsClientJs } from "../i18n/reasons.mjs";
 const UI = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blinka Payments (mock)</title>
 <style>body{font:15px/1.45 system-ui,sans-serif;margin:0;background:#f7f7f4;color:#1c253a}.b{background:#b54708;color:#fff;padding:8px 16px;font-size:13px}main{max-width:980px;margin:20px auto;padding:0 16px}
-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #dedfdc;border-radius:10px;overflow:hidden}td,th{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}.s{padding:2px 8px;border-radius:99px;font-size:12px;background:#eef}.settled{background:#e7f6ec}.k{color:#656975;font-size:13px}</style></head>
-<body><div class="b">MOCK · Not the Blinka API and not affiliated: a sandbox we built for the demo. Rails as listed on blinka.co. No money moves.</div><main><h2>Blinka Payments <span class="k">(mock sandbox)</span></h2><table id="t"></table><p class="k">Each payment is idempotent on its Idempotency-Key: sending the same invoice twice returns the same payment.</p></main>
-<script>const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
-async function load(){const r=await fetch("api/payment-intents");if(!r.ok){document.querySelector("#t").innerHTML="<tr><td>Sign in to Clearhold first.</td></tr>";return}const d=await r.json();
-document.querySelector("#t").innerHTML="<tr><th>Payment</th><th>Beneficiary</th><th>Amount</th><th>Rail</th><th>Status</th><th>Reference</th></tr>"+(d.data.map(x=>"<tr id='"+x.id+"'><td>"+x.id+"</td><td>"+esc(x.beneficiary.name)+"<div class=k>"+esc(x.beneficiary.account)+"</div></td><td>"+esc(x.currency)+" "+Number(x.amount).toLocaleString("en-US")+"</td><td>"+esc(x.rail)+"</td><td><span class='s "+x.status+"'>"+x.status+"</span></td><td class=k>"+esc(x.reference)+"</td></tr>").join("")||"<tr><td colspan=6 class=k>No payments yet. In Clearhold, use “Send paid to Blinka”.</td></tr>")}
-load();setInterval(load,3000)</script></body></html>`;
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #dedfdc;border-radius:10px;overflow:hidden}td,th{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}.s{padding:2px 8px;border-radius:99px;font-size:12px;background:#eef}.settled{background:#e7f6ec}.k{color:#656975;font-size:13px}${LNG_CSS}.b{display:flex;gap:10px;align-items:center}.b span{flex:1}</style></head>
+<body data-title="Blinka Payments (mock)"><div class="b"><span data-t>MOCK · Not the Blinka API and not affiliated: a sandbox we built for the demo. Rails as listed on blinka.co. No money moves.</span><span class="lng"><button data-lang="en">EN</button><button data-lang="es">ES</button></span></div><main><h2>Blinka Payments <span class="k" data-t>(mock sandbox)</span></h2><table id="t"></table><p class="k" data-t>Each payment is idempotent on its Idempotency-Key: sending the same invoice twice returns the same payment.</p></main>
+<script>${mockI18n(reasonsClientJs())}
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+async function load(){const r=await fetch("api/payment-intents");if(!r.ok){document.querySelector("#t").innerHTML="<tr><td>"+tx("Sign in to Clearhold first.")+"</td></tr>";return}const d=await r.json();
+document.querySelector("#t").innerHTML="<tr>"+["Payment","Beneficiary","Amount","Rail","Status","Reference"].map(h=>"<th>"+tx(h)+"</th>").join("")+"</tr>"+(d.data.map(x=>"<tr id='"+x.id+"'><td>"+x.id+"</td><td>"+esc(x.beneficiary.name)+"<div class=k>"+esc(x.beneficiary.account)+"</div></td><td>"+esc(x.currency)+" "+Number(x.amount).toLocaleString(NL())+"</td><td>"+esc(tm(x.rail))+"</td><td><span class='s "+x.status+"'>"+tx(x.status)+"</span></td><td class=k>"+esc(x.reference)+"</td></tr>").join("")||"<tr><td colspan=6 class=k>"+tx("No payments yet. In Clearhold, use “Send to Blinka”.")+"</td></tr>")}
+window.onlang=load;applyStatic();load();setInterval(load,3000)</script></body></html>`;
 
 /** store: { load(key), save(key, v) } (per workspace). */
 export function createBlinkaMock(store) {

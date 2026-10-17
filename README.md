@@ -23,6 +23,8 @@ Full table, verified against the code (EN/ES): [`docs/REAL-VS-SIMULATED.md`](doc
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
+**UI EN / ES** — toggle **EN · ES** top right, next to your email (saved in this browser; shared by Clearhold, Mailbox, WhatsApp and Blinka mock pages). Decision reasons are translated with keyed templates (`src/i18n/`); evidence quotes and invoice text stay in their original language. English is the default. Screenshots: [`docs/screenshots/i18n-es.png`](docs/screenshots/i18n-es.png), realistic invoice in details: [`docs/screenshots/realistic-invoice.png`](docs/screenshots/realistic-invoice.png).
+
 **ES** — **Clearhold** es un agente de cuentas por pagar para el reto **Blinka** (30X Hackathon). Recibe facturas por PDF, imagen, correo o chat, extrae beneficiario, monto, moneda y vencimiento, y decide **pagar / frenar / escalar** con reglas configurables, registro explicable y tablero. El modelo nunca autoriza un pago: las reglas duras viven en código y la duda se escala.
 
 **EN** — **Clearhold** is an accounts-payable agent for the **Blinka** challenge (30X Hackathon). Ingests invoices from PDF, image, email or chat, extracts payee, amount, currency and due date, and decides **pay / hold / escalate** under configurable rules, with an explainable log and a dashboard. The model never authorizes a payment: hard rules live in code; uncertainty (p 0.2–0.8) or any error escalates. Output is a standard **ISO 20022 pain.001** file — no money moves.
