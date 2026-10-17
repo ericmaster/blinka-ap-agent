@@ -62,3 +62,17 @@ test("pain.001 output only for pay decisions", { timeout: 300000 }, async () => 
   assert.match(xml, /<NbOfTxs>12<\/NbOfTxs>/);
   assert.ok(!xml.includes("MX-FAKE-9999") && !xml.includes("Bogot"));
 });
+
+import { metrics, expected } from "../src/metrics.mjs";
+test("honest KPIs: correct autonomy, wrongly held valid, escalation rate, timing and cost", () => {
+  const t = { a: { tags: ["valid"] }, b: { tags: ["valid"] }, c: { tags: ["trap:account-changed"] }, d: { tags: ["needs-approval"] }, e: { tags: ["trap:ambiguous-currency"] } };
+  const ag = (id, action, ms, model = true) => ({ id, action, ms, model: model ? {} : null, history: [{ by: "agent", action, at: "2026-10-17T10:00:00Z" }] });
+  const log = [ag("a", "pay", 100), ag("b", "hold", 200), ag("c", "hold", 300, false), ag("d", "escalate", 400), { ...ag("e", "escalate", 500), action: "pay", history: [{ by: "agent", action: "escalate", at: "2026-10-17T10:00:00Z" }, { by: "x", action: "pay", at: "2026-10-17T10:30:00Z" }] }];
+  const m = metrics(log, (e) => t[e.id]);
+  assert.equal(expected(t.d), "escalate"); assert.equal(expected(t.e), "escalate"); assert.equal(expected(t.c), "hold");
+  assert.equal(m.correctAutonomy, 2 / 5, "a (pay) and c (hold) are correct; b wrongly held; escalations are not autonomy");
+  assert.equal(m.wronglyHeldValid, 1); assert.equal(m.validCount, 2);
+  assert.equal(m.escalationRate, 2 / 5, "agent's decision counts, not the human's");
+  assert.equal(m.agentMsP50, 300); assert.equal(m.humanMinutesP50, 30);
+  assert.ok(m.costPerInvoiceUsd > 0 && m.costPerInvoiceUsd < 0.01);
+});
