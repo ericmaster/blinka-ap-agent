@@ -15,14 +15,17 @@ export function parseNumber(raw) {
   const lc = s.lastIndexOf(","), ld = s.lastIndexOf(".");
   let dec = null;
   if (lc >= 0 && ld >= 0) dec = lc > ld ? "," : ".";
-  else if (lc >= 0 || ld >= 0) { const sep = lc >= 0 ? "," : "."; const parts = s.split(sep); if (parts.length === 2 && parts[1].length === 2) dec = sep; }
+  else if (lc >= 0 || ld >= 0) { const sep = lc >= 0 ? "," : "."; const parts = s.split(sep); if (parts.length === 2 && parts[1].length === 2) dec = sep;
+    else if (parts.slice(1).some((x) => x.length !== 3)) return null; } // e.g. "1.5" or "1,5": ambiguous -> null (escalates)
+  else if (lc < 0 && ld < 0) {}
+  if (dec) { const th = dec === "," ? "." : ","; if (s.split(dec)[0].split(th).slice(1).some((x) => x.length !== 3)) return null; }
   const clean = dec ? s.replace(new RegExp(`\\${dec === "," ? "." : ","}`, "g"), "").replace(dec, ".") : s.replace(/[.,]/g, "");
   const n = Number(clean);
   return Number.isFinite(n) ? n : null;
 }
 const AMT = String.raw`(\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{2})?|\d+(?:[.,]\d{2})?)`;
 const CUR = String.raw`(R\$|US\$|MX\$|S\/|\$|${CODES.join("|")})`;
-const AMOUNT_RE = new RegExp(String.raw`${CUR}\s?${AMT}(?!\d)|${AMT}\s?(${CODES.join("|")})\b`, "g");
+const AMOUNT_RE = new RegExp(String.raw`${CUR}\s?${AMT}(?![\d]|[.,]\d)|${AMT}\s?(${CODES.join("|")})\b`, "g");
 
 export function findAmount(text) {
   // Prefer amounts on a line/segment introduced by a total keyword.

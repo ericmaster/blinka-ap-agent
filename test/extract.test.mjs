@@ -26,3 +26,15 @@ test("curated set: every field extracted from email, chat, PDF and image (OCR)",
   }
   assert.deepEqual(wrong, []);
 });
+
+import { nnum, fold, fingerprint } from "../src/engine/decide.mjs";
+test("amounts: ambiguous decimals are null (escalate), clear formats parse", () => {
+  for (const s of ["1.5", "1,5", "12.34.5", "1.44.000"]) assert.equal(parseNumber(s), null, s);
+  assert.equal(parseNumber("1.440.000"), 1440000); assert.equal(parseNumber("2,400.00"), 2400); assert.equal(parseNumber("1.440,50"), 1440.5);
+});
+test("unicode: NFKC + homoglyph folding for invoice numbers and fingerprints", () => {
+  assert.equal(nnum("ＡＤ－１０４４"), nnum("AD-1044")); assert.equal(nnum("АD-1О44"), nnum("AD-1044")); // Cyrillic А, О
+  const x = { vendorKey: "a", items: [{ description: "Desarrollo", qty: 1, unitPrice: 1 }], amount: 1, currency: "USD", date: "2026-10-01", number: "AD-1", acct: "X" };
+  assert.equal(fingerprint({ ...x, items: [{ description: "Dеsаrrollo", qty: 1, unitPrice: 1 }], number: "АD-1" }), fingerprint(x));
+  assert.equal(fold("Ｓａｍｐａ"), "Sampa");
+});

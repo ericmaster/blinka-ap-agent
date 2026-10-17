@@ -30,7 +30,7 @@ export async function extract(doc) {
     else text = new TextDecoder().decode(buf);
   }
   const fields = extractText(text);
-  return { ...fields, channel: doc.kind, ocrConfidence, lang: detectLang(text) };
+  return { ...fields, channel: doc.kind, ocrConfidence, clientOcr: !!doc.clientOcr, lang: detectLang(text) };
 }
 
 const STOP = { es: ["factura", "proveedor", "vence", "cuenta", "horas", "hola", "concepto", "de la", "por"], en: ["invoice", "vendor", "due", "account", "hours", "the", "hi", "for", "total due"],

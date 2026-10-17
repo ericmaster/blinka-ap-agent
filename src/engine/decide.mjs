@@ -5,8 +5,11 @@ export const registry = (rules) => rules?.vendors ?? VENDORS;
 
 export const newLedger = () => ({ seen: HISTORY.map((h) => ({ ...h, paid: true })), spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} });
 // Duplicate fingerprint (FNV-1a, runtime-agnostic): items + vendor + total + currency + date + number + account.
+// Unicode NFKC + homoglyph folding (Cyrillic/Greek lookalikes -> Latin) so lookalike text cannot dodge duplicate checks.
+const CONF = Object.fromEntries([..."аАвВеЕкКмМнНоОрРсСтТхХуУіІѕјԁɡοΟαΑβΒεΕιΙκΚμΜνΝρΡτΤχΧυΥ"].map((c, i, a) => [c, "aABBeEkKMMHHoOpPcCTTxXyYiIsjdgoOaABBeEiIkKMMvNpPTTxXuY"[i]]));
+export const fold = (s) => (s ?? "").normalize("NFKC").replace(/[\u0370-\u04ff\u0500-\u052f\u0261]/g, (c) => CONF[c] ?? c);
 const fnv = (str) => { let h = 0x811c9dc5; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); };
-const normItems = (items = []) => items.map((i) => [i.description.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), i.qty, i.unitPrice].join("|")).join(";");
+const normItems = (items = []) => items.map((i) => [fold(i.description).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), i.qty, i.unitPrice].join("|")).join(";");
 export const itemsKey = (x) => fnv([x.vendorKey, normItems(x.items), x.amount, x.currency].join("#"));
 export const fingerprint = (x) => fnv([itemsKey(x), x.date, nnum(x.number), x.acct].join("#"));
 const kwNorm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -29,7 +32,7 @@ export function agreementCheck(x, ledger, rules) {
   if (used + units > a.max_units_per_period) return { fail: `Would exceed the ${a.max_units_per_period} contracted hours this period (already paid ${used}, this invoice ${Math.round(units)}).` };
   return { units: Math.round(units) };
 }
-const nnum = (s) => (s ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+export const nnum = (s) => fold(s).toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/O/g, "0").replace(/[IL]/g, "1");
 export const toUsd = (amt, cur, rules) => (rules.fx_to_usd[cur] != null ? amt * rules.fx_to_usd[cur] : null);
 
 export function questionsFor(x, ledger, rules) {
@@ -49,6 +52,8 @@ const fmt = (n) => n.toLocaleString("en-US", { maximumFractionDigits: 2 });
 export function hardChecks(x, ledger, rules) {
   const hold = [], esc = [];
   const v = x.vendorKey ? registry(rules)[x.vendorKey] : null;
+  if (x.vendorKey && rules.pendingChanges?.[x.vendorKey]) hold.push(`A bank account or terms change for ${v?.name ?? x.vendorKey} is waiting for a second approver; payments to this vendor are held.`);
+  if (x.clientOcr) esc.push("Image was read in the browser, so a person must confirm the fields.");
   if (x.injectionSuspected) hold.push("Invoice contains instructions addressed to the agent (possible prompt injection); ignored and held.");
   for (const [k, label] of [["payee", "vendor"], ["amount", "amount"], ["currency", "currency"], ["due", "due date"], ["number", "invoice number"], ["acct", "bank account"]])
     if (x[k] == null) esc.push(`Could not read with confidence: ${label}.`);
@@ -126,13 +131,17 @@ function book(x, ledger, rules) {
 
 /** Human approval of an escalated invoice. Hard rules are re-checked against the ledger as it is now;
  *  a human can resolve doubt or the approval threshold, never override a hard hold or pay an unknown payee. */
-export function approve(entry, ledger, rules) {
+export const DUP_RE = /duplicate|resend/i;
+export function approve(entry, ledger, rules, { override = null } = {}) {
   const x = { ...entry.extracted, id: entry.id };
   if (entry.action !== "escalate") return { ok: false, reason: "Only pending invoices can be approved." };
   if (!x.vendorKey) return { ok: false, reason: "Vendor not in registry: add it to the vendor registry before approving." };
   if (x.amount == null || !x.currency || !x.due || !x.number || !x.acct) return { ok: false, reason: "Invoice data is missing; cannot approve." };
-  const { hold } = hardChecks(x, { ...ledger, seen: ledger.seen.filter((h) => h.entryId !== entry.id) }, rules);
+  const { hold, esc } = hardChecks(x, { ...ledger, seen: ledger.seen.filter((h) => h.entryId !== entry.id) }, rules);
   if (hold.length) return { ok: false, reason: hold.join(" ") };
+  const dup = [...new Set([...esc, ...(entry.reasons ?? [])].filter((r) => DUP_RE.test(r)))];
+  if (dup.length && !(typeof override === "string" && override.trim().length >= 5))
+    return { ok: false, needsOverride: true, reason: `Still flagged as a possible duplicate: ${dup.join(" ")} To pay anyway, give an override reason (it is logged).` };
   const s = ledger.seen.find((h) => h.entryId === entry.id); if (s) s.paid = true;
   book(x, ledger, rules);
   return { ok: true };
