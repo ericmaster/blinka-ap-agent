@@ -1,5 +1,7 @@
 # Blinka · bench de modelos de decisión
 
+> Bench histórico de selección de modelo (dataset anterior). El producto usa el dataset Northwind LatAm de `docs/DATASET.md`.
+
 Datos 100% ficticios: 30 facturas de *Panadería Andina SAS*, 8 proveedores con acuerdos, reglas en `data.py`.
 Verdad: 14 pay / 13 hold / 3 escalate. Trampas: 3 duplicados difusos + 1 exacto, 2 proveedores nuevos, 1 cuenta bancaria cambiada, 5 que no cumplen el acuerdo, 1 sobre el límite por pago, topes por proveedor y presupuesto.
 El código aplica las reglas duras (límites, sumas, presupuesto, beneficiarios, cuentas, duplicado exacto). Los modelos sólo responden 2 preguntas noul por factura (`is_duplicate`, `matches_agreement`). Un modelo nunca puede autorizar un pago que las reglas bloquean; con p entre 0.2 y 0.8 la factura se escala.

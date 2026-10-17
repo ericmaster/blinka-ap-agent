@@ -54,7 +54,7 @@ Canales (correo · WhatsApp · PDF · imagen · chat)
   → Registro explicable + tablero + notificaciones
   → Salida ISO 20022 pain.001 (XML) — sin mover dinero
 ```
-Sistemas externos solo vía `src/ports/*` (adapter real + fake con `ADAPTER_MODE`). Claves (`FASTINO_API_KEY`, `JEV_API_KEY`) solo por variables de entorno; nunca en el repo.
+Sistemas externos vía adaptadores: modelos en `src/adapters/index.mjs` (`fromEnv`: GLiDE → JEV; `reckless`/`oracle` para tests) y correo/WhatsApp vía conectores (`docs/CONNECTORS.md`). Claves (`FASTINO_API_KEY`, `JEV_API_KEY`) solo por variables de entorno; nunca en el repo.
 
 ## 9. Real vs simulado
 | Componente | Demo |
