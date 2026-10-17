@@ -33,6 +33,7 @@ Full table, verified against the code (EN/ES): [`docs/REAL-VS-SIMULATED.md`](doc
 
 ## Arquitectura / Architecture
 Reglas deterministas → GLiDE (Fastino, principal) → JEV (respaldo) → pagar · frenar · escalar → log + tablero → pain.001. Detalle: [`docs/SPEC.md`](docs/SPEC.md).
+The app's **Architecture / Arquitectura** link opens `/architecture` (also `/architecture/`): an inline SVG of the real pipeline, with Real/Simulated labels and the shared EN/ES toggle. Served by the Worker, not the docs asset directory.
 
 ## Uso / Usage
 ```bash
@@ -47,6 +48,8 @@ Reglas configurables: [`config/rules.json`](config/rules.json). Extracción: [`d
 npm ci && npm run build && npm start      # http://localhost:8796  (FASTINO_API_KEY / JEV_API_KEY optional; without them every invoice escalates)
 ```
 English UI. Sign in with email + one-time code (DEMO MODE shows the code on screen). Mock email inbox and WhatsApp chat are the primary feed ("Process new"), plus manual upload; each queue entry links to its source message. Details: NER-style schema with evidence span + confidence per field, rules applied, decision log with who/when, original PDF/image view + download, translation toggle (Workers AI m2m100 when deployed; otherwise the original with a note).
+
+**Reset my demo** clears transient UI state too: run the guided demo, process the inbox or upload the same file again without reloading. Browser regression (Chrome + externally installed `puppeteer-core`, no new project dependencies): `npm run build`, `node scripts/serve.mjs 8800`, then `PUPPETEER_DIR=/workspace/scratch/e2e node test/e2e/reset.e2e.mjs http://localhost:8800`.
 
 Pendientes / pagadas / frenadas con el porqué, aprobar o rechazar (la aprobación vuelve a verificar las reglas duras), reglas editables, carga de correo/chat/PDF/imagen (OCR en el navegador), prueba de estrés con Autonomía · Pagos indebidos · Explicabilidad, descarga pain.001.
 Cloudflare Workers: `wrangler.toml` (KV `STATE`), `npx wrangler secret put FASTINO_API_KEY`, `npx wrangler deploy`.

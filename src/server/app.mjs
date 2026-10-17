@@ -26,6 +26,7 @@ export function kpis(st) {
     ...metrics(st.log, (e) => MANIFEST.find((m) => m.id === /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1]) ?? null) };
 }
 import { UI } from "./ui.mjs";
+import { ARCHITECTURE } from "./architecture.mjs";
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -93,6 +94,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
     const url = new URL(req.url), p = url.pathname, m = req.method; let mm;
     try {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
+      if (m === "GET" && (p === "/architecture" || p === "/architecture/")) return new Response(ARCHITECTURE, { headers: { "content-type": "text/html; charset=utf-8" } });
       // ---- auth: email + one-time code. DEMO MODE returns the code in the response (no email is sent).
       if (m === "POST" && p === "/api/auth/start") {
         const { email } = await req.json(), st = await loadA();
