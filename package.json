@@ -10,7 +10,7 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "start": "node scripts/serve.mjs",
-    "build": "node scripts/build-ui.mjs",
+    "build": "node scripts/build-ui.mjs && node scripts/build-mock-ui.mjs",
     "bundle": "esbuild src/worker.mjs --bundle --format=esm --platform=browser --conditions=worker,browser --external:node:* --external:tesseract.js --minify --outfile=dist/worker.mjs",
     "deploy": "wrangler deploy"
   },
