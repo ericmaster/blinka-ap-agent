@@ -20,6 +20,7 @@ test("curated: zero improper payments, every trap stopped with a reason", { time
   assert.match(byId.C16.reason, /does not match the registered/);
   for (const [id, a] of Object.entries(want)) assert.equal(byId[id].action, a, `${id}: ${byId[id].reason}`);
   for (const l of log) assert.ok(l.reason.length > 10, `${l.id} has a plain-language reason`);
+  for (const l of log.filter((x) => x.action === "pay")) assert.deepEqual(l.checks.filter((c) => !c.ok), [], `${l.id}: paid invoices show every rule passed`);
 });
 
 for (const seed of [2, 3, 4, 5, 6]) test(`stress seed ${seed} (60 random noisy invoices): zero improper payments`, async () => {
