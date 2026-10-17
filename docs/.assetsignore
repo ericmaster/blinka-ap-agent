@@ -1,0 +1,6 @@
+# Workers static assets: only the public pitch files under docs/pitch/ are uploaded (served at /pitch/).
+/*
+!/pitch/
+/pitch/build/
+/pitch/README.md
+/pitch/demo-narration.md

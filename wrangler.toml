@@ -11,3 +11,9 @@ id = "35536029a2244107bfdb69254a64f871"
 
 [ai]
 binding = "AI"
+
+# Static pitch deck at /pitch/ (index.html + demo video, PPTX, PDF). Only docs/pitch/ files listed in docs/.assetsignore are uploaded.
+[assets]
+directory = "./docs"
+html_handling = "auto-trailing-slash"
+not_found_handling = "none"
