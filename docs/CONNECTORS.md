@@ -19,6 +19,6 @@ Email and WhatsApp are modeled as **external services** with their own UI and AP
 Clearhold **polls** with `POST /api/sync` on load, every 10 s, and before "Process new". Each new message gets added to the queue tagged with its `channel`.
 "Source message ↗" opens `ui(id)`.
 
-By default both services run in the same Worker (in-process). Set `MAIL_API_URL` / `CHAT_API_URL` to point the connectors at remote services over HTTP.
+By default both services run in the same Worker (in-process), one instance per demo workspace (company domain, or the full address for public mail domains), and their API requires a signed-in Clearhold session. Set `MAIL_API_URL` / `CHAT_API_URL` to point the connectors at remote services over HTTP.
 
 Webhooks (the service POSTs to Clearhold) are on the backlog. Polling keeps the contract stateless and demo-safe.

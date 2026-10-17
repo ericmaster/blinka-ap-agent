@@ -27,8 +27,7 @@ const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const rand = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b) => b.toString(16).padStart(2, "0")).join("");
 const channels = () => ({ emails: [], chats: [] }); // filled by /api/sync from the connectors
-const fresh = (prev = {}) => ({ rules: prev.rules ?? structuredClone(defaultRules), ledger: newLedger(), log: [], seq: 0, channels: channels(), uploads: [],
-  users: prev.users ?? {}, sessions: prev.sessions ?? {}, otps: {}, audit: prev.audit ?? [] });
+const fresh = () => ({ rules: structuredClone(defaultRules), ledger: newLedger(), log: [], seq: 0, channels: channels(), uploads: [], audit: [] });
 const noModel = { name: "no model configured", async ask() { return { error: "model not configured" }; } };
 const MAX_UPLOAD = 4 * 1024 * 1024;
 const SESSION_TTL = 7 * 864e5, OTP_MAX_PER_10MIN = 5;
@@ -48,7 +47,10 @@ export function validateRules(r) {
 const withAllow = (rules, x) => (x.vendorKey && !(rules.allowlist ?? Object.keys(registry(rules))).includes(x.vendorKey) ? { ...x, vendorKey: null } : x);
 const cookie = (req) => Object.fromEntries((req.headers.get("cookie") ?? "").split(/;\s*/).filter(Boolean).map((c) => { const i = c.indexOf("="); return [c.slice(0, i), c.slice(i + 1)]; }));
 
-export function createApp({ store, env = {}, connectors = {} }) {
+export function createApp({ store, auth, env = {}, connectors = {}, resetMocks = async () => {} }) {
+  // Auth (users, sessions, one-time codes) is one shared record; everything else is per workspace (store).
+  const loadA = async () => { const a = (await auth.load()) ?? {}; a.users ??= {}; a.sessions ??= {}; a.otps ??= {}; a.otpLog ??= {}; return a; };
+  const saveA = async (a) => { const cur = await auth.load(); if ((cur?.v ?? 0) !== (a.v ?? 0)) throw new Conflict("auth changed"); a.v = (a.v ?? 0) + 1; await auth.save(a); };
   const demo = env.DEMO_MODE !== "false";
   const adapter = () => fromEnv(env) ?? noModel;
   // Optimistic concurrency: every save checks the stored version; a conflicting request is re-run from fresh state
@@ -72,7 +74,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
     st.log.push(e); return e;
   }
 
-  const userOf = async (req) => { const st = await load(), s = st.sessions[cookie(req).sid]; return s && Date.now() - s.at < SESSION_TTL ? s.email : null; };
+  const userOf = async (req) => { const a = await loadA(), s = a.sessions[cookie(req).sid]; return s && Date.now() - s.at < SESSION_TTL ? s.email : null; };
   async function handle(req0) {
     const body = req0.method === "GET" || req0.method === "HEAD" ? null : await req0.arrayBuffer();
     const mk = () => new Request(req0.url, { method: req0.method, headers: req0.headers, body });
@@ -87,27 +89,28 @@ export function createApp({ store, env = {}, connectors = {} }) {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
       // ---- auth: email + one-time code. DEMO MODE returns the code in the response (no email is sent).
       if (m === "POST" && p === "/api/auth/start") {
-        const { email } = await req.json(), st = await load();
+        const { email } = await req.json(), st = await loadA();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email ?? "")) return json({ error: "Enter a valid email" }, 400);
         const ek = email.toLowerCase(), now = Date.now(); st.otpLog[ek] = (st.otpLog[ek] ?? []).filter((t) => now - t < 10 * 60000);
         if (st.otpLog[ek].length >= OTP_MAX_PER_10MIN) return json({ error: "Too many codes requested. Try again in 10 minutes." }, 429);
         st.otpLog[ek].push(now);
         const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1e6).padStart(6, "0");
-        st.otps[email.toLowerCase()] = { code, exp: Date.now() + 10 * 60000, tries: 0 }; await save(st);
+        st.otps[email.toLowerCase()] = { code, exp: Date.now() + 10 * 60000, tries: 0 }; await saveA(st);
         return json(demo ? { sent: false, demo: true, code } : { sent: false, error: "Email delivery is not configured on this deployment." }, demo ? 200 : 503);
       }
       if (m === "POST" && p === "/api/auth/verify") {
-        const { email, code } = await req.json(), st = await load(), k = (email ?? "").toLowerCase(), o = st.otps[k];
+        const { email, code } = await req.json(), st = await loadA(), k = (email ?? "").toLowerCase(), o = st.otps[k];
         if (!o || o.exp < Date.now() || o.tries >= 5) return json({ error: "Code expired, request a new one" }, 401);
-        if (o.code !== String(code).trim()) { o.tries++; await save(st); return json({ error: "Wrong code" }, 401); }
+        if (o.code !== String(code).trim()) { o.tries++; await saveA(st); return json({ error: "Wrong code" }, 401); }
         delete st.otps[k]; st.users[k] ??= { email: k, createdAt: new Date().toISOString() }; // auto-register
-        const sid = rand(24); st.sessions[sid] = { email: k, at: Date.now() }; await save(st);
+        const sid = rand(24); st.sessions[sid] = { email: k, at: Date.now() }; await saveA(st);
         return json({ email: k }, 200, { "set-cookie": `sid=${sid}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800${url.protocol === "https:" ? "; Secure" : ""}` });
       }
-      if (m === "POST" && p === "/api/auth/logout") { const st = await load(), sid = cookie(req).sid; if (sid && st.sessions[sid]) { delete st.sessions[sid]; await save(st); } return json({ ok: true }, 200, { "set-cookie": "sid=; Path=/; Max-Age=0" }); }
+      if (m === "POST" && p === "/api/auth/logout") { const st = await loadA(), sid = cookie(req).sid; if (sid && st.sessions[sid]) { delete st.sessions[sid]; await saveA(st); } return json({ ok: true }, 200, { "set-cookie": "sid=; Path=/; Max-Age=0" }); }
       if (p.startsWith("/api/")) {
-        var st0 = await load(), ses = st0.sessions[cookie(req).sid], user = ses && Date.now() - ses.at < SESSION_TTL ? ses.email : null;
+        const A = await loadA(), ses = A.sessions[cookie(req).sid]; var user = ses && Date.now() - ses.at < SESSION_TTL ? ses.email : null;
         if (!user) return json({ error: "auth required" }, 401);
+        var st0 = await load();
       }
       const st = st0;
       if (m === "GET" && p === "/api/state") {
@@ -236,7 +239,9 @@ export function createApp({ store, env = {}, connectors = {} }) {
         const err = validateRules(r); if (err) return json({ error: err }, 400);
         st.rules = r; await save(st); return json(r);
       }
-      if (m === "POST" && p === "/api/reset") { const f = fresh(st); f.v = st.v; f.rules.pendingChanges = {}; await save(f); return json({ ok: true }); }
+      if (m === "POST" && p === "/api/reset") { // "Reset my demo": default rules and vendors, empty queue, mock inbox/chat back to the seed
+        const f = fresh(); f.v = st.v; f.rules.pendingChanges = {}; f.audit = [{ by: user, at: new Date().toISOString(), action: "reset demo", key: "-", name: "workspace", changes: {} }];
+        await save(f); await resetMocks(); return json({ ok: true }); }
       if (m === "GET" && p === "/api/pain001") {
         const pays = st.log.filter((l) => l.action === "pay").map((l) => ({ id: l.id, ...l.extracted }));
         return new Response(pain001(pays, { registry: st.rules.vendors, msgId: `NWR-${Date.now()}` }), { headers: { "content-type": "application/xml", "content-disposition": "attachment; filename=pain001.xml" } });

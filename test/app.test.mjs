@@ -94,8 +94,7 @@ test("vendors: bank/terms changes need a second approver; invoices held meanwhil
   assert.equal((await call("POST", "/api/vendors/andes-dev/change/approve")).status, 403, "proposer cannot approve own change");
   await login("ana@example.com");
   assert.equal((await call("POST", "/api/vendors/andes-dev/change/approve")).status, 200);
-  await call("POST", "/api/reset"); // fresh ledger, registry kept
-  const e1 = await J(await call("POST", "/api/upload", { filename: "a.txt", type: "text/plain", text }));
+  const e1 = await J(await call("POST", "/api/upload", { filename: "a.txt", type: "text/plain", text: readFileSync("data/curated/C18.email.txt", "utf8") }));
   assert.equal(e1.action, "hold"); assert.match(e1.reason, /10 contracted hours/);
   // bank account change: pending until approved, then mismatching invoices are held
   assert.equal((await call("PUT", "/api/vendors/maria-qa", { acct: "CO-FAKE-0001" })).status, 202);
@@ -161,8 +160,29 @@ test("concurrency: overlapping writes never lose an update", async () => {
 });
 
 test("migration: older partial vendor records are filled from defaults instead of crashing extraction", async () => {
-  const mem = new Map([["state", { rules: { ...JSON.parse(readFileSync("config/rules.json", "utf8")), vendors: { "lima-support": { acct: "PE-FAKE-4004", category: "soporte", keywords: ["soporte"] } } }, ledger: { seen: [], spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} }, log: [], seq: 0, users: {}, sessions: { s1: { email: "e@x.co", at: Date.now() } }, otps: {}, audit: [] }]]);
+  const mem = new Map([["auth", { sessions: { s1: { email: "e@x.co", at: Date.now() } } }], ["ws:x.co:state", { rules: { ...JSON.parse(readFileSync("config/rules.json", "utf8")), vendors: { "lima-support": { acct: "PE-FAKE-4004", category: "soporte", keywords: ["soporte"] } } }, ledger: { seen: [], spentUsd: 0, vendorPaidUsd: {}, unitsPaid: {} }, log: [], seq: 0, audit: [] }]]);
   const app = createHost({ kv: { get: async (k) => structuredClone(mem.get(k) ?? null), put: async (k, v) => mem.set(k, structuredClone(v)), getBlob: async () => null, putBlob: async () => {} } });
   const r = await app(new Request("http://x/api/upload", { method: "POST", headers: { "content-type": "application/json", cookie: "sid=s1" }, body: JSON.stringify({ filename: "a.txt", type: "text/plain", text: readFileSync("data/curated/C13.email.txt", "utf8") }) }));
   const e = await r.json(); assert.equal(r.status, 200); assert.doesNotMatch(e.reason, /Could not read the document/);
+});
+
+test("demo sandbox: each workspace has its own queue and mock inbox; colleagues share; Reset my demo restores the seed", async () => {
+  const { call, login } = mk();
+  await login("judge1@gmail.com"); assert.equal((await J(await call("POST", "/api/sync"))).added, 29);
+  await call("POST", "/mail/api/messages", { from: "x@v.example", subject: "Invoice", body: "Total due: USD 10.00" });
+  await J(await call("POST", "/api/sync")); const st1 = await J(await call("GET", "/api/state"));
+  await call("POST", "/api/process", { messageId: "m-C02" });
+  assert.equal(st1.channels.emails.length, 20);
+  await call("PUT", "/api/rules", { max_per_payment_usd: 4000 });
+  await login("judge2@gmail.com"); assert.equal((await J(await call("POST", "/api/sync"))).added, 29, "other public-domain user starts clean");
+  assert.equal((await J(await call("GET", "/api/state"))).log.length, 0);
+  assert.equal((await J(await call("GET", "/mail/api/messages"))).messages.length, 19);
+  await login("ana@acme.example"); await call("POST", "/api/sync"); await call("POST", "/api/process", { messageId: "m-C02" });
+  await login("luis@acme.example"); assert.equal((await J(await call("GET", "/api/state"))).log.length, 1, "same company domain shares a workspace");
+  await login("judge1@gmail.com");
+  assert.equal((await J(await call("POST", "/api/reset"))).ok, true);
+  const st = await J(await call("GET", "/api/state"));
+  assert.equal(st.log.length, 0); assert.equal(st.channels.emails.length, 0); assert.equal(st.rules.max_per_payment_usd, 5000);
+  assert.equal((await J(await call("GET", "/mail/api/messages"))).messages.length, 19, "mock inbox back to the seed");
+  assert.equal((await J(await call("POST", "/api/sync"))).added, 29);
 });
