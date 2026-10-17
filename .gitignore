@@ -14,3 +14,4 @@ coverage/
 docs/private/
 out/
 .wrangler/
+!docs/pitch/build/
