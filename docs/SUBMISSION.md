@@ -5,8 +5,8 @@
 - **Repo:** https://github.com/ericmaster/blinka-ap-agent
 - **Demo:** https://blinka-ap-agent.ericmaster.workers.dev
 - **Presentación (HTML):** https://blinka-ap-agent.ericmaster.workers.dev/pitch/ · PPTX y PDF en `docs/pitch/`
-- **Video del pitch (2:54):** _pendiente: Eric sube `docs/pitch/clearhold-pitch-3min.mp4` a YouTube (no listado) o Drive y pega el enlace aquí_ · copia servida: https://blinka-ap-agent.ericmaster.workers.dev/pitch/clearhold-pitch-3min.mp4
-- **Demo narrado (75 s):** https://blinka-ap-agent.ericmaster.workers.dev/pitch/demo-narrated.mp4
+- **Video del pitch (2:41):** _pendiente: Eric sube `docs/pitch/clearhold-pitch-3min.mp4` a YouTube (no listado) o Drive y pega el enlace aquí_ · copia servida: https://blinka-ap-agent.ericmaster.workers.dev/pitch/clearhold-pitch-3min.mp4
+- **Demo narrado (70 s):** https://blinka-ap-agent.ericmaster.workers.dev/pitch/demo-narrated.mp4
 - **Largo de la descripción:** **4568 caracteres** (límite 5000; contado con `python3 -c "print(len(open('desc.txt').read().strip()))"` sobre el bloque de abajo, con espacios y saltos de línea).
 
 Antes de pegar:

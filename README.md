@@ -11,8 +11,8 @@ Equipo / Team: Nimble · 30X Hackathon, reto Blinka.
 | Live demo | https://blinka-ap-agent.ericmaster.workers.dev (any email; demo mode shows the code) |
 | 2-minute guide (EN/ES) | [`docs/JUDGE-GUIDE.md`](docs/JUDGE-GUIDE.md) |
 | Pitch deck (3:00, ES) | HTML: https://blinka-ap-agent.ericmaster.workers.dev/pitch/ ([`docs/pitch/index.html`](docs/pitch/index.html)) · PPTX: [`docs/pitch/clearhold-pitch.pptx`](docs/pitch/clearhold-pitch.pptx) · PDF: [`docs/pitch/clearhold-pitch.pdf`](docs/pitch/clearhold-pitch.pdf) |
-| Narrated demo video (75 s, ES) | [`docs/pitch/demo-narrated.mp4`](docs/pitch/demo-narrated.mp4) · [watch online](https://blinka-ap-agent.ericmaster.workers.dev/pitch/demo-narrated.mp4) · narration: [`docs/pitch/demo-narration.md`](docs/pitch/demo-narration.md) |
-| 3-minute pitch video (2:54, ES) | [`docs/pitch/clearhold-pitch-3min.mp4`](docs/pitch/clearhold-pitch-3min.mp4) · [watch online](https://blinka-ap-agent.ericmaster.workers.dev/pitch/clearhold-pitch-3min.mp4) · script: [`docs/pitch/pitch-narration.md`](docs/pitch/pitch-narration.md) · backup screen capture: [`docs/demo-backup.mp4`](docs/demo-backup.mp4) |
+| Narrated demo video (70 s, ES) | [`docs/pitch/demo-narrated.mp4`](docs/pitch/demo-narrated.mp4) · [watch online](https://blinka-ap-agent.ericmaster.workers.dev/pitch/demo-narrated.mp4) · narration: [`docs/pitch/demo-narration.md`](docs/pitch/demo-narration.md) |
+| 3-minute pitch video (2:41, ES) | [`docs/pitch/clearhold-pitch-3min.mp4`](docs/pitch/clearhold-pitch-3min.mp4) · [watch online](https://blinka-ap-agent.ericmaster.workers.dev/pitch/clearhold-pitch-3min.mp4) · script: [`docs/pitch/pitch-narration.md`](docs/pitch/pitch-narration.md) · backup screen capture: [`docs/demo-backup.mp4`](docs/demo-backup.mp4) |
 | Run locally | **Node ≥ 22** required: `npm ci && npm test && npm run build && npm start` |
 
 | Real | Simulated |

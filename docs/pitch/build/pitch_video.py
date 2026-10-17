@@ -13,7 +13,7 @@ Narration text: pitch-narration.json (slides) and demo-beats.json (demo beats). 
 """
 import argparse, hashlib, json, os, pathlib, re, subprocess, sys, urllib.request
 
-VOICE_ID = os.environ.get("VOICE_ID", "a508e76ec74e4b57ad77d907992a536e")  # Fish Audio voice ("Voz tik tok", male, Latin American Spanish)
+VOICE_ID = os.environ.get("VOICE_ID", "7033e0e6d35e404d81a100701ceca41b")  # Fish Audio voice (male, Latin American Spanish)
 MODEL = "s2.1-pro-free"
 TEMPO = 1.03            # light speed-up applied to Fish clips (same as the demo video)
 LEAD, TAIL, XF = 0.5, 0.6, 0.5   # seconds of silence before/after each slide's line, crossfade length

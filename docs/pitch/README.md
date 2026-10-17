@@ -7,8 +7,8 @@
 | `index.html` | Presentación en un solo archivo (CSS, JS e imágenes embebidas). El video se carga por ruta relativa: `demo-narrated.mp4`, en esta misma carpeta. |
 | `clearhold-pitch.pptx` | La misma presentación, con texto editable y notas del orador cronometradas en cada diapositiva. |
 | `clearhold-pitch.pdf` | Exportado del HTML. En la diapositiva del demo se ve el póster y la URL en vivo. |
-| `demo-narrated.mp4` | Video narrado del demo (75 s, 1920×1080). Narración y voz: `demo-narration.md`. |
-| `clearhold-pitch-3min.mp4` | Video del pitch de 3:00 (2:54): las diapositivas narradas, con el demo en la diapositiva 3. Guion y voz: `pitch-narration.md`. |
+| `demo-narrated.mp4` | Video narrado del demo (70 s, 1920×1080, UI de la app en español). Narración y voz: `demo-narration.md`. |
+| `clearhold-pitch-3min.mp4` | Video del pitch de 3:00 (2:41): las diapositivas narradas, con el demo en la diapositiva 3. Guion y voz: `pitch-narration.md`. |
 | `build/` | Fuentes para volver a generar todo (ver abajo). |
 
 ## Presentar (HTML)
@@ -41,10 +41,9 @@ Abrir `index.html` en Chrome o Edge. Se ve bien a 1920×1080 y en laptop: la dia
 - Hechos de Blinka: blinka.co, según `../PITCH.md` §5 · Piloto: `../RUNBOOK-PRODUCTION.md` §3
 - Real vs simulado: `../REAL-VS-SIMULATED.md`
 
-## Pendiente: volver a generar el video del pitch
-El 17 oct 2026 cambió el texto de la narración (diapositivas 1, 2, 4 y 7 en `build/pitch-narration.json` y `pitch-narration.md`): Laura con un dolor concreto, «detiene lo sospechoso» en vez de «frena lo raro» y «gobernanza por diseño» en vez de «el modelo solo puede frenar». **`clearhold-pitch-3min.mp4` todavía tiene la narración y las diapositivas anteriores**; hay que volver a generarlo (con la voz de Eric o con Fish). Las tomas nuevas suman unos 3–4 s con Fish, así que puede acercarse al tope de 2:58. `demo-narrated.mp4` no cambió: su voz y sus subtítulos fijos todavía dicen «frenada» y «el modelo solo puede frenar, nunca pagar» (`demo-narration.md`, `build/demo-beats.json`).
-
 ## Volver a generar
+Voz de Fish Audio (pitch y demo, desde el 17 oct 2026): modelo `s2.1-pro-free`, `reference_id` **`7033e0e6d35e404d81a100701ceca41b`** (reemplaza a `a508e76ec74e4b57ad77d907992a536e`). Es el valor por defecto de `VOICE_ID` en `build/pitch_video.py`.
+
 Necesita Python 3, Node con `pptxgenjs` y Google Chrome.
 ```bash
 cd docs/pitch/build
@@ -66,13 +65,13 @@ El texto y las notas viven en `build/template.html`. `deck.cjs` toma las notas d
 
 | Archivo | Qué es | Duración de referencia (Fish) |
 |---|---|---|
-| `1.wav` | Portada y dolor | 23,0 s |
-| `2.wav` | Gobernanza por diseño | 15,5 s |
-| `4.wav` | Real vs simulado | 13,0 s |
-| `5.wav` | Costo e impacto | 20,9 s |
-| `6.wav` | Por qué Blinka | 13,3 s |
-| `7.wav` | Cierre | 7,6 s |
-| `demo-1.wav` … `demo-7.wav` | Los 7 bloques del demo (opcional) | 6,5 · 17,5 · 10,4 · 7,8 · 9,1 · 9,6 · 7,1 s |
+| `1.wav` | Portada y dolor | 24,7 s |
+| `2.wav` | Gobernanza por diseño | 13,2 s |
+| `4.wav` | Real vs simulado | 10,4 s |
+| `5.wav` | Costo e impacto | 18,6 s |
+| `6.wav` | Por qué Blinka | 11,0 s |
+| `7.wav` | Cierre | 7,4 s |
+| `demo-1.wav` … `demo-7.wav` | Los 7 bloques del demo (opcional) | 5,9 · 15,3 · 9,4 · 6,8 · 8,3 · 11,6 · 6,3 s |
 
 ```bash
 cd docs/pitch/build
@@ -89,7 +88,7 @@ python3 pitch_video.py --track ~/eric-pitch.wav --timing ~/etiquetas.txt
 - Cada diapositiva dura 0,5 s + la toma + 0,6 s, con fundidos de 0,5 s entre una y otra.
 - En el demo, cada bloque arranca donde arrancaba la voz de Fish. Si la toma es más larga que su ventana (`build/demo-beats.json`), el video se congela en el último cuadro de ese bloque lo que haga falta. Si es más corta, queda un silencio. Un bloque del demo sin toma conserva la voz de Fish, así que conviene grabar los 7 para que haya una sola voz. Los subtítulos del demo son fijos: si Eric cambia una frase, la idea debe seguir coincidiendo.
 - El recuadro «0 pagos indebidos» de la diapositiva 5 aparece al 52 % de la toma. Para ajustarlo, se agrega una etiqueta puntual `emphasis-5` con los segundos desde que empieza a hablar en esa toma, o la clave `"emphasis-5": 11.0` en el JSON. Con `--voice-dir`, esa marca se pasa en un `--timing` aparte.
-- El script se detiene si el video pasa de 2:58 y dice cuántos segundos sobran. Hoy, con Fish, el video dura 2:53,6, así que el margen es de unos 4 s. Si sobra, hay tres opciones: grabar de nuevo la toma más larga, acelerar las tomas propias con `--own-tempo 1.04` (sin cambiar el tono) o, como último recurso, usar `--max-len 180`.
+- El script se detiene si el video pasa de 2:58 y dice cuántos segundos sobran. Hoy, con Fish, el video dura 2:41,0, así que el margen es de unos 17 s. Si sobra, hay tres opciones: grabar de nuevo la toma más larga, acelerar las tomas propias con `--own-tempo 1.04` (sin cambiar el tono) o, como último recurso, usar `--max-len 180`.
 - Si falta alguna diapositiva, el script falla, a menos que se pase `--fish-fallback`.
 
 **Cómo entregarlo:** la carpeta con los archivos (opción A) o el WAV + las etiquetas (opción B), por Drive o por correo. Con eso se corre el comando, se revisa y se publica igual que ahora.
