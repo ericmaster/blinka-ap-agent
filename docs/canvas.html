@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nimble · Reto Blinka · 30X</title>
+<title>Clearhold · Nimble · Reto Blinka · 30X</title>
 <style>
 :root{--ink:#14181f;--mut:#5b6472;--line:#e3e6eb;--bg:#fafbfc;--acc:#2b5cff;--ok:#12805c;--hold:#b54708;--esc:#6941c6;--bad:#c01048}
 *{box-sizing:border-box}
@@ -48,7 +48,7 @@ svg text{font-family:system-ui,sans-serif}
 </head>
 <body>
 <header>
-  <h1>Nimble · Reto Blinka</h1>
+  <h1>Clearhold <small style="font-weight:500;color:#656975">by Blinka</small> · Nimble · Reto Blinka</h1>
   <p class="sub">30X Hackathon · Eric Aguayo · entrega dom 18 oct, 11:59 ECT</p>
   <nav id="nav">
     <button data-t="vp">Propuesta de valor</button>
@@ -259,7 +259,7 @@ document.getElementById('rst').onclick=()=>{if(!confirm('¿Volver al texto origi
 document.getElementById('exp').onclick=()=>{
   const order=["Problema","Segmentos de clientes","Propuesta única de valor","Solución","Canales","Flujo de ingresos (valor para Blinka y sus clientes)","Estructura de costos","Métricas clave","Ventaja injusta"];
   const by={};cells.forEach(c=>by[c.dataset.k]=c.innerText.trim());
-  const md='# Lean Canvas · Nimble · Reto Blinka\n\n'+order.map(k=>'## '+k+'\n\n'+by[k]+'\n').join('\n');
+  const md='# Lean Canvas · Clearhold · Nimble · Reto Blinka\n\n'+order.map(k=>'## '+k+'\n\n'+by[k]+'\n').join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='lean-canvas-nimble.md';a.click();
   if(navigator.clipboard)navigator.clipboard.writeText(md).catch(()=>{});st.textContent='Exportado';
 };

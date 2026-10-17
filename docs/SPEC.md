@@ -1,4 +1,6 @@
-# Nimble · Agente de cuentas por pagar para Blinka — especificación
+# Clearhold (by Blinka) · agente de cuentas por pagar — especificación
+
+Equipo: Nimble.
 
 > Fuentes: reto Blinka (30X Hackathon), `docs/PROPUESTA.md`, `bench/RESULTS.md`. Actualizado vie 16 oct 2026.
 
@@ -6,7 +8,7 @@
 B2B · Data/IA. Usuario: equipo de finanzas (CFO, controller, cuentas por pagar). Decisor: cliente de Blinka. KPI: autonomía con **0 pagos indebidos**.
 
 ## 1. Resumen
-Agente que recibe facturas por PDF, imagen, correo o chat, extrae **beneficiario, monto, moneda y fecha de vencimiento**, y decide **pagar / frenar / escalar** según reglas configurables, con un registro explicable y un tablero.
+**Clearhold** es un agente que recibe facturas por PDF, imagen, correo o chat, extrae **beneficiario, monto, moneda y fecha de vencimiento**, y decide **pagar / frenar / escalar** según reglas configurables, con un registro explicable y un tablero.
 **High-concept:** «El piloto automático de cuentas por pagar: paga lo acordado, frena lo raro y te pregunta lo dudoso.»
 
 ## 2. Reto y problema
