@@ -116,7 +116,7 @@ export function createApp({ store, env = {}, connectors = {} }) {
         if (m === "PUT" && !reg[k]) return json({ error: "not found" }, 404);
         if (m === "POST" && (!k || reg[k])) return json({ error: "Vendor already exists or name missing" }, 409);
         const prev = reg[k] ?? {}, v = { ...prev, ...pickVendor(b) }, err = validateVendor(v, st.rules); if (err) return json({ error: err }, 400);
-        const changes = Object.fromEntries(Object.keys(v).filter((f) => JSON.stringify(prev[f]) !== JSON.stringify(v[f])).map((f) => [f, [prev[f] ?? null, v[f]]]));
+        const changes = Object.fromEntries(Object.keys(v).filter((f) => f !== "agreement" && JSON.stringify(prev[f]) !== JSON.stringify(v[f])).map((f) => [f, [prev[f] ?? null, v[f]]]));
         reg[k] = v; if (m === "POST") st.rules.allowlist.push(k);
         st.audit.push({ by: user, at, action: m === "POST" ? "add vendor" : "edit vendor", key: k, name: v.name, changes });
         await store.save(st); return json({ key: k, ...v });
