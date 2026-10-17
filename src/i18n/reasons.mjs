@@ -98,6 +98,18 @@ export const ES = [
   [R`invalid uncertain_band`, "uncertain_band no válido"],
   [R`invalid allowlist`, "lista de permitidos no válida"],
   [R`No route for (\S+) to (\S+)`, "No hay ruta para $1 hacia $2"],
+  // payout rails (src/mocks/blinka.mjs railFor)
+  [R`Colombia · COP bank transfer`, "Colombia · transferencia bancaria COP"],
+  [R`Brazil · Pix`, "Brasil · Pix"],
+  [R`Mexico · MXN local transfer`, "México · transferencia local MXN"],
+  [R`Argentina · CBU / CVU / Alias`, "Argentina · CBU / CVU / Alias"],
+  [R`Chile · CLP bank transfer`, "Chile · transferencia bancaria CLP"],
+  [R`Peru · PEN bank transfer`, "Perú · transferencia bancaria PEN"],
+  [R`Bolivia · BOB bank transfer`, "Bolivia · transferencia bancaria BOB"],
+  [R`Costa Rica · CRC bank transfer`, "Costa Rica · transferencia bancaria CRC"],
+  [R`United States · ACH`, "Estados Unidos · ACH"],
+  [R`Local USD route \((\S+)\)`, "Ruta local en USD ($1)"],
+  [R`SWIFT \(USD\)`, "SWIFT (USD)"],
   // notification recipients (src/notify)
   [R`approvers`, "aprobadores"],
   [R`contact on file for (.+)`, "contacto registrado de $1"],

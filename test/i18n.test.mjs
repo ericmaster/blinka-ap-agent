@@ -19,11 +19,15 @@ test("i18n: every decision reason the engine produces (curated + stress, any mod
   assert.deepEqual(missing(RULE_CATALOG.map(([r]) => r)), []);
 });
 
-test("i18n: API errors and notes from the server and mocks are covered", () => {
+test("i18n: API errors, notes and payout rails from the server and mocks are covered", async () => {
   const src = ["src/server/app.mjs", "src/mocks/service.mjs"].map((f) => readFileSync(f, "utf8")).join("\n");
   const lits = [...src.matchAll(/(?:error|note): "([^"]+)"/g)].map((x) => x[1]);
   assert.ok(lits.length > 20);
   assert.deepEqual(missing(lits), []);
+  const { railFor } = await import("../src/mocks/blinka.mjs");
+  const rails = [["CO", "COP"], ["BR", "BRL"], ["MX", "MXN"], ["AR", "ARS"], ["CL", "CLP"], ["PE", "PEN"], ["BO", "BOB"], ["CR", "CRC"], ["US", "USD"], ["PE", "USD"], ["DE", "USD"]].map(([c, k]) => railFor(c, k).rail);
+  assert.deepEqual(missing(rails.filter((r) => !/^(Argentina|SWIFT)/.test(r))), []); // those two read the same in Spanish
+  assert.ok(rails.every((r) => es(r)));
   assert.deepEqual(missing(["Approved by ana@x.example at 2026-10-17T15:00:00Z; hard rules re-checked.", "Rejected by ana@x.example at 2026-10-17T15:00:00Z.", "approvers", "contact on file for Pixel Norte S.A. de C.V."]), []);
 });
 
