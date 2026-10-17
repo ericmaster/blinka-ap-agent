@@ -22,7 +22,9 @@ button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}button:disab
 #drop{border:2px dashed var(--line);border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;margin-bottom:12px;color:var(--mut)}#drop.over{border-color:var(--acc)}
 #drop textarea{flex:1;min-height:38px;border:0;outline:0;font:inherit;resize:vertical;background:transparent}
 .split{display:grid;grid-template-columns:340px 1fr;gap:14px;min-height:560px}.list{overflow:auto;max-height:70vh}
-.mi{padding:9px 10px;border-bottom:1px solid var(--line);cursor:pointer}.mi.on{background:#eef1fc}.mi b{font-weight:600}
+.mi{padding:9px 10px;border-bottom:1px solid var(--line);cursor:pointer}.mi.on{background:#eef1fc}button.sm{padding:3px 12px;font-size:12.5px;border-color:#c9cfdf;color:var(--acc);background:#fff}button.sm:hover{border-color:var(--acc)}.act{gap:8px}
+nav{align-items:center}a.ext{font-size:13px;color:var(--mut);text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:999px;margin-left:6px}a.ext:hover{color:var(--acc);border-color:var(--acc)}.sp{flex:1}
+#vt td input,#vt td select,#vform input,#vform select{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:8px;width:100%}#vform{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 14px}#vform:empty{display:none}#vform label{font-size:12px;color:var(--mut)}.mi b{font-weight:600}
 pre.body{white-space:pre-wrap;font:inherit;margin:10px 0}.att{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:4px 6px 0 0}
 .chat{background:#efeae2;border-radius:12px;padding:14px;max-height:72vh;overflow:auto}.bub{background:#fff;border-radius:10px;padding:8px 10px;margin:8px 0;max-width:70%;box-shadow:0 1px 0 #0001}
 .bub img{max-width:260px;border-radius:6px;display:block;margin-bottom:4px;cursor:zoom-in}.flash{outline:3px solid var(--acc);transition:outline .3s}
@@ -44,21 +46,20 @@ mark{background:#fff3b0;border-radius:3px}.doc{width:100%;height:420px;border:1p
 <header><div class="logo"><svg width="30" height="30" viewBox="8 8 48 48" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#1c253a"/><path d="M22 33l7 7 13-15" stroke="#b9c8ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Clearhold</b><small>by Blinka</small></div></div><span class="pill" id="model"></span><span class="sp"></span>
 <span class="kpi"><span class="dot pay"></span><b id="cPay">0</b> paid</span><span class="kpi"><span class="dot hold"></span><b id="cHold">0</b> held</span><span class="kpi"><span class="dot escalate"></span><b id="cEsc">0</b> pending</span>
 <button class="pri" id="proc">Process new</button><a class="btn" href="/api/pain001">pain.001</a><span class="k" id="who"></span><button class="link" id="out">Sign out</button></header>
-<nav><button data-v="queue" class="on">Queue</button><button data-v="email">Email</button><button data-v="chat">WhatsApp</button><button data-v="rules">Rules</button><button data-v="stress">Stress test</button></nav>
+<nav><button data-v="queue" class="on">Queue</button><button data-v="vendors">Vendors</button><button data-v="rules">Rules</button><button data-v="stress">Stress test</button><span class="sp"></span><a class="ext" href="/mail/" target="clearhold-mail">Mailbox ↗</a><a class="ext" href="/chat/" target="clearhold-chat">WhatsApp ↗</a></nav>
 <main>
 <section id="v-queue"><div class="card"><div id="drop"><textarea id="txt" placeholder="Paste an email or chat message, or drop a PDF / photo here"></textarea><button id="go">Add</button><label class="btn">File<input type="file" id="file" accept=".pdf,image/*,.txt,.eml" multiple hidden></label></div>
 <div class="sub"><button class="tab on" data-t="escalate">Pending</button><button class="tab" data-t="pay">Paid</button><button class="tab" data-t="hold">Held</button></div><div id="list"></div></div></section>
-<section id="v-email" hidden><div class="card split"><div class="list" id="elist"></div><div id="eview"></div></div></section>
-<section id="v-chat" hidden><div class="chat" id="chat"></div></section>
-<section id="v-rules" hidden><div class="card" style="max-width:520px"><div id="rules"></div><div class="k" style="margin:8px 0 2px">Approved vendors</div><div class="chips" id="allow"></div><button class="pri" id="save">Save rules</button>
-<div class="k" style="margin-top:10px">Contracted services, rates and bank accounts live in <code>config/rules.json</code>.</div></div></section>
+<section id="v-rules" hidden><div class="card" style="max-width:520px"><div id="rules"></div><button class="pri" id="save">Save rules</button>
+<div class="k" style="margin-top:10px">Vendors, bank accounts, contracted services and prices are in the Vendors tab.</div></div></section>
+<section id="v-vendors" hidden><div class="card"><div class="sub"><b>Vendor registry</b><span class="sp"></span><button class="pri" id="addv">Add vendor</button></div><div id="vform"></div><table id="vt"></table><div style="margin-top:14px"><b>Change log</b><div id="audit"></div></div></div></section>
 <section id="v-stress" hidden><div class="card" style="max-width:620px"><b>Stress test</b> <span class="k" id="sinfo">random invoices with traps and noise</span>
 <div style="margin-top:8px"><button class="pri" id="stress">Run 30 invoices</button></div>
 <div class="score"><div><b id="sA">–</b>Autonomy</div><div><b id="sS">–</b>Improper payments</div><div><b id="sE">–</b>Explainability</div></div></div></section>
 </main>
 <div class="modal" id="modal"><div class="card" id="mbody"></div></div><div id="toast"></div>
 <script>
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let S=null,tab="escalate",view="queue",selEmail=null;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let S=null,tab="escalate",view="queue",editV=null;
 const toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._);t._=setTimeout(()=>t.style.display="none",4000)};
 async function api(p,o={}){const r=await fetch(p,{headers:{"content-type":"application/json"},...o});const d=await r.json().catch(()=>({}));if(r.status===401&&!p.startsWith("/api/auth")){showLogin();throw new Error("Please sign in")}if(!r.ok){const e=new Error(d.error||r.status);e.data=d;e.status=r.status;throw e}return d}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
@@ -69,37 +70,31 @@ const time=s=>new Date(s).toLocaleString("en-US",{month:"short",day:"numeric",ho
 function showLogin(){$("#login").style.display="flex"}
 $("#lgo").onclick=async()=>{const email=$("#em").value.trim();try{if($("#otpBox").style.display==="none"){const d=await api("/api/auth/start",{method:"POST",body:JSON.stringify({email})});$("#otpBox").style.display="grid";
  $("#demoCode").innerHTML=d.demo?`Demo mode: no email is sent. Your code is <b>${d.code}</b>`:"We sent a code to your email.";$("#lgo").textContent="Sign in";$("#otp").focus()}
- else{await api("/api/auth/verify",{method:"POST",body:JSON.stringify({email,code:$("#otp").value})});$("#login").style.display="none";load()}}catch(e){toast(e.message)}};
+ else{await api("/api/auth/verify",{method:"POST",body:JSON.stringify({email,code:$("#otp").value})});$("#login").style.display="none";boot()}}catch(e){toast(e.message)}};
 $("#otp").onkeydown=$("#em").onkeydown=e=>{if(e.key==="Enter")$("#lgo").click()};
 $("#out").onclick=async()=>{await api("/api/auth/logout",{method:"POST"});location.reload()};
 // ---- data
 async function load(){S=await api("/api/state");render()}
+async function boot(){await load();await sync()}
 const entry=id=>S.log.find(l=>l.id===id);
 const unprocessed=()=>[...S.channels.emails.map(e=>({...e,ch:"email"})),...S.channels.chats.map(c=>({...c,ch:"whatsapp"}))].filter(m=>!m.entryId).sort((a,b)=>a.at<b.at?-1:1);
 const status=m=>m.entryId?`<span class="pill"><span class="dot ${entry(m.entryId)?.action}"></span>${ACT[entry(m.entryId)?.action]||""}</span>`:`<span class="pill"><span class="dot new"></span>New</span>`;
 function render(){$("#model").textContent="model: "+S.model;$("#cPay").textContent=S.counts.pay;$("#cHold").textContent=S.counts.hold;$("#cEsc").textContent=S.counts.escalate;$("#who").textContent=S.user;
- const n=unprocessed().length;$("#proc").textContent=n?`Process ${n} new`:"Inbox processed";$("#proc").disabled=!n;
+ const n=unprocessed().length;if(!busy){$("#proc").textContent=n?`Process ${n} new`:"Inbox processed";$("#proc").disabled=!n}
  $$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));$$("main>section").forEach(s=>s.hidden=s.id!=="v-"+view);
- renderQueue();renderEmail();renderChat();renderRules()}
+ renderQueue();renderRules();renderVendors()}
 function renderQueue(){const rows=S.log.filter(l=>l.action===tab).slice().reverse();
  $("#list").innerHTML=rows.length?rows.map(l=>{const x=l.extracted||{},s=l.source||{};return `<div class="row"><div class="k">${l.id}</div><div><b>${esc(x.payee||"(no vendor)")}</b> <span class="pill">${CH[s.channel]||"—"}</span>${DK[l.channel]?`<span class="pill">${DK[l.channel]}</span>`:""}${x.lang?`<span class="pill">${LG[x.lang]}</span>`:""}
- <div class="why">${esc(l.reason)}</div><div class="act" style="justify-content:flex-start"><button class="link" data-d="${l.id}">Details</button>${s.messageId?`<button class="link" data-src="${s.messageId}">Source message</button>`:""}</div></div>
+ <div class="why">${esc(l.reason)}</div><div class="act" style="justify-content:flex-start"><button class="sm" data-d="${l.id}">Details</button>${s.messageId?`<button class="sm" data-src="${s.channel}:${s.messageId}">Source message ↗</button>`:""}</div></div>
  <div><div class="amt"><b>${money(x.amount,x.currency)}</b>${l.amountUsd!=null&&x.currency!=="USD"?`<div class="k">≈ US$ ${l.amountUsd.toLocaleString("en-US",{maximumFractionDigits:0})}</div>`:""}</div>${l.action==="escalate"?`<div class="act"><button data-a="reject" data-id="${l.id}">Reject</button>${x.vendorKey?`<button class="pri" data-a="approve" data-id="${l.id}">Approve</button>`:""}</div>`:""}</div></div>`}).join(""):`<div class="empty">Nothing here.</div>`}
-function renderEmail(){const E=S.channels.emails.slice().sort((a,b)=>a.at<b.at?1:-1);selEmail??=E[0]?.id;
- $("#elist").innerHTML=E.map(e=>`<div class="mi ${e.id===selEmail?"on":""}" data-e="${e.id}"><div style="display:flex;justify-content:space-between"><b>${esc(e.fromName)}</b><span class="k">${time(e.at)}</span></div><div>${esc(e.subject)} ${e.attachments.length?"📎":""}</div>${status(e)}</div>`).join("");
- const e=E.find(x=>x.id===selEmail);if(!e){$("#eview").innerHTML="";return}
- $("#eview").innerHTML=`<div style="display:flex;justify-content:space-between"><div><b>${esc(e.subject)}</b><div class="k">${esc(e.fromName)} &lt;${esc(e.from)}&gt; · ${time(e.at)}</div></div><div>${status(e)}${e.entryId?`<button class="link" data-d="${e.entryId}">Open ${e.entryId}</button>`:""}</div></div>
- <pre class="body">${esc(e.body)}</pre>${e.attachments.map(a=>`<span class="att">📄 ${esc(a.name)} <a href="/api/blob/${a.id}" target="_blank">View</a><a href="/api/blob/${a.id}?download">Download</a></span>`).join("")}`}
-function renderChat(){$("#chat").innerHTML=S.channels.chats.slice().sort((a,b)=>a.at<b.at?-1:1).map(c=>`<div class="bub" id="${c.id}"><div class="k"><b>${esc(c.from)}</b> · ${time(c.at)}</div>${c.attachment?`<a href="/api/blob/${c.attachment.id}" target="_blank"><img src="/api/blob/${c.attachment.id}" alt="${esc(c.attachment.name)}"></a>`:""}<div>${esc(c.text)}</div><div style="margin-top:4px">${status(c)}${c.entryId?`<button class="link" data-d="${c.entryId}">Open ${c.entryId}</button>`:""}</div></div>`).join("")}
 const RL=[["max_per_payment_usd","Per-payment limit (USD)"],["human_approval_above_usd","Human approval above (USD)"],["vendor_period_cap_usd","Vendor monthly cap (USD)"],["period_budget_usd","Monthly budget (USD)"]];
-function renderRules(){if(document.activeElement?.dataset?.k)return;$("#rules").innerHTML=RL.map(([k,n])=>`<label class="f">${n}<input type="number" min="0" step="any" data-k="${k}" value="${S.rules[k]}"></label>`).join("");
- $("#allow").innerHTML=Object.entries(S.vendors).map(([k,v])=>`<label><input type="checkbox" data-v="${k}" ${S.rules.allowlist.includes(k)?"checked":""}> ${esc(v.name.replace(/ \(.*\)$/,""))}</label>`).join("")}
+function renderRules(){if(document.activeElement?.dataset?.k)return;$("#rules").innerHTML=RL.map(([k,n])=>`<label class="f">${n}<input type="number" min="0" step="any" data-k="${k}" value="${S.rules[k]}"></label>`).join("");}
 // ---- navigation
 $$("nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
 $$(".sub .tab").forEach(b=>b.onclick=()=>{$$(".sub .tab").forEach(x=>x.classList.remove("on"));b.classList.add("on");tab=b.dataset.t;renderQueue()});
-function openSource(id){if(id.startsWith("m-")){view="email";selEmail=id;render()}else{view="chat";render();const el=document.getElementById(id);el?.scrollIntoView({block:"center"});el?.classList.add("flash");setTimeout(()=>el?.classList.remove("flash"),1800)}closeModal()}
-document.body.addEventListener("click",async e=>{const t=e.target.closest("[data-d],[data-src],[data-a],[data-e]");if(!t)return;
- if(t.dataset.d)return details(t.dataset.d);if(t.dataset.src)return openSource(t.dataset.src);if(t.dataset.e){selEmail=t.dataset.e;return renderEmail()}
+function openSource(v){const [ch,id]=v.split(":");window.open((S.sources[ch]||"/")+id,"clearhold-"+(ch==="email"?"mail":"chat"))}
+document.body.addEventListener("click",async e=>{const t=e.target.closest("[data-d],[data-src],[data-a],[data-ve],[data-vr],[data-vt]");if(!t)return;
+ if(t.dataset.d)return details(t.dataset.d);if(t.dataset.src)return openSource(t.dataset.src);if(t.dataset.ve){editV=t.dataset.ve;return vform()}if(t.dataset.vr)return removeV(t.dataset.vr);if(t.dataset.vt)return toggleV(t.dataset.vt)
  t.disabled=true;try{await api(`/api/entry/${t.dataset.id}/${t.dataset.a}`,{method:"POST"});await load();if($("#modal").style.display==="flex")details(t.dataset.id)}catch(err){toast(err.message);t.disabled=false}});
 // ---- details
 const closeModal=()=>$("#modal").style.display="none";$("#modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
@@ -108,7 +103,7 @@ function highlight(text,schema){const sp=Object.entries(schema).filter(([,f])=>f
 async function details(id){const l=await api("/api/entry/"+id),x=l.extracted||{},s=l.source||{},sc=l.schema||{};
  const fv=(k,f)=>k==="line_items"?(f.value||[]).map(i=>`${esc(i.description)}${i.unitPrice!=null?` <span class="k">(${i.qty} × ${i.unitPrice})</span>`:""}`).join("<br>")||"—":esc(f.value??"—");
  const doc=s.attachmentId?(s.type==="application/pdf"?`<iframe class="doc" src="/api/blob/${s.attachmentId}"></iframe>`:`<img src="/api/blob/${s.attachmentId}" style="max-width:100%;border:1px solid var(--line);border-radius:8px">`)+`<div style="margin-top:6px"><a class="btn" href="/api/blob/${s.attachmentId}?download">Download original</a></div>`:"";
- $("#mbody").innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><b>${l.id} · ${esc(x.payee||"(no vendor)")}</b> <span class="pill"><span class="dot ${l.action}"></span>${ACT[l.action]}</span><span class="pill">${CH[s.channel]||""}</span>${x.lang?`<span class="pill">${LG[x.lang]}</span>`:""}</div><div>${s.messageId?`<button class="link" data-src="${s.messageId}">Source message</button> `:""}<button onclick="closeModal()">Close</button></div></div>
+ $("#mbody").innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><b>${l.id} · ${esc(x.payee||"(no vendor)")}</b> <span class="pill"><span class="dot ${l.action}"></span>${ACT[l.action]}</span><span class="pill">${CH[s.channel]||""}</span>${x.lang?`<span class="pill">${LG[x.lang]}</span>`:""}</div><div>${s.messageId?`<button class="sm" data-src="${s.channel}:${s.messageId}">Source message ↗</button> `:""}<button onclick="closeModal()">Close</button></div></div>
  <p><b>Decision:</b> ${esc(l.reason)}</p>${l.action==="escalate"?`<div class="act" style="justify-content:flex-start"><button data-a="reject" data-id="${l.id}">Reject</button>${x.vendorKey?`<button class="pri" data-a="approve" data-id="${l.id}">Approve</button>`:""}</div>`:""}
  <div class="grid2" style="margin-top:10px"><div><b>Extracted fields</b><table><tr><th>Field</th><th>Value</th><th>Evidence</th><th>Confidence</th></tr>${Object.entries(sc).map(([k,f])=>`<tr><td>${k}</td><td>${fv(k,f)}</td><td class="k">${f.evidence?"“"+esc(f.evidence.text)+"”":"—"}</td><td><span class="bar"><i style="width:${Math.round(f.confidence*100)}%;background:${f.confidence>=.9?"var(--pay)":f.confidence>=.7?"var(--esc)":"var(--hold)"}"></i></span>${Math.round(f.confidence*100)}%</td></tr>`).join("")}</table></div>
  <div><b>Rules applied</b><table>${(l.checks||[]).map(c=>`<tr><td>${c.ok?'<span class="ok">✓</span>':'<span class="bad">✗</span>'}</td><td>${esc(c.rule)}</td></tr>`).join("")}</table>
@@ -121,11 +116,13 @@ async function details(id){const l=await api("/api/entry/"+id),x=l.extracted||{}
 // ---- OCR + processing (images are read in the browser; PDFs and text on the server)
 let T=null;async function ocr(blob){if(!window.Tesseract)await new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/tesseract.min.js";s.onload=ok;s.onerror=ko;document.head.appendChild(s)});
  T??=await Tesseract.createWorker(["spa","eng","por"]);const{data}=await T.recognize(blob);return{text:data.text,confidence:data.confidence}}
-$("#proc").onclick=async()=>{const b=$("#proc");b.disabled=true;let k=0;const todo=unprocessed();
+let busy=false;async function sync(){try{const r=await api("/api/sync",{method:"POST"});if(r.added)await load()}catch(e){}}
+setInterval(()=>{if(S&&!busy&&!document.hidden)sync()},10000);
+$("#proc").onclick=async()=>{const b=$("#proc");busy=true;b.disabled=true;await sync();let k=0;const todo=unprocessed();
  for(const m of todo){b.textContent=`Processing ${++k}/${todo.length}…`;const att=m.attachment||m.attachments?.[0];let body={messageId:m.id};
   try{if(att?.type?.startsWith("image/"))body.ocr=await ocr(await (await fetch("/api/blob/"+att.id)).blob());const e=await api("/api/process",{method:"POST",body:JSON.stringify(body)});m.entryId=e.id;S.log.push(e);S.counts[e.action]++;
    const src=(m.ch==="email"?S.channels.emails:S.channels.chats).find(x=>x.id===m.id);if(src)src.entryId=e.id;render()}catch(err){toast(err.message)}}
- await load()};
+ busy=false;await load()};
 const b64=async b=>{const u=new Uint8Array(await b.arrayBuffer());let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s)};
 async function upload(blob,name){const type=blob.type||(/\.pdf$/i.test(name)?"application/pdf":"text/plain");const body={filename:name,type};
  if(type==="application/pdf")body.fileBase64=await b64(blob);else if(type.startsWith("image/")){toast("Reading image…");body.fileBase64=await b64(blob);body.ocr=await ocr(blob)}else body.text=await blob.text();
@@ -135,12 +132,29 @@ $("#go").onclick=()=>{const t=$("#txt").value.trim();if(!t)return toast("Paste a
 $("#file").onchange=e=>many([...e.target.files].map(f=>[f,f.name]));
 const d=$("#drop");d.ondragover=e=>{e.preventDefault();d.classList.add("over")};d.ondragleave=()=>d.classList.remove("over");d.ondrop=e=>{e.preventDefault();d.classList.remove("over");many([...e.dataTransfer.files].map(f=>[f,f.name]))};
 // ---- rules + stress
-$("#save").onclick=async()=>{const body={allowlist:$$("[data-v]:checked").map(i=>i.dataset.v)};$$("[data-k]").forEach(i=>body[i.dataset.k]=Number(i.value));try{await api("/api/rules",{method:"PUT",body:JSON.stringify(body)});toast("Rules saved");load()}catch(e){toast(e.message)}};
+$("#save").onclick=async()=>{const body={};$$("[data-k]").forEach(i=>body[i.dataset.k]=Number(i.value));try{await api("/api/rules",{method:"PUT",body:JSON.stringify(body)});toast("Rules saved");load()}catch(e){toast(e.message)}};
 $("#stress").onclick=async()=>{const b=$("#stress");b.disabled=true;["#sA","#sS","#sE"].forEach(s=>$(s).textContent="…");
  const r=await fetch("/api/stress",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({n:30})});const rd=r.body.getReader(),dec=new TextDecoder();let buf="",k=0,seed="";
  for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf("\n"))>=0){const ev=JSON.parse(buf.slice(0,i));buf=buf.slice(i+1);
   if(ev.type==="start"){seed=ev.seed;$("#sinfo").textContent=`seed ${seed} · 0/${ev.n}`}else{k++;const s=ev.score;$("#sinfo").textContent=`seed ${seed} · ${k}/30 · ${s.pay} paid · ${s.hold} held · ${s.escalate} pending`;
   $("#sA").textContent=Math.round(s.autonomy*100)+"%";$("#sS").textContent=s.improper;$("#sS").className=s.improper?"bad":"ok";$("#sE").textContent=Math.round(s.explainability*100)+"%"}}}
  b.disabled=false};
-load().catch(()=>{});
+// ---- vendors
+const terms=v=>v.terms?.type==="flat"?`${v.currency} ${Number(v.terms.amount).toLocaleString("en-US")} / month`:`${v.currency} ${Number(v.terms?.rate).toLocaleString("en-US")} / h · max ${v.terms?.max_units_per_period} h`;
+function renderVendors(){const V=S.rules.vendors;
+ $("#vt").innerHTML=`<tr><th>Active</th><th>Vendor</th><th>Contracted service</th><th>Price</th><th>Bank account</th><th>Allowed keywords</th><th></th></tr>`+Object.entries(V).map(([k,v])=>`<tr><td><input type="checkbox" data-vt="${k}" ${S.rules.allowlist.includes(k)?"checked":""}></td><td><b>${esc(v.name)}</b><div class="k">${esc(v.country)} · ${esc(v.currency)}</div></td><td>${esc(v.category)}</td><td>${terms(v)}</td><td><code>${esc(v.acct)}</code></td><td class="k">${esc((v.keywords||[]).join(", "))}</td>
+ <td style="white-space:nowrap"><a class="btn sm" style="padding:3px 12px;font-size:12.5px" href="/api/vendors/${k}/contract" target="_blank">Contract</a> <button class="sm" data-ve="${k}">Edit</button> <button class="sm" data-vr="${k}" style="color:var(--hold)">Remove</button></td></tr>`).join("");
+ $("#audit").innerHTML=(S.audit||[]).map(a=>`<div class="k">${time(a.at)} · ${esc(a.by)} · ${esc(a.action)} <b>${esc(a.name)}</b>${a.changes?": "+Object.entries(a.changes).filter(([f])=>f!=="agreement").map(([f,[o,n]])=>`${f} ${esc(JSON.stringify(o))} → ${esc(JSON.stringify(n))}`).join("; "):""}</div>`).join("")||'<div class="k">No changes yet.</div>'}
+function vform(){const v=editV&&editV!=="new"?S.rules.vendors[editV]:{currency:"USD",terms:{type:"flat"}},t=v.terms||{};
+ const f=(n,l,val,ty="text")=>`<label>${l}<input name="${n}" type="${ty}" value="${esc(val??"")}"></label>`;
+ $("#vform").innerHTML=f("name","Name",v.name)+f("acct","Bank account",v.acct)+f("category","Contracted service",v.category)+f("keywords","Allowed keywords (comma separated)",(v.keywords||[]).join(", "))+
+ `<label>Currency<select name="currency">${Object.keys(S.rules.fx_to_usd).map(c=>`<option ${c===v.currency?"selected":""}>${c}</option>`).join("")}</select></label><label>Price type<select name="type"><option value="flat" ${t.type==="flat"?"selected":""}>Flat per month</option><option value="hourly" ${t.type==="hourly"?"selected":""}>Hourly</option></select></label>`+
+ f("amount","Flat amount / hourly rate",t.type==="flat"?t.amount:t.rate,"number")+f("max","Max hours / month (hourly)",t.max_units_per_period,"number")+`<div style="grid-column:1/-1;display:flex;gap:8px"><button class="pri" id="vsave">${editV==="new"?"Add vendor":"Save"}</button><button id="vcancel">Cancel</button></div>`;
+ $("#vcancel").onclick=()=>{editV=null;$("#vform").innerHTML=""};
+ $("#vsave").onclick=async()=>{const g=n=>$("#vform [name="+n+"]").value,ty=g("type");const body={name:g("name"),acct:g("acct").trim(),category:g("category"),keywords:g("keywords"),currency:g("currency"),terms:ty==="flat"?{type:"flat",amount:g("amount")}:{type:"hourly",rate:g("amount"),max_units_per_period:g("max")}};
+  try{await api(editV==="new"?"/api/vendors":"/api/vendors/"+editV,{method:editV==="new"?"POST":"PUT",body:JSON.stringify(body)});editV=null;$("#vform").innerHTML="";toast("Vendor saved; hard rules updated");load()}catch(e){toast(e.message)}}}
+$("#addv").onclick=()=>{editV="new";vform()};
+async function removeV(k){if(!confirm("Remove "+S.rules.vendors[k].name+"? Its invoices will escalate as unknown vendor."))return;try{await api("/api/vendors/"+k,{method:"DELETE"});load()}catch(e){toast(e.message)}}
+async function toggleV(k){const al=new Set(S.rules.allowlist);al.has(k)?al.delete(k):al.add(k);try{await api("/api/rules",{method:"PUT",body:JSON.stringify({allowlist:[...al]})});load()}catch(e){toast(e.message)}}
+boot().catch(()=>{});
 </script></body></html>
