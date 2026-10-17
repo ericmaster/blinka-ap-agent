@@ -11,6 +11,7 @@ import { generate, renderEmail, renderChat, bodyLines, rng } from "../gen/genera
 import { textPdf } from "../gen/pdf.mjs";
 import { score, counts, improper } from "../score.mjs";
 import { curated } from "../gen/generator.mjs";
+import { metrics, BENCHMARKS } from "../metrics.mjs";
 const MANIFEST = curated();
 /** Header KPIs. Improper payments are judged against ground truth for seeded (fake) cases paid by the agent on its own. */
 export function kpis(st) {
@@ -19,7 +20,8 @@ export function kpis(st) {
     .map((l) => ({ ...l, id: /-(C\d+)$/.exec(l.source?.messageId ?? "")?.[1] })).filter((l) => l.id && MANIFEST.some((m) => m.id === l.id));
   return { heldUsd: Math.round(held.reduce((a, l) => a + (l.amountUsd ?? 0), 0)), stopped: held.length,
     autonomy: n ? Math.round((st.log.filter((l) => l.history?.at(-1)?.by === "agent" && l.action !== "escalate").length / n) * 100) : null,
-    improper: improper(agentPaid, MANIFEST, st.rules).length };
+    improper: improper(agentPaid, MANIFEST, st.rules).length,
+    ...metrics(st.log, (e) => MANIFEST.find((m) => m.id === /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1]) ?? null) };
 }
 import { UI } from "./ui.mjs";
 
@@ -115,7 +117,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
       const st = st0;
       if (m === "GET" && p === "/api/state") {
         return json({ user, demo, rules: st.rules, audit: st.audit.slice(-50).reverse(), sources: { email: connectors.email?.ui("") ?? null, whatsapp: connectors.whatsapp?.ui("") ?? null }, model: adapter().name, translation: env.AI ? "Workers AI (m2m100)" : null,
-          log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), kpis: kpis(st), spentUsd: st.ledger.spentUsd, channels: st.channels });
+          log: st.log.map(({ sourceText, schema, checks, ...e }) => e), counts: counts(st.log), kpis: kpis(st), benchmarks: BENCHMARKS, spentUsd: st.ledger.spentUsd, channels: st.channels });
       }
       // ---- connectors: pull new messages from the external email / WhatsApp services (poll)
       if (m === "POST" && p === "/api/sync") {
@@ -285,8 +287,8 @@ function stress({ seed = Math.floor(Math.random() * 1e6), n = 30 }, rules, adapt
       const doc = t.format === "email" ? { kind: "email", text: renderEmail(t, r) } : t.format === "chat" ? { kind: "chat", text: renderChat(t, r) }
         : t.format === "pdf" ? { kind: "pdf", buffer: textPdf(bodyLines(t, r)) } : { kind: "image", text: bodyLines(t, r).join("\n"), ocrConfidence: 95 };
       const e = await processDoc({ ...doc, id: t.id }, { ledger: st.ledger, rules, adapter, mapExtracted: (x) => withAllow(rules, x) });
-      st.log.push(e);
-      const s = score(st.log, inv, rules);
+      e.history = [{ by: "agent", action: e.action }]; st.log.push(e);
+      const s = { ...score(st.log, inv, rules), ...metrics(st.log, (x) => inv.find((m) => m.id === x.id)) };
       c.enqueue(enc.encode(JSON.stringify({ type: "row", id: e.id, channel: e.channel, action: e.action, reason: e.reason, truth: t.tags[0], score: { ...s, improper: s.improper.length, improperList: s.improper } }) + "\n"));
     }
     c.close();
