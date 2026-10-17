@@ -14,7 +14,8 @@ All data is synthetic: the company, the 8 vendors, accounts (`XX-FAKE-NNNN`) and
 3. Click **Details** on a held one to see the evidence for every field, the rules applied and the original text. Click **Show English** to translate it.
 4. Click **Process N new** to run the rest of the inbox (29 messages in ES/EN/PT, email, WhatsApp, PDF and photos). Watch the header: **0 improper payments**.
 5. Open **Mailbox ↗**, compose an invoice (attach a PDF if you want), then come back. It appears within 10 seconds; process it.
-6. Go to **Stress test** and run 30 random invoices with traps. Improper payments stay at 0.
+6. Go to **Stress test**, pick **Realistic 80/20** (most invoices valid) or **Traps**, and run 30 random invoices. Improper payments stay at 0, and the metrics table compares the run with AP market benchmarks.
+   Under the queue tabs, **Audit log CSV · JSON** exports every decision with its reasons, failed rules, evidence and who decided when.
 7. Click **pain.001** to download the bank file that contains only the paid invoices.
 
 ### Try to break it
@@ -34,7 +35,8 @@ All data is synthetic: the company, the 8 vendors, accounts (`XX-FAKE-NNNN`) and
 3. Pulsa **Details** en una frenada para ver la evidencia de cada campo, las reglas aplicadas y el texto original. **Show English** la traduce.
 4. Pulsa **Process N new** para procesar el resto del buzón (29 mensajes en ES/EN/PT: correo, WhatsApp, PDF y fotos). Mira el encabezado: **0 improper payments**.
 5. Abre **Mailbox ↗**, redacta una factura (con PDF si quieres) y vuelve. Aparece en menos de 10 segundos.
-6. En **Stress test**, corre 30 facturas al azar con trampas. Los pagos indebidos siguen en 0.
+6. En **Stress test**, elige **Realistic 80/20** (casi todas válidas) o **Traps** y corre 30 facturas al azar. Los pagos indebidos siguen en 0, y la tabla de métricas compara la corrida con benchmarks del mercado de AP.
+   Bajo las pestañas de la cola, **Audit log CSV · JSON** exporta cada decisión con sus razones, reglas fallidas, evidencia y quién decidió y cuándo.
 7. Con **pain.001** descargas el archivo bancario, que solo trae las facturas pagadas.
 
 ### Intenta romperlo

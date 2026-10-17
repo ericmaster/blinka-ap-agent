@@ -7,9 +7,9 @@ import { generate } from "../src/gen/generator.mjs";
 
 export const rules = JSON.parse(readFileSync("config/rules.json", "utf8"));
 export const load = (dir) => JSON.parse(readFileSync(`${dir}/manifest.json`, "utf8"));
-export function stressSet(seed, n = 60) { // no Pillow in CI: images re-rendered as PDFs here; committed data/stress-s1 has real PNGs
+export function stressSet(seed, n = 60, mix = "traps") { // no Pillow in CI: images re-rendered as PDFs here; committed data/stress-s1 has real PNGs
   const dir = mkdtempSync(`${tmpdir()}/blinka-`);
-  return { dir, manifest: writeSet(dir, generate(seed, n).map((i) => (i.format === "image" ? { ...i, format: "pdf" } : i)), seed) };
+  return { dir, manifest: writeSet(dir, generate(seed, n, { mix }).map((i) => (i.format === "image" ? { ...i, format: "pdf" } : i)), seed) };
 }
 export async function run(dir, manifest, adapter) {
   const ledger = newLedger(), log = [];

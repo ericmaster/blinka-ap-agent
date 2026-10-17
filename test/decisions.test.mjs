@@ -76,3 +76,14 @@ test("honest KPIs: correct autonomy, wrongly held valid, escalation rate, timing
   assert.equal(m.agentMsP50, 300); assert.equal(m.humanMinutesP50, 30);
   assert.ok(m.costPerInvoiceUsd > 0 && m.costPerInvoiceUsd < 0.01);
 });
+
+import { generate } from "../src/gen/generator.mjs";
+test("stress mix: realistic is ~80% valid, traps mix unchanged (safety tests keep their dataset)", async () => {
+  // one month of invoices (the stress test runs 30); across 20 seeds
+  const real = Array.from({ length: 20 }, (_, i) => generate(i + 1, 30, { mix: "realistic" })).flat(), share = real.filter((x) => x.tags[0] === "valid").length / real.length;
+  assert.ok(share > 0.7 && share < 0.88, `valid share ${share}`);
+  assert.deepEqual(generate(7, 40).map((x) => x.id + x.tags[0]), generate(7, 40, { mix: "traps" }).map((x) => x.id + x.tags[0]));
+});
+test("reckless model on the realistic 80/20 mix: 0 improper payments", async () => {
+  for (const seed of [31, 32, 33]) { const s = stressSet(seed, 60, "realistic"); assert.deepEqual(improper(await run(s.dir, s.manifest, chain(reckless())), s.manifest), [], `seed ${seed}`); }
+});
