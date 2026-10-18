@@ -27,7 +27,7 @@ header,main{max-width:1280px;margin:auto;padding:24px}header{display:flex;align-
 h1{font-size:34px;letter-spacing:-1px;margin:8px 0}p{margin:8px 0 16px}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--mut);font-size:13px}.legend b{padding:3px 10px;border:1.5px solid var(--pay);border-radius:8px;color:var(--fg)}.legend b.sim{border-color:var(--hold);border-style:dashed}
 .diagram{margin-top:20px;border:1px solid var(--line);border-radius:20px;background:var(--surface);overflow-x:auto}svg{display:block;width:100%;min-width:900px;height:auto}.node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5}.real rect{stroke:var(--pay)}.simulated rect{stroke:var(--hold);stroke-dasharray:7 5}.badge{fill:var(--pay);font-size:12px;font-weight:600;letter-spacing:.5px}.simulated .badge{fill:var(--mut)}text{fill:var(--fg);font-family:Inter,ui-sans-serif,system-ui,sans-serif}.node-title{font-size:18px;font-weight:600}.detail{font-size:13px;fill:var(--mut)}.edge{fill:none;stroke:var(--acc);stroke-width:2}.bypass{stroke:var(--hold);stroke-dasharray:6 4}.edge-label{font-size:13px;fill:var(--acc)}.notes{border-left:3px solid var(--soft);padding-left:18px;margin-top:24px;color:var(--mut)}.notes p{margin:8px 0}footer{margin-top:24px;font-size:13px;color:var(--mut)}@media(max-width:600px){header,main{padding:16px}header{flex-wrap:wrap}h1{font-size:28px}}
 </style></head><body>
-<header><span class="brand">Clearhold <small>by Blinka</small></span><a href="/" ${t("Back to Clearhold")}>Back to Clearhold</a><span class="lng" data-lng title="Language / Idioma"><button data-lang="en" class="on">EN</button><button data-lang="es">ES</button></span></header>
+<header><span class="brand">Clearhold <small ${t("by Blinka")}>by Blinka</small></span><a href="/" ${t("Back to Clearhold")}>Back to Clearhold</a><span class="lng" data-lng title="Language / Idioma"><button data-lang="en" class="on">EN</button><button data-lang="es">ES</button></span></header>
 <main><h1 ${t("How Clearhold decides")}>How Clearhold decides</h1><p ${t("Hard rules own the decision. The model can veto, never authorize a payment.")}>Hard rules own the decision. The model can veto, never authorize a payment.</p>
 <div class="legend"><b ${t("Real")}>Real</b><b class="sim" ${t("Simulated")}>Simulated</b><span ${t("Dashed boxes are simulated services. No money moves.")}>Dashed boxes are simulated services. No money moves.</span></div>
 <div class="diagram" tabindex="0" aria-label="Clearhold architecture / Arquitectura Clearhold">
@@ -57,10 +57,26 @@ ${node("xml", 500, 715, 700, 110, "pain.001 XML", ["Real ISO 20022 format; no ba
 ${node("blinka", 500, 885, 700, 110, "Mock Blinka payout", ["Idempotent sandbox via connector"], true)}
 </svg></div>
 <aside class="notes">${["Live models are real APIs; CI uses fake adapters. Without keys, the model path escalates.", "Vendors, invoices, contracts and history are synthetic; FX rates are a fixed simulated table.", "Browser OCR is real and requires human confirmation. Local Node extraction also supports server-side OCR."].map((key) => `<p ${t(key)}>${esc(key)}</p>`).join("")}</aside>
-<footer>Source: docs/REAL-VS-SIMULATED.md · src/server/host.mjs · src/server/app.mjs · src/pipeline.mjs · src/engine/decide.mjs · src/adapters/index.mjs</footer></main>
+<footer><span ${t("Source")}>Source</span>: docs/REAL-VS-SIMULATED.md · src/server/host.mjs · src/server/app.mjs · src/pipeline.mjs · src/engine/decide.mjs · src/adapters/index.mjs</footer></main>
 <script>
 const LANG_KEY=${JSON.stringify(LANG_KEY)};
 function setLang(value){const lang=value==="es"?"es":"en";document.documentElement.lang=lang;document.title="Clearhold · "+(lang==="es"?"Arquitectura":"Architecture");document.querySelectorAll("[data-en]").forEach(el=>el.textContent=el.dataset[lang]);document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang))}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lang]");if(b){localStorage.setItem(LANG_KEY,b.dataset.lang);setLang(b.dataset.lang)}});
-window.addEventListener("storage",e=>{if(e.key===LANG_KEY)setLang(e.newValue)});setLang(localStorage.getItem(LANG_KEY));
+const DEFAULT_LANG="en";
+const queryLang=typeof location==="undefined"?null:new URLSearchParams(location.search).get("lang");
+window.addEventListener("storage",e=>{if(e.key===LANG_KEY)setLang(e.newValue)});setLang(["en","es"].includes(queryLang)?queryLang:localStorage.getItem(LANG_KEY)||DEFAULT_LANG);
 </script></body></html>`;
+
+/** The browser's shared saved preference wins over the request-language default. */
+export function architecturePage(req) {
+  const query = new URL(req.url).searchParams.get("lang");
+  const accepted = (req.headers.get("accept-language") ?? "").split(",").map((part) => {
+    const [tag, q] = part.trim().split(";q="); return { lang: tag.split("-")[0].toLowerCase(), q: q == null ? 1 : Number(q) };
+  }).filter(({ lang, q }) => ["en", "es"].includes(lang) && q > 0).sort((a, b) => b.q - a.q);
+  const lang = ["en", "es"].includes(query) ? query : accepted[0]?.lang ?? "en";
+  if (lang === "en") return ARCHITECTURE;
+  return ARCHITECTURE.replace('<html lang="en">', '<html lang="es">')
+    .replace("<title>Clearhold · Architecture</title>", "<title>Clearhold · Arquitectura</title>")
+    .replace(/(data-en="[^"]+" data-es="([^"]+)"[^>]*>)[^<]*/g, "$1$2")
+    .replace('const DEFAULT_LANG="en";', 'const DEFAULT_LANG="es";');
+}

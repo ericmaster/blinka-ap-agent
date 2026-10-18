@@ -39,7 +39,8 @@ function paymentLedger(st, e) {
   return l;
 }
 import { UI } from "./ui.mjs";
-import { ARCHITECTURE } from "./architecture.mjs";
+import { architecturePage } from "./architecture.mjs";
+import { maskLine, unmask, TRANSLATION_VERSION } from "../i18n/translate.mjs";
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -107,7 +108,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
     const url = new URL(req.url), p = url.pathname, m = req.method; let mm;
     try {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
-      if (m === "GET" && (p === "/architecture" || p === "/architecture/")) return new Response(ARCHITECTURE, { headers: { "content-type": "text/html; charset=utf-8" } });
+      if (m === "GET" && (p === "/architecture" || p === "/architecture/")) return new Response(architecturePage(req), { headers: { "content-type": "text/html; charset=utf-8" } });
       // ---- auth: email + one-time code. DEMO MODE returns the code in the response (no email is sent).
       if (m === "POST" && p === "/api/auth/start") {
         const { email } = await req.json(), st = await loadA();
@@ -236,11 +237,15 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
         const e = st.log.find((l) => l.id === mm[1]); if (!e) return json({ error: "not found" }, 404);
         const lang = e.extracted?.lang;
         if (lang === "en") return json({ text: e.sourceText, lang, note: "Already in English" });
-        if (e.translation) return json(e.translation);
+        if (e.translation?.version === TRANSLATION_VERSION) return json(e.translation);
         if (!env.AI) return json({ text: null, lang, note: "Translation unavailable here (no translation model configured); showing the original." });
         const parts = (e.sourceText ?? "").split("\n"), out = [];
-        for (const line of parts) out.push(line.trim() ? (await env.AI.run("@cf/meta/m2m100-1.2b", { text: line, source_lang: lang, target_lang: "en" })).translated_text : line);
-        e.translation = { text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
+        for (const line of parts) {
+          const masked = maskLine(line, e.extracted, registry(st.rules)[e.extracted?.vendorKey]);
+          const text = masked.needsModel ? (await env.AI.run("@cf/meta/m2m100-1.2b", { text: masked.text, source_lang: lang, target_lang: "en" })).translated_text : masked.text;
+          out.push(unmask(text, masked));
+        }
+        e.translation = { version: TRANSLATION_VERSION, text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
         await save(st); return json(e.translation);
       }
       if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|approve-second|reject|reopen)$/))) {

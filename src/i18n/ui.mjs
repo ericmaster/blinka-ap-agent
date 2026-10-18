@@ -10,6 +10,9 @@ export const UI_ES = {
   "Re-evaluated later": "Re-evaluado después",
   "{0} evaluated · {1} not evaluated · {2} overrides": "{0} evaluadas · {1} no evaluadas · {2} excepciones",
   "Dual approval above (USD)": "Doble aprobación por encima de (USD)",
+  "Reason": "Motivo",
+  "Source": "Fuente",
+  "by Blinka": "por Blinka",
   "Clearhold · by Blinka": "Clearhold · por Blinka",
   // login
   "Sign in with your work email. New users are registered automatically.": "Inicia sesión con tu correo de trabajo. Los usuarios nuevos se registran automáticamente.",
