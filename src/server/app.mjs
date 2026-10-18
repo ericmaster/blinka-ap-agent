@@ -10,6 +10,7 @@ import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, rng } from "../gen/generator.mjs";
 import { invoicePdf } from "../gen/invoice.mjs";
 import { pdfText } from "../extract/index.mjs";
+import { lineItems } from "../extract/text.mjs";
 import { score, counts, improper } from "../score.mjs";
 import { curated } from "../gen/generator.mjs";
 import { metrics, BENCHMARKS } from "../metrics.mjs";
@@ -25,10 +26,12 @@ export function kpis(st) {
     autonomy: n ? Math.round((st.log.filter((l) => l.history?.at(-1)?.by === "agent" && l.action !== "escalate").length / n) * 100) : null,
     improper: new Set([...improper(evaluated, MANIFEST, st.rules).map((s) => s.split(":")[0]), ...paid.filter((e) => {
       const p = e.paidCheck;
-      const hard = p?.hard ?? hardChecks({ ...e.extracted, id: e.id }, paymentLedger(st, e), st.rules).hold;
+      // Records paid before paidCheck existed (legacy): re-evaluate; user-paid ones re-read line items from the stored text (older extraction missed unit prices).
+      const legacyItems = !p && e.history?.at(-1)?.by !== "agent" && e.sourceText ? lineItems(e.sourceText) : null;
+      const hard = p?.hard ?? hardChecks({ ...e.extracted, ...(legacyItems?.length ? { items: legacyItems } : {}), id: e.id }, paymentLedger(st, e), st.rules).hold;
       return hard.length || ((p?.amountUsd ?? e.amountUsd) > (p?.threshold ?? st.rules.human_approval_above_usd) && new Set((p?.approvers ?? e.approvals ?? []).map((a) => (typeof a === "string" ? a : a.by).toLowerCase())).size < 2);
     }).map((e) => /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1] ?? e.id)]).size,
-    evaluated: evaluated.length, notEvaluated: paid.length - evaluated.length, overrides: paid.filter((e) => e.paidOverride).length,
+    evaluated: evaluated.length, notEvaluated: paid.length - evaluated.length, overrides: paid.filter((e) => e.paidOverride ?? (e.reasons ?? []).some((r) => /^Approved over a hold|Duplicate override/.test(r))).length,
     ...metrics(st.log, (e) => MANIFEST.find((m) => m.id === /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1]) ?? null) };
 }
 // Remove this invoice's own booking when inspecting an older/crafted paid record.
