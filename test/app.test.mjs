@@ -42,8 +42,10 @@ test("channels: seeded inbox + WhatsApp flow into the queue, entries link to sou
   const big = st.channels.emails.find((e) => /AD-1045/.test(e.subject));
   const e2 = await J(await call("POST", "/api/process", { messageId: big.id }));
   assert.equal(e2.action, "escalate"); // no model configured => escalate
+  const first = await call("POST", `/api/entry/${e2.id}/approve`); assert.equal(first.status, 202);
+  await login("ana@example.com");
   const ap = await J(await call("POST", `/api/entry/${e2.id}/approve`));
-  assert.equal(ap.action, "pay"); assert.match(ap.reason, /Approved by eric@example\.com at 20/); assert.equal(ap.history.at(-1).by, "eric@example.com");
+  assert.equal(ap.action, "pay"); assert.match(ap.reason, /Approved by ana@example\.com at 20/); assert.equal(ap.history.at(-1).by, "ana@example.com");
   const d = await J(await call("GET", `/api/entry/${e2.id}`));
   for (const k of ["vendor", "amount", "currency", "due_date", "invoice_number", "bank_account", "line_items"]) assert.ok(k in d.schema, k);
   assert.equal(d.schema.amount.value, 10800000); assert.ok(d.schema.amount.evidence.text.includes("10.800.000")); assert.ok(d.schema.amount.confidence > 0.9);
@@ -57,7 +59,7 @@ test("safety: held invoice and unknown payee cannot be approved; pain.001 only p
   const up = async (f) => J(await call("POST", "/api/upload", { filename: f, type: "text/plain", text: readFileSync(`data/curated/${f}`, "utf8") }));
   const held = await up("C16.email.txt"), unknown = await up("C11.email.txt");
   assert.equal(held.action, "hold"); assert.equal(held.source.channel, "upload");
-  assert.equal((await call("POST", `/api/entry/${held.id}/approve`)).status, 400, "overriding a hold needs a typed reason");
+  assert.equal((await call("POST", `/api/entry/${held.id}/approve`)).status, 409, "hard holds fail even without an override reason");
   assert.equal((await call("POST", `/api/entry/${held.id}/approve`, { reason: "pay it anyway please" })).status, 409, "and still cannot pay a wrong account");
   assert.equal((await call("POST", `/api/entry/${unknown.id}/approve`)).status, 409);
   const rj = await J(await call("POST", `/api/entry/${unknown.id}/reject`)); assert.match(rj.reason, /Rejected by eric@example\.com/);

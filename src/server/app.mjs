@@ -4,29 +4,46 @@ import defaultRules from "../../config/rules.json" with { type: "json" };
 import { VENDORS, COMPANY } from "../data/vendors.mjs";
 import { contractMarkdown, contractHtml, contractPdf } from "../contracts.mjs";
 import { processDoc } from "../pipeline.mjs";
-import { newLedger, approve, registry, DUP_RE, toUsd } from "../engine/decide.mjs";
+import { newLedger, approve, registry, toUsd, hardChecks, checksFor, snapshot } from "../engine/decide.mjs";
 import { fromEnv } from "../adapters/index.mjs";
 import { pain001 } from "../output/pain001.mjs";
 import { generate, renderEmail, renderChat, rng } from "../gen/generator.mjs";
 import { invoicePdf } from "../gen/invoice.mjs";
 import { pdfText } from "../extract/index.mjs";
+import { lineItems } from "../extract/text.mjs";
 import { score, counts, improper } from "../score.mjs";
 import { curated } from "../gen/generator.mjs";
 import { metrics, BENCHMARKS } from "../metrics.mjs";
 import { createNotifier } from "../notify/index.mjs";
 const MANIFEST = curated();
-/** Header KPIs. Improper payments are judged against ground truth for seeded (fake) cases paid by the agent on its own. */
+/** Header KPIs: all payments, using synthetic ground truth plus stored payment-time safety checks. */
 export function kpis(st) {
   const held = st.log.filter((l) => l.action === "hold"), n = st.log.length;
-  const agentPaid = st.log.filter((l) => l.action === "pay" && l.history?.at(-1)?.by === "agent")
+  const paid = st.log.filter((l) => l.action === "pay");
+  const evaluated = paid
     .map((l) => ({ ...l, id: /-(C\d+)$/.exec(l.source?.messageId ?? "")?.[1] })).filter((l) => l.id && MANIFEST.some((m) => m.id === l.id));
   return { heldUsd: Math.round(held.reduce((a, l) => a + (l.amountUsd ?? 0), 0)), stopped: held.length,
     autonomy: n ? Math.round((st.log.filter((l) => l.history?.at(-1)?.by === "agent" && l.action !== "escalate").length / n) * 100) : null,
-    improper: improper(agentPaid, MANIFEST, st.rules).length,
+    improper: new Set([...improper(evaluated, MANIFEST, st.rules).map((s) => s.split(":")[0]), ...paid.filter((e) => {
+      const p = e.paidCheck;
+      // Records paid before paidCheck existed (legacy): re-evaluate; user-paid ones re-read line items from the stored text (older extraction missed unit prices).
+      const legacyItems = !p && e.history?.at(-1)?.by !== "agent" && e.sourceText ? lineItems(e.sourceText) : null;
+      const hard = p?.hard ?? hardChecks({ ...e.extracted, ...(legacyItems?.length ? { items: legacyItems } : {}), id: e.id }, paymentLedger(st, e), st.rules).hold;
+      return hard.length || ((p?.amountUsd ?? e.amountUsd) > (p?.threshold ?? st.rules.human_approval_above_usd) && new Set((p?.approvers ?? e.approvals ?? []).map((a) => (typeof a === "string" ? a : a.by).toLowerCase())).size < 2);
+    }).map((e) => /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1] ?? e.id)]).size,
+    evaluated: evaluated.length, notEvaluated: paid.length - evaluated.length, overrides: paid.filter((e) => e.paidOverride ?? (e.reasons ?? []).some((r) => /^Approved over a hold|Duplicate override/.test(r))).length,
     ...metrics(st.log, (e) => MANIFEST.find((m) => m.id === /-(C\d+)$/.exec(e.source?.messageId ?? "")?.[1]) ?? null) };
 }
+// Remove this invoice's own booking when inspecting an older/crafted paid record.
+function paymentLedger(st, e) {
+  const l = structuredClone(st.ledger ?? newLedger()), x = e.extracted ?? {}, usd = e.amountUsd ?? 0;
+  l.seen = l.seen.filter((h) => h.entryId !== e.id);
+  if (e.action === "pay") { l.spentUsd = Math.max(0, l.spentUsd - usd); l.vendorPaidUsd[x.vendorKey] = Math.max(0, (l.vendorPaidUsd[x.vendorKey] ?? 0) - usd); if (registry(st.rules)[x.vendorKey]?.terms?.type === "hourly") l.unitsPaid[x.vendorKey] = Math.max(0, (l.unitsPaid[x.vendorKey] ?? 0) - x.amount / registry(st.rules)[x.vendorKey].terms.rate); }
+  return l;
+}
 import { UI } from "./ui.mjs";
-import { ARCHITECTURE } from "./architecture.mjs";
+import { architecturePage } from "./architecture.mjs";
+import { maskLine, unmask, TRANSLATION_VERSION } from "../i18n/translate.mjs";
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -94,7 +111,7 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
     const url = new URL(req.url), p = url.pathname, m = req.method; let mm;
     try {
       if (m === "GET" && p === "/") return new Response(UI, { headers: { "content-type": "text/html; charset=utf-8" } });
-      if (m === "GET" && (p === "/architecture" || p === "/architecture/")) return new Response(ARCHITECTURE, { headers: { "content-type": "text/html; charset=utf-8" } });
+      if (m === "GET" && (p === "/architecture" || p === "/architecture/")) return new Response(architecturePage(req), { headers: { "content-type": "text/html; charset=utf-8" } });
       // ---- auth: email + one-time code. DEMO MODE returns the code in the response (no email is sent).
       if (m === "POST" && p === "/api/auth/start") {
         const { email } = await req.json(), st = await loadA();
@@ -213,27 +230,36 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
         return new Response(b.bytes, { headers: { "content-type": type, "content-disposition": `${url.searchParams.has("download") ? "attachment" : "inline"}; filename="${name.replace(/[^\w.\-]/g, "_")}"` } });
       }
       if (m === "GET" && (mm = p.match(/^\/api\/entry\/(F\d+)$/))) {
-        const e = st.log.find((l) => l.id === mm[1]); return e ? json(e) : json({ error: "not found" }, 404);
+        const e = st.log.find((l) => l.id === mm[1]);
+        if (!e) return json({ error: "not found" }, 404);
+        const fresh = checksFor(hardChecks({ ...e.extracted, id: e.id }, paymentLedger(st, e), st.rules).hold);
+        const snap = e.decisionSnapshot?.checks ?? e.checks ?? [];
+        return json({ ...e, reevaluated: fresh.some((c, i) => !c.ok && snap[i]?.ok) ? fresh : null }); // only when a rule that passed at decision time fails now
       }
       if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/translate$/))) {
         const e = st.log.find((l) => l.id === mm[1]); if (!e) return json({ error: "not found" }, 404);
         const lang = e.extracted?.lang;
         if (lang === "en") return json({ text: e.sourceText, lang, note: "Already in English" });
-        if (e.translation) return json(e.translation);
+        if (e.translation?.version === TRANSLATION_VERSION) return json(e.translation);
         if (!env.AI) return json({ text: null, lang, note: "Translation unavailable here (no translation model configured); showing the original." });
         const parts = (e.sourceText ?? "").split("\n"), out = [];
-        for (const line of parts) out.push(line.trim() ? (await env.AI.run("@cf/meta/m2m100-1.2b", { text: line, source_lang: lang, target_lang: "en" })).translated_text : line);
-        e.translation = { text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
+        for (const line of parts) {
+          const masked = maskLine(line, e.extracted, registry(st.rules)[e.extracted?.vendorKey]);
+          const text = masked.needsModel ? (await env.AI.run("@cf/meta/m2m100-1.2b", { text: masked.text, source_lang: lang, target_lang: "en" })).translated_text : masked.text;
+          out.push(unmask(text, masked));
+        }
+        e.translation = { version: TRANSLATION_VERSION, text: out.join("\n"), lang, note: "Machine translation (Workers AI m2m100). Decisions always use the original text." };
         await save(st); return json(e.translation);
       }
-      if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|reject|reopen)$/))) {
+      if (m === "POST" && (mm = p.match(/^\/api\/entry\/(F\d+)\/(approve|approve-second|reject|reopen)$/))) {
         const e = st.log.find((l) => l.id === mm[1]);
         if (!e) return json({ error: "not found" }, 404);
         const at = new Date().toISOString();
         const ab = await req.json().catch(() => ({}));
         const why = typeof ab.reason === "string" ? ab.reason.trim().slice(0, 300) : "";
         const audit = (action, extra = {}) => st.audit.push({ by: user, at, action, key: e.id, name: `${e.id} · ${e.extracted?.payee ?? "?"}`, changes: { reason: [null, why], ...extra } });
-        const done = () => { e.reason = e.reasons.join(" "); e.decidedBy = user; e.history = [...(e.history ?? []), { by: user, at, action: e.action }]; };
+        let actor = user;
+        const done = () => { e.reason = e.reasons.join(" "); e.decidedBy = actor; e.history = [...(e.history ?? []), { by: actor, at, action: e.action }]; e.decisionSnapshot = snapshot(e.extracted, e.reasons, st.rules); };
         // Held -> Pending: a person takes it back for review (typed reason, logged). Nothing is paid; approving later re-runs every hard rule.
         if (mm[2] === "reopen") {
           if (e.action !== "hold") return json({ error: "Only held invoices can be moved to pending." }, 409);
@@ -243,33 +269,39 @@ export function createApp({ store, auth, env = {}, connectors = {}, resetMocks =
         }
         // Overriding a hold (held now, or held before and moved to pending): typed reason; above the human-approval threshold a second, different person.
         const overriding = e.action === "hold" || (e.action === "escalate" && e.wasHeld);
-        if (e.action !== "escalate" && !(overriding && mm[2] === "approve")) return json({ error: "Only pending invoices can be decided" }, 409);
-        if (mm[2] === "reject") { e.action = "hold"; delete e.overrideRequest; e.reasons = [...e.reasons, `Rejected by ${user} at ${at}.`]; done(); await save(st); return json(e); }
-        if (overriding) {
-          if (why.length < 5) return json({ error: "Give a reason (at least 5 characters); it is logged.", needsReason: true }, 400);
-          const dry = approve({ ...e, action: "escalate" }, structuredClone(st.ledger), st.rules, { override: why });
-          if (!dry.ok) return json({ error: dry.reason, needsOverride: !!dry.needsOverride }, 409);
-          const usd = e.amountUsd ?? toUsd(e.extracted.amount, e.extracted.currency, st.rules);
-          if (usd == null || usd > st.rules.human_approval_above_usd) {
-            const req1 = e.overrideRequest;
-            if (!req1) {
-              e.overrideRequest = { by: user, at, reason: why };
-              e.reasons = [...e.reasons, `Override requested by ${user} at ${at}: "${why}". Above US$${st.rules.human_approval_above_usd.toLocaleString("en-US")}, a second person must approve.`];
-              e.reason = e.reasons.join(" "); audit("request hold override"); await save(st); return json({ ...e, pendingSecond: true }, 202);
-            }
-            if (req1.by === user) return json({ error: "A different person must approve this override." }, 403);
-          }
-          const r = approve({ ...e, action: "escalate" }, st.ledger, st.rules, { override: why });
-          if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
-          const second = e.overrideRequest ? ` Second approver after ${e.overrideRequest.by}.` : "";
-          e.action = "pay"; delete e.overrideRequest;
-          e.reasons = [...e.reasons, `Approved over a hold by ${user} at ${at}; hard rules re-checked. Reason: "${why}".${second}`];
-          done(); audit("approve held invoice"); await save(st); return json(e);
+        if (e.action !== "escalate" && !(overriding && mm[2].startsWith("approve"))) return json({ error: "Only pending invoices can be decided" }, 409);
+        if (mm[2] === "reject") { e.action = "hold"; e.reasons = [...e.reasons, `Rejected by ${user} at ${at}.`]; done(); await save(st); return json(e); }
+        const candidate = { ...e, action: "escalate" };
+        const override = why || ab.override;
+        const dry = approve(candidate, st.ledger, st.rules, { override, dryRun: true });
+        e.hard = candidate.hard;
+        if (!dry.ok) { await save(st); return json({ error: dry.reason, hard: !!dry.hard, needsOverride: !!dry.needsOverride }, 409); }
+        if (overriding && why.length < 5) return json({ error: "Give a reason (at least 5 characters); it is logged.", needsReason: true }, 400);
+        e.approvals ??= e.overrideRequest ? [e.overrideRequest] : [];
+        const first = e.approvals[0];
+        if (mm[2] === "approve-second") {
+          if (!first) return json({ error: "Only pending invoices can be decided" }, 409);
+          actor = String(ab.email ?? "").trim().toLowerCase();
+          if (actor === first.by.toLowerCase()) return json({ error: "A different person must approve" }, 403);
+          const a = await loadA(), o = a.otps[actor];
+          if (!o || o.exp < Date.now() || o.tries >= 5) return json({ error: "Code expired, request a new one" }, 401);
+          if (o.code !== String(ab.code).trim()) { o.tries++; await saveA(a); return json({ error: "Wrong code" }, 401); }
+          delete a.otps[actor]; await saveA(a);
         }
-        const r = approve(e, st.ledger, st.rules, { override: ab.override });
-        if (!r.ok) return json({ error: r.reason, needsOverride: !!r.needsOverride }, 409);
-        e.action = "pay"; e.reasons = [...e.reasons, `Approved by ${user} at ${at}; hard rules re-checked.` + (ab.override && e.reasons.some((x) => DUP_RE.test(x)) ? ` Duplicate override: "${String(ab.override).slice(0, 200)}".` : "")];
-        done(); await save(st); return json(e);
+        if (first && first.by.toLowerCase() === actor.toLowerCase()) return json({ error: "A different person must approve" }, 403);
+        const usd = toUsd(e.extracted.amount, e.extracted.currency, st.rules);
+        const approvals = [...e.approvals, { by: actor, at, reason: override ?? "" }];
+        if (usd > st.rules.human_approval_above_usd && !first) {
+          e.approvals = approvals; e.overrideRequest = approvals[0]; e.pendingSecond = true;
+          done(); audit("request hold override"); await save(st); return json({ ...e, pendingSecond: true }, 202);
+        }
+        const r = approve(candidate, st.ledger, st.rules, { override, approvers: approvals });
+        if (!r.ok) return json({ error: r.reason, hard: !!r.hard, needsOverride: !!r.needsOverride }, 409);
+        e.approvals = approvals; e.paidOverride = overriding || !!ab.override;
+        e.paidCheck = { hard: [...e.hard], approvers: approvals.map((a) => a.by), at, amountUsd: usd, threshold: st.rules.human_approval_above_usd };
+        e.action = "pay"; delete e.overrideRequest; delete e.pendingSecond;
+        e.reasons = [...e.reasons, `Approved${overriding ? " over a hold" : ""} by ${actor} at ${at}; hard rules re-checked.` + (override ? ` Reason: "${override}".` : "") + (first ? ` Second approver after ${first.by}.` : "")];
+        done(); audit(overriding ? "approve held invoice" : "approve invoice"); await save(st); return json(e);
       }
       if (m === "PUT" && p === "/api/rules") {
         const r = { ...st.rules, ...(await req.json()) };
@@ -343,12 +375,14 @@ export function auditRows(st) {
       payee: x.payee ?? null, vendor_key: x.vendorKey ?? null, invoice_number: x.number ?? null, amount: x.amount ?? null, currency: x.currency ?? null,
       amount_usd: e.amountUsd != null ? Math.round(e.amountUsd * 100) / 100 : null, due: x.due ?? null, bank_account: x.acct ?? null,
       agent_decision: h[0]?.action ?? e.action, final_decision: e.action, decided_by: h.at(-1)?.by ?? "agent", decision_source: (h.at(-1)?.by ?? "agent") === "agent" ? "agent" : "user", decided_at: h.at(-1)?.at ?? e.at,
-      reasons: e.reason, rules_failed: (e.checks ?? []).filter((c) => !c.ok).map((c) => c.rule).join("; "),
+      reasons: e.reason, rules_failed: (e.decisionSnapshot?.checks ?? e.checks ?? []).filter((c) => !c.ok).map((c) => c.rule).join("; "),
+      rules_version: e.decisionSnapshot?.rulesHash ?? null, config_hash: e.decisionSnapshot?.rulesHash ?? null,
+      vendor_contract: e.decisionSnapshot?.vendorContract ?? null, fx_table: e.decisionSnapshot?.fx?.fx_to_usd ?? null, fx_as_of: e.decisionSnapshot?.fx?.fx_as_of ?? null,
       model: e.model?.name ?? null, p_duplicate: e.model?.is_duplicate ?? null, p_matches_agreement: e.model?.matches_agreement ?? null,
       evidence: JSON.stringify(ev), history: h.map((y) => `${y.at ?? ""} ${y.by} ${y.action}`).join(" | ") };
   });
 }
-const csvCell = (v) => { const s = v == null ? "" : String(v); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
+const csvCell = (v) => { const s = v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
 export const toCsv = (rows) => (rows.length ? [Object.keys(rows[0]).join(","), ...rows.map((r) => Object.values(r).map(csvCell).join(","))].join("\r\n") + "\r\n" : "id\r\n");
 
 /** Stress test on a separate ledger; streams NDJSON: one line per invoice + running score. */

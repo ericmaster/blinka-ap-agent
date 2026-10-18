@@ -3,6 +3,16 @@
 // Invoice content, evidence quotes, vendor names and messages are never translated. test/i18n.test.mjs checks every UI string has an entry.
 export const LANG_KEY = "clearhold.lang";
 export const UI_ES = {
+  "Awaiting 2nd approver": "Esperando 2.º aprobador",
+  "Approve as second approver (different email + code)": "Aprobar como segundo aprobador (otro correo + código)",
+  "Second approver email": "Correo del segundo aprobador",
+  "Hard rule prevents approval: {0}": "Una regla dura impide aprobar: {0}",
+  "Re-evaluated later": "Re-evaluado después",
+  "{0} evaluated · {1} not evaluated · {2} overrides": "{0} evaluadas · {1} no evaluadas · {2} excepciones",
+  "Dual approval above (USD)": "Doble aprobación por encima de (USD)",
+  "Reason": "Motivo",
+  "Source": "Fuente",
+  "by Blinka": "por Blinka",
   "Clearhold · by Blinka": "Clearhold · por Blinka",
   // login
   "Sign in with your work email. New users are registered automatically.": "Inicia sesión con tu correo de trabajo. Los usuarios nuevos se registran automáticamente.",

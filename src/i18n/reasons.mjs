@@ -6,6 +6,11 @@
 export const FIELDS = { vendor: "proveedor", amount: "monto", currency: "moneda", "due date": "fecha de vencimiento", "invoice number": "número de factura", "bank account": "cuenta bancaria" };
 const R = String.raw;
 export const ES = [
+  [R`A different person must approve`, "Otra persona debe aprobar"],
+  [R`Unit price (\S+) (\S+) differs from the contracted rate \((\S+) (\S+)/h\)\.`, "El precio unitario $1 $2 difiere de la tarifa contratada ($3 $4/h)."],
+  [R`Quantity × unit price does not match the line amount\.`, "La cantidad × precio unitario no coincide con el monto del ítem."],
+  [R`Quantity × unit price does not match the invoice total\.`, "La cantidad × precio unitario no coincide con el total de la factura."],
+  [R`Amount US\$(\S+) is above US\$(\S+): requires dual approval\.`, "El monto US$$1 requiere doble aprobación sobre US$$2."],
   // decision reasons (src/engine/decide.mjs)
   [R`Approved vendor, registered account, matches the agreement, not a duplicate, within limits and budget\.`, "Proveedor aprobado, cuenta registrada, cumple el acuerdo, no es duplicado, dentro de los límites y del presupuesto."],
   [R`A bank account or terms change for (.+) is waiting for a second approver; payments to this vendor are held\.`, "Un cambio de cuenta bancaria o de condiciones de $1 espera un segundo aprobador; los pagos a este proveedor quedan retenidos."],
@@ -27,7 +32,7 @@ export const ES = [
   [R`Amount US\$(\S+) exceeds the per-payment limit of US\$(\S+)\.`, "El monto US$$1 supera el límite por pago de US$$2."],
   [R`Exceeds the period cap for (.+) \(US\$(\S+)\)\.`, "Supera el tope del período para $1 (US$$2)."],
   [R`Insufficient budget: US\$(\S+) left, invoice is US\$(\S+)\.`, "Presupuesto insuficiente: quedan US$$1 y la factura es de US$$2."],
-  [R`Amount US\$(\S+) is above US\$(\S+): requires human approval\.`, "El monto US$$1 supera US$$2: requiere aprobación humana."],
+  [R`Amount US\$(\S+) is above US\$(\S+): requires human approval\.`, "El monto US$$1 requiere doble aprobación sobre US$$2."],
   [R`Decision model failed \(([\s\S]*)\); escalated for safety\.`, "Falló el modelo de decisión ($1); se escaló por seguridad."],
   [R`Incomplete model answer; escalated\.`, "Respuesta incompleta del modelo; se escaló."],
   [R`Model unsure whether duplicate \(p=(\S+)\)\.`, "El modelo no está seguro de si es un duplicado (p=$1)."],
@@ -45,15 +50,15 @@ export const ES = [
   [R`Amount is not a whole number of hours at the contracted rate \((\S+) (\S+)/h\)\.`, "El monto no equivale a un número entero de horas a la tarifa contratada ($1 $2/h)."],
   [R`Would exceed the (\S+) contracted hours this period \(already paid (\S+), this invoice (\S+)\)\.`, "Superaría las $1 horas contratadas del período (ya pagadas: $2; esta factura: $3)."],
   // human decisions (src/server/app.mjs)
-  [R`Approved by (\S+) at (\S+); hard rules re-checked\. Duplicate override: "([\s\S]*)"\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo. Excepción de duplicado: \"$3\"."],
-  [R`Approved by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo."],
-  [R`Rejected by (\S+) at (\S+)\.`, "Rechazada por $1 el $2."],
+  [R`Approved by (.+?) at (\S+); hard rules re-checked\. Duplicate override: "([\s\S]*)"\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo. Excepción de duplicado: \"$3\"."],
+  [R`Approved by (.+?) at (\S+); hard rules re-checked\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo."],
+  [R`Rejected by (.+?) at (\S+)\.`, "Rechazada por $1 el $2."],
   [R`Vendor details changed at (\S+); re-checked on approval\.`, "Los datos del proveedor cambiaron el $1; se verifican de nuevo al aprobar."],
   // hold overrides (held -> pending, approve over a hold, dual control above the threshold)
-  [R`Moved to pending by (\S+) at (\S+): "([\s\S]*)"\.`, "Movida a pendientes por $1 el $2: \"$3\"."],
-  [R`Override requested by (\S+) at (\S+): "([\s\S]*)"\.`, "Excepción solicitada por $1 el $2: \"$3\"."],
+  [R`Moved to pending by (.+?) at (\S+): "([\s\S]*)"\.`, "Movida a pendientes por $1 el $2: \"$3\"."],
+  [R`Override requested by (.+?) at (\S+): "([\s\S]*)"\.`, "Excepción solicitada por $1 el $2: \"$3\"."],
   [R`Above US\$(\S+), a second person must approve\.`, "Por encima de US$$1, otra persona debe aprobar."],
-  [R`Approved over a hold by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada sobre una retención por $1 el $2; reglas duras verificadas de nuevo."],
+  [R`Approved over a hold by (.+?) at (\S+); hard rules re-checked\.`, "Aprobada sobre una retención por $1 el $2; reglas duras verificadas de nuevo."],
   [R`Reason: "([\s\S]*)"\.`, "Motivo: \"$1\"."],
   [R`Second approver after (\S+)\.`, "Segundo aprobador después de $1."],
   [R`Duplicate override: "([\s\S]*)"\.`, "Excepción de duplicado: \"$1\"."],
@@ -148,7 +153,9 @@ export function translateReason(s, lang = "en") {
   const whole = one(s.trim());
   if (whole != null) return whole;
   // joined reasons ("Held because X. Also: Y."): split at sentence ends that start a new capitalised sentence
-  const parts = s.split(/(?<=[.)])\s+(?=(?:Also: |[A-Z][a-z]|"))/);
+  const quotes = [];
+  const protectedText = s.replace(/"[^"]*"/g, (quote) => { quotes.push(quote); return `⟦${quotes.length - 1}⟧`; });
+  const parts = protectedText.split(/(?<=[.)])\s+(?=(?:Also: |[A-Z][a-z]|"))/).map((p) => p.replace(/⟦(\d+)⟧/g, (_, i) => quotes[i]));
   return parts.length > 1 ? parts.map((p) => one(p) ?? p).join(" ") : s;
 }
 /** True when a message has a translation (used by the coverage test). */
