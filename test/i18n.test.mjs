@@ -51,6 +51,23 @@ test("i18n: captures (names, numbers, quotes from the invoice) stay in the origi
   assert.equal(f("Bank account MX-FAKE-9999 does not match the registered account for Monterrey Ops Partners S.C..", "es"), es("Bank account MX-FAKE-9999 does not match the registered account for Monterrey Ops Partners S.C.."));
 });
 
+test("i18n: human-action reasons preserve full user names and multi-sentence quoted explanations", () => {
+  const at = "2026-10-18T10:00:00Z";
+  for (const [action, translated] of [["Moved to pending", "Movida a pendientes"], ["Override requested", "Excepción solicitada"]]) {
+    assert.equal(es(`Rejected by Ana QA at ${at}. ${action} by Ana QA at ${at}: "Checked invoice. Vendor confirmed.".`), `Rechazada por Ana QA el ${at}. ${translated} por Ana QA el ${at}: "Checked invoice. Vendor confirmed.".`);
+  }
+  assert.equal(es(`Approved by Ana QA at ${at}; hard rules re-checked.`), `Aprobada por Ana QA el ${at}; reglas duras verificadas de nuevo.`);
+  assert.equal(es(`Approved over a hold by Ana QA at ${at}; hard rules re-checked. Reason: "Checked invoice. Vendor confirmed.".`), `Aprobada sobre una retención por Ana QA el ${at}; reglas duras verificadas de nuevo. Motivo: "Checked invoice. Vendor confirmed.".`);
+  assert.equal(UI_ES.Reason, "Motivo");
+  assert.equal(UI_ES.Source, "Fuente");
+});
+
+test("UI invoice cost formatter: sub-cent costs never round to zero or insert a currency space", () => {
+  const html = readFileSync("src/server/ui.html", "utf8");
+  const USD = new Function(`${html.match(/const USD=.*;/)[0]} return USD;`)();
+  for (const [value, expected] of [[null, "–"], [0, "US$0.00"], [0.000001, "< US$0.01"], [0.0042, "< US$0.01"], [0.00999, "< US$0.01"], [0.01, "US$0.01"], [0.12, "US$0.12"], [0.1234, "US$0.1234"], [2, "US$2.00"]]) assert.equal(USD(value), expected);
+});
+
 // Every literal passed to tx(...) and every static [data-t] text/title/placeholder must have a Spanish entry with the same {n} arguments.
 const strings = (html) => {
   const out = [...html.matchAll(/\btx\(\s*"((?:[^"\\]|\\.)*)"/g)].map((x) => JSON.parse(`"${x[1]}"`));

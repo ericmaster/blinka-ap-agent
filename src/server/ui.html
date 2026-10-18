@@ -78,7 +78,7 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const money=(a,c)=>a==null?"—":(c||"$")+" "+Number(a).toLocaleString(NL(),{maximumFractionDigits:2});
 const CH0={email:"Email",whatsapp:"WhatsApp",upload:"Upload"},DK0={pdf:"PDF",image:"Image"},LG0={es:"Spanish",en:"English",pt:"Portuguese"},ACT0={pay:"Paid",hold:"Held",escalate:"Pending"};
 const tmap=o=>new Proxy(o,{get:(x,k)=>x[k]==null?undefined:tx(x[k])}),CH=tmap(CH0),DK=tmap(DK0),LG=tmap(LG0),ACT=tmap(ACT0);
-const FLD={vendor:"Vendor",payee:"Vendor",amount:"Amount",currency:"Currency",due_date:"Due date",invoice_number:"Invoice number",bank_account:"Bank account",line_items:"Line items",issue_date:"Issue date"},fld=k=>FLD[k]?tx(FLD[k]):k;
+const FLD={vendor:"Vendor",payee:"Vendor",amount:"Amount",currency:"Currency",due_date:"Due date",invoice_number:"Invoice number",bank_account:"Bank account",line_items:"Line items",issue_date:"Issue date",reason:"Reason",source:"Source"},fld=k=>FLD[k]?tx(FLD[k]):k;
 const time=s=>new Date(s).toLocaleString(NL(),{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
 // ---- login
 function showLogin(){$("#login").style.display="flex"}
@@ -161,7 +161,8 @@ function renderGuide(){const g=$("#guide"),show=view==="queue"&&GUIDE.every(([id
 let guideRan=false,gMsg="";
 let lastStress=null,mix="realistic";
 $$("[data-mix]").forEach(b=>b.onclick=()=>{mix=b.dataset.mix;$$("[data-mix]").forEach(x=>x.classList.toggle("on",x===b))});
-const P=x=>x==null?"–":Math.round(x*100)+"%",MS=x=>x==null?"–":x<1000?Math.round(x)+" ms":(x/1000).toLocaleString(NL(),{minimumFractionDigits:1,maximumFractionDigits:1})+" s",USD=x=>x==null?"–":x<0.0001?"< US$ "+(0.0001).toLocaleString(NL()):"US$ "+x.toLocaleString(NL(),{minimumFractionDigits:x<0.01?4:2,maximumFractionDigits:x<0.01?4:2});
+const P=x=>x==null?"–":Math.round(x*100)+"%",MS=x=>x==null?"–":x<1000?Math.round(x)+" ms":(x/1000).toLocaleString(NL(),{minimumFractionDigits:1,maximumFractionDigits:1})+" s";
+const USD=x=>x==null?"–":x>0&&x<0.01?"< US$0.01":"US$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4});
 function renderMetrics(){const el=$("#metrics");if(!el||!S)return;const q=S.kpis||{},s=lastStress||{},B=S.benchmarks||{};
  const row=(name,a,b,bench)=>`<tr><td>${tx(name)}</td><td>${a}</td><td>${b}</td><td class="k">${bench||""}</td></tr>`;
  el.innerHTML=`<table><tr><th></th><th>${tx("Last stress run")}</th><th>${tx("Your queue")}</th><th>${tx("AP market (avg · best)")}</th></tr>
@@ -201,7 +202,7 @@ const terms=v=>v.terms?.type==="flat"?tx("{0} {1} / month",v.currency,Number(v.t
 const fv=v=>v&&typeof v==="object"?(v.type==="flat"?tx("{0} flat",v.amount):tx("{0}/h · max {1}",v.rate,v.max_units_per_period)):String(v??"—");
 function pendRow(k){const p=S.rules.pendingChanges?.[k];if(!p)return"";const mine=p.by===S.user;
  return `<div class="pend"><b>${tx(p.type==="add"?"New vendor waiting for a second approver":"Change waiting for a second approver")}</b> · ${tx("proposed by {0}",esc(p.by))}<br>${Object.entries(p.changes).filter(([f])=>["acct","terms","currency"].includes(f)||p.type==="add").slice(0,4).map(([f,[a,b]])=>`${esc(vf(f))}: ${esc(fv(a))} → <b>${esc(fv(b))}</b>`).join("<br>")}<br><span class="k">${tx("Payments to this vendor are held until then.")}</span><div class="act" style="justify-content:flex-start">${mine?`<span class="k">${tx("Ask a colleague to sign in and approve.")}</span>`:`<button class="sm" data-vc="${k}:approve">${tx("Approve change")}</button>`}<button class="sm" data-vc="${k}:reject">${tx("Discard")}</button></div></div>`}
-const VF={name:"Name",acct:"Bank account",category:"Contracted service",keywords:"Allowed keywords",currency:"Currency",terms:"Price",country:"Country",contact:"Contact"},vf=f=>VF[f]?tx(VF[f]).toLowerCase():f;
+const VF={name:"Name",acct:"Bank account",category:"Contracted service",keywords:"Allowed keywords",currency:"Currency",terms:"Price",country:"Country",contact:"Contact",reason:"Reason",source:"Source"},vf=f=>VF[f]?tx(VF[f]).toLowerCase():f;
 function renderVendors(){const V=S.rules.vendors;
  $("#vt").innerHTML=`<tr><th>${tx("Active")}</th><th>${tx("Vendor")}</th><th>${tx("Contracted service")}</th><th>${tx("Price")}</th><th>${tx("Bank account")}</th><th>${tx("Allowed keywords")}</th><th></th></tr>`+Object.entries(V).map(([k,v])=>`<tr><td><input type="checkbox" data-vt="${k}" ${S.rules.allowlist.includes(k)?"checked":""}></td><td><b>${esc(v.name)}</b><div class="k">${esc(v.country)} · ${esc(v.currency)}</div></td><td>${esc(v.category)}</td><td>${terms(v)}</td><td><code>${esc(v.acct)}</code></td><td class="k">${esc((v.keywords||[]).join(", "))}${pendRow(k)}</td>
  <td style="white-space:nowrap"><a class="btn sm" style="padding:3px 12px;font-size:12.5px" href="/api/vendors/${k}/contract" target="_blank">${tx("Contract")}</a> <button class="sm" data-ve="${k}">${tx("Edit")}</button> <button class="sm" data-vr="${k}" style="color:var(--hold)">${tx("Remove")}</button></td></tr>`).join("");

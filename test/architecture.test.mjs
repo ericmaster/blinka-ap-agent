@@ -54,3 +54,28 @@ test("architecture: shared toggle defaults EN, persists ES and responds to cross
     assert.equal(title.textContent, "Architecture");
   }
 });
+
+test("architecture: request query and Accept-Language render all visible copy in Spanish", async () => {
+  for (const [path, accept, lang] of [["/architecture?lang=es", "en-US", "es"], ["/architecture/", "es-EC,es;q=0.9,en;q=0.8", "es"], ["/architecture?lang=en", "es", "en"], ["/architecture", "es;q=0.2,en;q=0.9", "en"]]) {
+    const response = await worker.fetch(new Request(`https://clearhold.example${path}`, { headers: { "Accept-Language": accept } }), { STATE: { get: async () => null } });
+    const html = await response.text();
+    assert.ok(html.includes(`<html lang="${lang}">`));
+    if (lang === "es") {
+      assert.match(html, /<title>Clearhold · Arquitectura<\/title>/);
+      const entries = [...html.matchAll(/data-en="([^"]+)" data-es="([^"]+)"[^>]*>([^<]*)/g)];
+      assert.ok(entries.length > 40);
+      for (const [, en, es, visible] of entries) assert.equal(visible, es, en);
+      assert.match(html, />Fuente<\/span>/);
+      assert.match(html, />por Blinka<\/small>/);
+    }
+  }
+});
+
+test("architecture: browser language priority is query, shared storage, then request default", () => {
+  const script = ARCHITECTURE.match(/<script>([\s\S]*?)<\/script>/)[1];
+  for (const [query, saved, fallback, expected] of [["?lang=es", "en", "en", "es"], ["?lang=en", "es", "es", "en"], ["", "es", "en", "es"], ["", null, "es", "es"], ["?lang=xx", "es", "en", "es"]]) {
+    const document = { documentElement: {}, querySelectorAll: () => [], addEventListener() {} };
+    runInNewContext(script.replace('const DEFAULT_LANG="en";', `const DEFAULT_LANG="${fallback}";`), { document, window: { addEventListener() {} }, location: { search: query }, URLSearchParams, localStorage: { getItem: () => saved } });
+    assert.equal(document.documentElement.lang, expected);
+  }
+});

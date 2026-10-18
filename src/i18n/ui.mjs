@@ -3,6 +3,9 @@
 // Invoice content, evidence quotes, vendor names and messages are never translated. test/i18n.test.mjs checks every UI string has an entry.
 export const LANG_KEY = "clearhold.lang";
 export const UI_ES = {
+  "Reason": "Motivo",
+  "Source": "Fuente",
+  "by Blinka": "por Blinka",
   "Clearhold · by Blinka": "Clearhold · por Blinka",
   // login
   "Sign in with your work email. New users are registered automatically.": "Inicia sesión con tu correo de trabajo. Los usuarios nuevos se registran automáticamente.",

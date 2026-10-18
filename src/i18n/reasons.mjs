@@ -45,15 +45,15 @@ export const ES = [
   [R`Amount is not a whole number of hours at the contracted rate \((\S+) (\S+)/h\)\.`, "El monto no equivale a un número entero de horas a la tarifa contratada ($1 $2/h)."],
   [R`Would exceed the (\S+) contracted hours this period \(already paid (\S+), this invoice (\S+)\)\.`, "Superaría las $1 horas contratadas del período (ya pagadas: $2; esta factura: $3)."],
   // human decisions (src/server/app.mjs)
-  [R`Approved by (\S+) at (\S+); hard rules re-checked\. Duplicate override: "([\s\S]*)"\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo. Excepción de duplicado: \"$3\"."],
-  [R`Approved by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo."],
-  [R`Rejected by (\S+) at (\S+)\.`, "Rechazada por $1 el $2."],
+  [R`Approved by (.+?) at (\S+); hard rules re-checked\. Duplicate override: "([\s\S]*)"\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo. Excepción de duplicado: \"$3\"."],
+  [R`Approved by (.+?) at (\S+); hard rules re-checked\.`, "Aprobada por $1 el $2; reglas duras verificadas de nuevo."],
+  [R`Rejected by (.+?) at (\S+)\.`, "Rechazada por $1 el $2."],
   [R`Vendor details changed at (\S+); re-checked on approval\.`, "Los datos del proveedor cambiaron el $1; se verifican de nuevo al aprobar."],
   // hold overrides (held -> pending, approve over a hold, dual control above the threshold)
-  [R`Moved to pending by (\S+) at (\S+): "([\s\S]*)"\.`, "Movida a pendientes por $1 el $2: \"$3\"."],
-  [R`Override requested by (\S+) at (\S+): "([\s\S]*)"\.`, "Excepción solicitada por $1 el $2: \"$3\"."],
+  [R`Moved to pending by (.+?) at (\S+): "([\s\S]*)"\.`, "Movida a pendientes por $1 el $2: \"$3\"."],
+  [R`Override requested by (.+?) at (\S+): "([\s\S]*)"\.`, "Excepción solicitada por $1 el $2: \"$3\"."],
   [R`Above US\$(\S+), a second person must approve\.`, "Por encima de US$$1, otra persona debe aprobar."],
-  [R`Approved over a hold by (\S+) at (\S+); hard rules re-checked\.`, "Aprobada sobre una retención por $1 el $2; reglas duras verificadas de nuevo."],
+  [R`Approved over a hold by (.+?) at (\S+); hard rules re-checked\.`, "Aprobada sobre una retención por $1 el $2; reglas duras verificadas de nuevo."],
   [R`Reason: "([\s\S]*)"\.`, "Motivo: \"$1\"."],
   [R`Second approver after (\S+)\.`, "Segundo aprobador después de $1."],
   [R`Duplicate override: "([\s\S]*)"\.`, "Excepción de duplicado: \"$1\"."],
@@ -148,7 +148,9 @@ export function translateReason(s, lang = "en") {
   const whole = one(s.trim());
   if (whole != null) return whole;
   // joined reasons ("Held because X. Also: Y."): split at sentence ends that start a new capitalised sentence
-  const parts = s.split(/(?<=[.)])\s+(?=(?:Also: |[A-Z][a-z]|"))/);
+  const quotes = [];
+  const protectedText = s.replace(/"[^"]*"/g, (quote) => { quotes.push(quote); return `⟦${quotes.length - 1}⟧`; });
+  const parts = protectedText.split(/(?<=[.)])\s+(?=(?:Also: |[A-Z][a-z]|"))/).map((p) => p.replace(/⟦(\d+)⟧/g, (_, i) => quotes[i]));
   return parts.length > 1 ? parts.map((p) => one(p) ?? p).join(" ") : s;
 }
 /** True when a message has a translation (used by the coverage test). */
