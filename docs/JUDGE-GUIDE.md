@@ -24,6 +24,8 @@ All data is synthetic: the company, the 8 vendors, accounts (`XX-FAKE-NNNN`) and
 - Raise the amount, add an item that isn't in the contract, or use an unknown vendor.
 - **Vendors** tab: change a bank account. The change waits for a *second person*: sign in in a private window with another address at the same domain, e.g. `a@team.test` and `b@team.test`, and payments to that vendor are held meanwhile.
 - **Approve** an invoice that is still flagged as a duplicate. It asks for a reason, and the reason is logged.
+- **Dual approval above US$2,000**: approve an invoice over US$2,000 (e.g. Andes Dev Studio, 60 h × COP 180.000). It moves to **Awaiting 2nd approver** and shows who approved first. The same email can never complete it: sign in as a colleague at the same domain, or use **Approve as second approver (different email + code)**, which needs a one-time code for a different email. This applies to pending, held and moved-to-pending invoices.
+- Try to **approve a hard failure** (wrong contracted rate, off-contract item, unknown vendor, account mismatch, pending bank change, limits/budget). Approve is disabled with the reason, and the server refuses it on every route. Only soft holds (model doubt, possible duplicate with a typed reason) can be approved.
 
 ## Español
 
@@ -45,6 +47,8 @@ All data is synthetic: the company, the 8 vendors, accounts (`XX-FAKE-NNNN`) and
 - Sube el monto, agrega un ítem fuera del contrato o usa un proveedor desconocido.
 - En la pestaña **Vendors**, cambia una cuenta bancaria. El cambio espera a *otra persona*: entra en una ventana privada con otro correo del mismo dominio, p. ej. `a@team.test` y `b@team.test`, y mientras tanto los pagos a ese proveedor se frenan.
 - **Approve** una factura que sigue marcada como posible duplicado. Pide un motivo, y el motivo queda registrado.
+- **Doble aprobación sobre US$2.000**: aprueba una factura de más de US$2.000 (p. ej. Andes Dev Studio, 60 h × COP 180.000). Pasa a **Esperando 2.º aprobador** y muestra quién aprobó primero. El mismo correo nunca puede completarla: entra como un colega del mismo dominio, o usa **Aprobar como segundo aprobador (otro correo + código)**, que exige un código de un solo uso de otro correo. Aplica a pendientes, frenadas y movidas a pendientes.
+- Intenta **aprobar una falla dura** (tarifa distinta a la contratada, ítem fuera de contrato, proveedor desconocido, cuenta distinta, cambio bancario pendiente, límites/presupuesto). Approve queda deshabilitado con el motivo y el servidor lo rechaza en todas las rutas. Solo se pueden aprobar retenciones blandas (duda del modelo, posible duplicado con motivo escrito).
 
 ## Real vs simulated · Real vs simulado
 | Real | Simulated |
