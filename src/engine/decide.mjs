@@ -12,7 +12,7 @@ const fnv = (str) => { let h = 0x811c9dc5; for (const c of str) { h ^= c.codePoi
 const normItems = (items = []) => items.map((i) => [fold(i.description).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), i.qty, i.unitPrice].join("|")).join(";");
 export const itemsKey = (x) => fnv([x.vendorKey, normItems(x.items), x.amount, x.currency].join("#"));
 export const fingerprint = (x) => fnv([itemsKey(x), x.date, nnum(x.number), x.acct].join("#"));
-const kwNorm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const kwNorm = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 const days = (a, b) => (a && b ? Math.abs(Date.parse(a) - Date.parse(b)) / 864e5 : Infinity);
 
 /** Agreement check in code (config.agreements). Returns {fail?: reason, units?} */
@@ -26,6 +26,15 @@ export function agreementCheck(x, ledger, rules) {
       return { fail: `The ${rules.period} monthly fee was already paid (possible duplicate).` };
     return {};
   }
+  for (const i of x.items ?? []) {
+    if (i.unitPrice != null && Math.abs(i.unitPrice - a.rate) > 0.005)
+      return { fail: `Unit price ${a.currency} ${i.unitPrice} differs from the contracted rate (${a.currency} ${a.rate}/h).` };
+    const line = i.amount ?? i.total;
+    if (i.qty != null && i.unitPrice != null && line != null && Math.abs(i.qty * i.unitPrice - line) > 0.005)
+      return { fail: "Quantity × unit price does not match the line amount." };
+  }
+  if (x.items?.length && x.items.every((i) => i.qty != null && i.unitPrice != null) && Math.abs(x.items.reduce((s, i) => s + i.qty * i.unitPrice, 0) - x.amount) > 0.005)
+    return { fail: "Quantity × unit price does not match the invoice total." };
   const units = x.amount / a.rate;
   if (Math.abs(units - Math.round(units)) > 1e-6) return { fail: `Amount is not a whole number of hours at the contracted rate (${a.currency} ${a.rate}/h).` };
   const used = ledger.unitsPaid[x.vendorKey] ?? 0;
@@ -90,7 +99,7 @@ export function hardChecks(x, ledger, rules) {
       if (usd > rules.max_per_payment_usd) hold.push(`Amount US$${fmt(usd)} exceeds the per-payment limit of US$${fmt(rules.max_per_payment_usd)}.`);
       if (v && (ledger.vendorPaidUsd[x.vendorKey] ?? 0) + usd > rules.vendor_period_cap_usd) hold.push(`Exceeds the period cap for ${v.name} (US$${fmt(rules.vendor_period_cap_usd)}).`);
       if (ledger.spentUsd + usd > rules.period_budget_usd) hold.push(`Insufficient budget: US$${fmt(rules.period_budget_usd - ledger.spentUsd)} left, invoice is US$${fmt(usd)}.`);
-      if (usd > rules.human_approval_above_usd) esc.push(`Amount US$${fmt(usd)} is above US$${fmt(rules.human_approval_above_usd)}: requires human approval.`);
+       if (usd > rules.human_approval_above_usd) esc.push(`Amount US$${fmt(usd)} is above US$${fmt(rules.human_approval_above_usd)}: requires dual approval.`);
     }
   }
   return { hold, esc };
@@ -124,8 +133,18 @@ export function decide(x, answers, ledger, rules) {
   // Final invariant: pay only if every hard requirement is present.
   if (action === "pay" && (!x.vendorKey || x.amount == null || !x.currency || !x.due || !x.number || !x.acct)) { action = "escalate"; reasons = ["Safety invariant: missing data."]; }
   if (x.vendorKey && x.number) ledger.seen.push({ entryId: x.id, fp: fingerprint(x), ik: itemsKey(x), vendor: x.vendorKey, number: x.number, date: x.date, period: x.date?.slice(0, 7), paid: action === "pay", amount: x.amount, currency: x.currency, lines: itemSummary(x) });
+  const hard = [...hold, ...esc.filter((r) => /not in the approved vendor registry/.test(r))];
+  const decisionSnapshot = snapshot(x, reasons, rules);
+  const paidCheck = action === "pay" ? { hard, approvers: [], at: decisionSnapshot.at, amountUsd: toUsd(x.amount, x.currency, rules), threshold: rules.human_approval_above_usd } : undefined;
   if (action === "pay") book(x, ledger, rules);
-  return { action, reasons, checks: checksFor([...reasons]), needsModel: !hold.length };
+  return { action, reasons, hard, decisionSnapshot, paidCheck, checks: checksFor([...reasons]), needsModel: !hold.length };
+}
+const stable = (v) => JSON.stringify(v, (_, x) => x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, x[k]])) : x);
+export function snapshot(x, reasons, rules) {
+  const { vendors, pendingChanges, ...config } = rules, v = registry(rules)[x?.vendorKey];
+  return { checks: checksFor(reasons), reasons: [...reasons], at: new Date().toISOString(), rulesHash: fnv(stable(config)),
+    vendorContract: v ? structuredClone({ terms: v.terms, acct: v.acct, currency: v.currency }) : null,
+    fx: structuredClone({ fx_to_usd: rules.fx_to_usd, fx_as_of: rules.fx_as_of }) };
 }
 function book(x, ledger, rules) {
   const usd = toUsd(x.amount, x.currency, rules);
@@ -137,16 +156,20 @@ function book(x, ledger, rules) {
 /** Human approval of an escalated invoice. Hard rules are re-checked against the ledger as it is now;
  *  a human can resolve doubt or the approval threshold, never override a hard hold or pay an unknown payee. */
 export const DUP_RE = /duplicate|resend/i;
-export function approve(entry, ledger, rules, { override = null } = {}) {
+export function approve(entry, ledger, rules, { override = null, approvers = entry.approvals ?? [], dryRun = false } = {}) {
   const x = { ...entry.extracted, id: entry.id };
+  const { hold, esc } = hardChecks(x, { ...ledger, seen: ledger.seen.filter((h) => h.entryId !== entry.id) }, rules);
+  entry.hard = [...hold, ...esc.filter((r) => /not in the approved vendor registry/.test(r))];
+  if (entry.hard.length) return { ok: false, hard: true, reason: entry.hard.join(" ") };
   if (entry.action !== "escalate") return { ok: false, reason: "Only pending invoices can be approved." };
   if (!x.vendorKey) return { ok: false, reason: "Vendor not in registry: add it to the vendor registry before approving." };
   if (x.amount == null || !x.currency || !x.due || !x.number || !x.acct) return { ok: false, reason: "Invoice data is missing; cannot approve." };
-  const { hold, esc } = hardChecks(x, { ...ledger, seen: ledger.seen.filter((h) => h.entryId !== entry.id) }, rules);
-  if (hold.length) return { ok: false, reason: hold.join(" ") };
   const dup = [...new Set([...esc, ...(entry.reasons ?? [])].filter((r) => DUP_RE.test(r)))];
   if (dup.length && !(typeof override === "string" && override.trim().length >= 5))
     return { ok: false, needsOverride: true, reason: `Still flagged as a possible duplicate: ${dup.join(" ")} To pay anyway, give an override reason (it is logged).` };
+  if (dryRun) return { ok: true };
+  if (toUsd(x.amount, x.currency, rules) > rules.human_approval_above_usd && new Set(approvers.map((a) => a.by.toLowerCase())).size < 2)
+    return { ok: false, pendingSecond: true, reason: "A different person must approve" };
   const s = ledger.seen.find((h) => h.entryId === entry.id); if (s) s.paid = true;
   book(x, ledger, rules);
   return { ok: true };
@@ -164,7 +187,7 @@ export const RULE_CATALOG = [
   ["Per-payment limit", /per-payment limit/],
   ["Vendor period cap", /period cap/],
   ["Budget", /Insufficient budget/],
-  ["Human approval threshold", /requires human approval/],
+   ["Human approval threshold", /requires (?:human|dual) approval/],
   ["Decision model (yes/no signal only)", /[Mm]odel/],
 ];
 // The approval sentence names every rule ("…, not a duplicate, …"), so it never counts as a failed check.

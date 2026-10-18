@@ -20,7 +20,7 @@ export function improper(log, manifest, rules) {
     if (x.vendorKey !== t.vendorKey || x.amount !== t.amount || x.currency !== t.currency || x.acct !== t.acct) why.push("misread");
     const usd = t.currency ? toUsd(t.amount, t.currency, rules) : Infinity;
     if (usd > rules.max_per_payment_usd) why.push("over per-payment limit");
-    if (usd > rules.human_approval_above_usd) why.push("needed human approval");
+    if (usd > rules.human_approval_above_usd && new Set((e.paidCheck?.approvers ?? e.approvals ?? []).map((a) => typeof a === "string" ? a.toLowerCase() : a.by.toLowerCase())).size < 2) why.push("needed human approval");
     total += usd; perVendor[t.vendorKey] = (perVendor[t.vendorKey] ?? 0) + usd;
     if (total > rules.period_budget_usd + 1e-6) why.push("over budget");
     if (perVendor[t.vendorKey] > rules.vendor_period_cap_usd + 1e-6) why.push("over vendor cap");

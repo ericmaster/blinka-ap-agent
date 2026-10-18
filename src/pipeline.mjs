@@ -14,11 +14,11 @@ export async function processDoc(doc, { ledger, rules, adapter, mapExtracted = (
   const pre = hardChecks(x, ledger, rules);
   let answers = null;
   if (!pre.hold.length && x.vendorKey) answers = await adapter.ask(questionsFor(x, ledger, rules), { id: doc.id });
-  const { action, reasons, checks } = decide(x, answers, ledger, rules);
+  const { action, reasons, checks, hard, decisionSnapshot, paidCheck } = decide(x, answers, ledger, rules);
   const { text, evidence, ...fields } = x;
   const ocr = x.ocrConfidence != null ? x.ocrConfidence / 100 : 1;
   const schema = toSchema(x, evidence, ocr);
-  return { id: doc.id, channel: doc.kind, action, reasons, reason: reasons.join(" "), checks, schema, sourceText: text, extracted: fields,
+  return { id: doc.id, channel: doc.kind, action, reasons, reason: reasons.join(" "), checks, hard, decisionSnapshot, paidCheck, schema, sourceText: text, extracted: fields,
     amountUsd: x.amount != null && x.currency ? toUsd(x.amount, x.currency, rules) : null,
     model: answers ? { name: answers.model ?? null, is_duplicate: answers.is_duplicate ?? null, matches_agreement: answers.matches_agreement ?? null, error: answers.error ?? null } : null,
     ms: Date.now() - t0, at: new Date().toISOString() };

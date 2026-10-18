@@ -187,6 +187,12 @@ export function lineItems(t, ev = {}) {
   if (d) { const items = d[1].split(/\s\+\s|;/).map((x) => parseItemText(x)).map(({ unit, ...i }) => i);
     const st = d.index + d[0].indexOf(d[1]); ev.line_items = { text: d[1].trim(), start: st, end: st + d[1].length, confidence: items.every((i) => i.unitPrice != null) ? 0.9 : 0.75 };
     return items; }
+  const explicit = t.split("\n").filter((l) => IT1.test(l));
+  if (explicit.length) {
+    const start = t.indexOf(explicit[0]), end = t.lastIndexOf(explicit.at(-1)) + explicit.at(-1).length;
+    ev.line_items = { text: t.slice(start, end), start, end, confidence: 0.9 };
+    return explicit.map((l) => { const { unit, ...item } = parseItemText(l); return item; });
+  }
   return tableItems(t, ev);
 }
 const HEAD_DESC = /descrip|description|descri[cç]|concepto|discrimina|detalle|\bitem\b|servic/i, HEAD_QTY = /\b(cant|qty|quantity|qtd|quant|hrs|hours|horas|units?)\b/i, HEAD_AMT = /amount|importe|valor|total|monto|price|precio|rate/i;
